@@ -84,6 +84,9 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
+  verification: {
+    google: 'cmFnJanscmk0ia48oNs2uu0f5E1W7WmZxORJBPENKmI',
+  },
 };
 
 import { AppShell } from "@/components/layout/AppShell";
