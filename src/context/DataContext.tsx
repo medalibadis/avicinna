@@ -1,11 +1,11 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { Doctor, doctorsData as defaultDoctors } from '@/data/doctors';
-import { Treatment, treatmentsData as defaultTreatments } from '@/data/treatments';
-import { PatientStory, patientStoriesData as defaultStories } from '@/data/stories';
-import { Article, articlesData as defaultArticles } from '@/data/articles';
-import { HospitalPartner, hospitalsData as defaultHospitals } from '@/data/hospitals';
+import { Doctor } from '@/data/doctors';
+import { Treatment } from '@/data/treatments';
+import { PatientStory } from '@/data/stories';
+import { Article } from '@/data/articles';
+import { HospitalPartner } from '@/data/hospitals';
 import {
   isSupabaseConfigured,
   fetchSectionsFromDb,
@@ -184,44 +184,7 @@ export const defaultSections: SiteSectionsData = {
   },
 };
 
-export const defaultInquiries: ConsultationInquiry[] = [
-  {
-    id: 'inq-1',
-    trackingId: 'AVIC-7821',
-    fullName: 'خالد عبد الله العتيبي',
-    phone: '+966 50 123 4567',
-    email: 'khaled.alotaibi@example.com',
-    country: 'المملكة العربية السعودية',
-    specialty: 'cardiac-surgery',
-    notes: 'استفسار بخصوص عملية ترميم الصمام الميترالي بالمنظار لوالدي (65 سنة).',
-    createdAt: '2026-09-12T14:30:00Z',
-    status: 'contacted',
-  },
-  {
-    id: 'inq-2',
-    trackingId: 'AVIC-7822',
-    fullName: 'Jean-Marc Dubois',
-    phone: '+33 6 12 34 56 78',
-    email: 'jm.dubois@example.fr',
-    country: 'France',
-    specialty: 'hair-transplant',
-    notes: 'Demande de devis pour greffe de cheveux DHI (environ 4000 greffons).',
-    createdAt: '2026-09-13T09:15:00Z',
-    status: 'new',
-  },
-  {
-    id: 'inq-3',
-    trackingId: 'AVIC-7823',
-    fullName: 'مريم الكواري',
-    phone: '+974 55 987 654',
-    email: 'maryam.k@example.com',
-    country: 'قطر',
-    specialty: 'dentistry',
-    notes: 'حجز موعد لابتسامة هوليوود (عدسات إيماكس لكلا الفكين) خلال شهر أكتوبر.',
-    createdAt: '2026-09-14T08:00:00Z',
-    status: 'in_review',
-  },
-];
+
 
 export interface DataContextType {
   doctors: Doctor[];
@@ -260,8 +223,8 @@ export interface DataContextType {
   addInquiry: (inquiry: Omit<ConsultationInquiry, 'id' | 'trackingId' | 'createdAt' | 'status'>) => Promise<string>;
   updateInquiryStatus: (id: string, status: ConsultationInquiry['status']) => Promise<void>;
   deleteInquiry: (id: string) => Promise<void>;
-  // Reset
-  resetToDefaults: () => void;
+  // Clear local cache
+  clearLocalCache: () => void;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -269,13 +232,13 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 const LOCAL_STORAGE_KEY = 'avicinna_cms_v1';
 
 export function DataProvider({ children }: { children: React.ReactNode }) {
-  const [doctors, setDoctors] = useState<Doctor[]>(defaultDoctors);
-  const [treatments, setTreatments] = useState<Treatment[]>(defaultTreatments);
-  const [stories, setStories] = useState<PatientStory[]>(defaultStories);
-  const [articles, setArticles] = useState<Article[]>(defaultArticles);
-  const [hospitals, setHospitals] = useState<HospitalPartner[]>(defaultHospitals);
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [treatments, setTreatments] = useState<Treatment[]>([]);
+  const [stories, setStories] = useState<PatientStory[]>([]);
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [hospitals, setHospitals] = useState<HospitalPartner[]>([]);
   const [sections, setSections] = useState<SiteSectionsData>(defaultSections);
-  const [inquiries, setInquiries] = useState<ConsultationInquiry[]>(defaultInquiries);
+  const [inquiries, setInquiries] = useState<ConsultationInquiry[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'synced' | 'error'>('idle');
 
@@ -297,12 +260,12 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       if (secRes) {
         setSections((prev) => ({ ...prev, ...secRes }));
       }
-      if (hospRes && hospRes.length > 0) setHospitals(hospRes);
-      if (docRes && docRes.length > 0) setDoctors(docRes);
-      if (treatRes && treatRes.length > 0) setTreatments(treatRes);
-      if (storyRes && storyRes.length > 0) setStories(storyRes);
-      if (artRes && artRes.length > 0) setArticles(artRes);
-      if (inqRes && inqRes.length > 0) setInquiries(inqRes);
+      setHospitals(hospRes ?? []);
+      setDoctors(docRes ?? []);
+      setTreatments(treatRes ?? []);
+      setStories(storyRes ?? []);
+      setArticles(artRes ?? []);
+      setInquiries(inqRes ?? []);
 
       setSyncStatus('synced');
     } catch (err) {
@@ -554,15 +517,19 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const resetToDefaults = () => {
-    setDoctors(defaultDoctors);
-    setTreatments(defaultTreatments);
-    setStories(defaultStories);
-    setArticles(defaultArticles);
-    setHospitals(defaultHospitals);
+  const clearLocalCache = () => {
+    setDoctors([]);
+    setTreatments([]);
+    setStories([]);
+    setArticles([]);
+    setHospitals([]);
     setSections(defaultSections);
-    setInquiries(defaultInquiries);
+    setInquiries([]);
     localStorage.removeItem(LOCAL_STORAGE_KEY);
+    // Re-fetch from Supabase to get live data
+    if (isSupabaseConfigured) {
+      refreshFromSupabase();
+    }
   };
 
   return (
@@ -597,7 +564,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         addInquiry,
         updateInquiryStatus,
         deleteInquiry,
-        resetToDefaults,
+        clearLocalCache,
       }}
     >
       {children}

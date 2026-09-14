@@ -25,7 +25,7 @@ import {
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { inquiries, resetToDefaults, isSupabaseConnected, syncStatus, refreshFromSupabase } = useData();
+  const { inquiries, clearLocalCache, isSupabaseConnected, syncStatus, refreshFromSupabase } = useData();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -84,14 +84,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     },
   ];
 
-  const handleReset = () => {
+  const handleClearCache = () => {
     if (
       window.confirm(
-        'هل أنت متأكد من رغبتك في استعادة البيانات التجريبية الافتراضية؟ سيتم مسح أي تعديلات غير محفوظة.\nAre you sure you want to reset all data to default demo data?'
+        'هل أنت متأكد؟ سيتم مسح الذاكرة المحلية وإعادة تحميل البيانات من قاعدة البيانات.\nAre you sure? This will clear local cache and re-sync from Supabase.'
       )
     ) {
-      resetToDefaults();
-      alert('تمت استعادة البيانات الافتراضية بنجاح!');
+      clearLocalCache();
     }
   };
 
@@ -203,11 +202,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
             <button
               type="button"
-              onClick={handleReset}
-              className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 text-xs font-semibold border border-rose-500/20 transition-colors cursor-pointer"
+              onClick={handleClearCache}
+              className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 text-xs font-semibold border border-amber-500/20 transition-colors cursor-pointer"
             >
               <RotateCcw className="w-3.5 h-3.5" />
-              <span>استعادة البيانات الافتراضية / Reset</span>
+              <span>مسح الذاكرة المحلية / Clear Cache</span>
             </button>
           </div>
         </div>

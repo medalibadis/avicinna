@@ -130,7 +130,7 @@ export async function fetchHospitalsFromDb(): Promise<HospitalPartner[] | null> 
   if (!supabase) return null;
   try {
     const { data, error } = await supabase.from('hospitals').select('*').order('created_at', { ascending: true });
-    if (error || !data || data.length === 0) return null;
+    if (error || !data) return null;
     return data.map(mapHospitalRowToModel);
   } catch (err) {
     console.warn('Supabase fetchHospitals error:', err);
@@ -211,7 +211,7 @@ export async function fetchDoctorsFromDb(): Promise<Doctor[] | null> {
   if (!supabase) return null;
   try {
     const { data, error } = await supabase.from('doctors').select('*').order('created_at', { ascending: true });
-    if (error || !data || data.length === 0) return null;
+    if (error || !data) return null;
     return data.map(mapDoctorRowToModel);
   } catch (err) {
     console.warn('Supabase fetchDoctors error:', err);
@@ -286,7 +286,7 @@ export async function fetchTreatmentsFromDb(): Promise<Treatment[] | null> {
   if (!supabase) return null;
   try {
     const { data, error } = await supabase.from('treatments').select('*').order('created_at', { ascending: true });
-    if (error || !data || data.length === 0) return null;
+    if (error || !data) return null;
     return data.map(mapTreatmentRowToModel);
   } catch (err) {
     console.warn('Supabase fetchTreatments error:', err);
@@ -369,7 +369,7 @@ export async function fetchStoriesFromDb(): Promise<PatientStory[] | null> {
   if (!supabase) return null;
   try {
     const { data, error } = await supabase.from('patient_stories').select('*').order('created_at', { ascending: true });
-    if (error || !data || data.length === 0) return null;
+    if (error || !data) return null;
     return data.map(mapStoryRowToModel);
   } catch (err) {
     console.warn('Supabase fetchStories error:', err);
@@ -442,7 +442,7 @@ export async function fetchArticlesFromDb(): Promise<Article[] | null> {
   if (!supabase) return null;
   try {
     const { data, error } = await supabase.from('articles').select('*').order('created_at', { ascending: true });
-    if (error || !data || data.length === 0) return null;
+    if (error || !data) return null;
     return data.map(mapArticleRowToModel);
   } catch (err) {
     console.warn('Supabase fetchArticles error:', err);
@@ -511,7 +511,7 @@ export async function fetchInquiriesFromDb(): Promise<ConsultationInquiry[] | nu
   if (!supabase) return null;
   try {
     const { data, error } = await supabase.from('consultation_inquiries').select('*').order('created_at', { ascending: false });
-    if (error || !data || data.length === 0) return null;
+    if (error || !data) return null;
     return data.map(mapInquiryRowToModel);
   } catch (err) {
     console.warn('Supabase fetchInquiries error:', err);

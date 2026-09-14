@@ -1,10 +1,7 @@
 import { MetadataRoute } from 'next';
-import { doctorsData } from '@/data/doctors';
-import { treatmentsData } from '@/data/treatments';
-import { patientStoriesData } from '@/data/stories';
-import { articlesData } from '@/data/articles';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://avicinna.netlify.app';
 
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -59,8 +56,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
+  // If Supabase is not configured, return only static routes
+  if (!isSupabaseConfigured || !supabase) {
+    return staticRoutes;
+  }
+
+  // Fetch slugs from Supabase for dynamic routes
+  const [doctorsRes, treatmentsRes, storiesRes, articlesRes] = await Promise.all([
+    supabase.from('doctors').select('slug').order('created_at', { ascending: false }),
+    supabase.from('treatments').select('slug').order('created_at', { ascending: false }),
+    supabase.from('stories').select('slug').order('created_at', { ascending: false }),
+    supabase.from('articles').select('slug, published_date').order('published_date', { ascending: false }),
+  ]);
+
   // Dynamic doctor routes
-  const doctorRoutes: MetadataRoute.Sitemap = doctorsData.map((doc) => ({
+  const doctorRoutes: MetadataRoute.Sitemap = (doctorsRes.data ?? []).map((doc) => ({
     url: `${baseUrl}/doctors/${doc.slug}`,
     lastModified: new Date(),
     changeFrequency: 'weekly',
@@ -68,7 +78,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }));
 
   // Dynamic treatment routes
-  const treatmentRoutes: MetadataRoute.Sitemap = treatmentsData.map((treat) => ({
+  const treatmentRoutes: MetadataRoute.Sitemap = (treatmentsRes.data ?? []).map((treat) => ({
     url: `${baseUrl}/treatments/${treat.slug}`,
     lastModified: new Date(),
     changeFrequency: 'weekly',
@@ -76,7 +86,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }));
 
   // Dynamic story routes
-  const storyRoutes: MetadataRoute.Sitemap = patientStoriesData.map((story) => ({
+  const storyRoutes: MetadataRoute.Sitemap = (storiesRes.data ?? []).map((story) => ({
     url: `${baseUrl}/patient-stories/${story.slug}`,
     lastModified: new Date(),
     changeFrequency: 'monthly',
@@ -84,9 +94,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }));
 
   // Dynamic article routes
-  const articleRoutes: MetadataRoute.Sitemap = articlesData.map((art) => ({
+  const articleRoutes: MetadataRoute.Sitemap = (articlesRes.data ?? []).map((art) => ({
     url: `${baseUrl}/blog/${art.slug}`,
-    lastModified: new Date(art.publishedDate),
+    lastModified: art.published_date ? new Date(art.published_date) : new Date(),
     changeFrequency: 'weekly',
     priority: 0.8,
   }));
