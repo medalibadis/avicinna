@@ -1,0 +1,31 @@
+# Netlify Build and Runtime Configuration for AVICINNA Next.js App
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+# Essential Next.js runtime plugin for Netlify
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Global Security & Performance Headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+
+# Cache immutable Next.js static chunks
+[[headers]]
+  for = "/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Cache public media & images
+[[headers]]
+  for = "/*.(jpg|jpeg|png|webp|svg|ico)"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, stale-while-revalidate=604800"
