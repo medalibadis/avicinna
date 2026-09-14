@@ -228,7 +228,7 @@ export default function ArticleDetailPage() {
             </div>
 
             {/* In-Article Consultation Box */}
-            <div className="bg-gradient-to-r from-slate-900 via-[#0A192F] to-slate-900 rounded-2xl p-6 sm:p-8 text-white space-y-4">
+            <div className="bg-gradient-to-r from-[#021838] via-[#032654] to-[#021838] rounded-2xl p-6 sm:p-8 text-white space-y-4">
               <h3 className="text-lg sm:text-xl font-bold">{content.ctaTitle}</h3>
               <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
                 {content.ctaSubtitle}

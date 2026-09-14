@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useLanguage } from '@/context/LanguageContext';
 
 interface LogoProps {
@@ -16,26 +17,36 @@ export const Logo: React.FC<LogoProps> = ({
   size = 'md',
 }) => {
   const { language } = useLanguage();
+  const isDark = variant === 'dark' || variant === 'footer';
 
-  const isLight = variant === 'dark' || variant === 'footer';
-
-  const iconSizes = {
-    sm: 'w-8 h-8',
-    md: 'w-10 h-10',
-    lg: 'w-14 h-14',
+  const dimensions = {
+    sm: { height: 36, width: 48, iconSize: 'w-8 h-8' },
+    md: { height: 44, width: 59, iconSize: 'w-10 h-10' },
+    lg: { height: 56, width: 75, iconSize: 'w-14 h-14' },
   };
 
-  const textSizes = {
-    sm: 'text-lg',
-    md: 'text-2xl',
-    lg: 'text-3xl',
-  };
+  const currentDim = dimensions[size];
 
-  const subTextSizes = {
-    sm: 'text-[9px]',
-    md: 'text-[11px]',
-    lg: 'text-xs',
-  };
+  if (variant === 'iconOnly') {
+    return (
+      <Link
+        href="/"
+        className={`inline-flex items-center justify-center transition-transform duration-200 hover:scale-105 focus:outline-none ${className}`}
+        aria-label="AVICINNA - International Healthcare Platform"
+      >
+        <div className={`relative ${currentDim.iconSize} flex-shrink-0`}>
+          <Image
+            src={isDark ? '/images/logo-icon-white.png' : '/images/logo-icon.png'}
+            alt="AVICINNA"
+            fill
+            sizes="56px"
+            className="object-contain"
+            priority
+          />
+        </div>
+      </Link>
+    );
+  }
 
   return (
     <Link
@@ -43,76 +54,43 @@ export const Logo: React.FC<LogoProps> = ({
       className={`inline-flex items-center gap-3 transition-opacity hover:opacity-95 focus:outline-none group ${className}`}
       aria-label="AVICINNA - International Healthcare Platform"
     >
-      {/* Premium Minimalist AVICINNA Medical Icon */}
-      <div className={`relative ${iconSizes[size]} flex-shrink-0`}>
-        <svg
-          viewBox="0 0 48 48"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-full h-full transform transition-transform duration-300 group-hover:scale-105"
-        >
-          {/* Subtle Outer Glow / Hex Shield */}
-          <rect
-            x="3"
-            y="3"
-            width="42"
-            height="42"
-            rx="12"
-            className={isLight ? 'fill-white/10 stroke-sky-400/40' : 'fill-sky-50 stroke-sky-200'}
-            strokeWidth="1.5"
-          />
-          {/* Stylized Modern "A" & Cross & Healing Wings */}
-          <path
-            d="M24 10L14 34H19.5L21.5 29H26.5L28.5 34H34L24 10Z"
-            fill={isLight ? '#FFFFFF' : '#0A192F'}
-          />
-          <path
-            d="M24 18L22.2 24.5H25.8L24 18Z"
-            fill={isLight ? '#0EA5E9' : '#0EA5E9'}
-          />
-          {/* Medical Pulse / Cyan Crescent Accent */}
-          <circle cx="24" cy="11" r="2.5" fill="#38BDF8" />
-          <path
-            d="M12 26C14.5 24.5 17 25 18 26.5"
-            stroke="#0EA5E9"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-          <path
-            d="M36 26C33.5 24.5 31 25 30 26.5"
-            stroke="#0EA5E9"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-        </svg>
+      {/* Official AVICINNA Icon */}
+      <div className={`relative ${currentDim.iconSize} flex-shrink-0 transition-transform duration-300 group-hover:scale-105`}>
+        <Image
+          src={isDark ? '/images/logo-icon-white.png' : '/images/logo-icon.png'}
+          alt="AVICINNA"
+          fill
+          sizes="56px"
+          className="object-contain drop-shadow-xs"
+          priority
+        />
       </div>
 
-      {variant !== 'iconOnly' && (
-        <div className="flex flex-col">
-          <div className="flex items-center gap-1.5">
-            <span
-              className={`font-black tracking-wider uppercase font-sans ${textSizes[size]} ${
-                isLight ? 'text-white' : 'text-[#0A192F]'
-              }`}
-            >
-              AVICINNA
-            </span>
-            <span className="w-1.5 h-1.5 rounded-full bg-sky-500 inline-block mb-1"></span>
-          </div>
-
+      {/* Official Typography & Subtitle aligned with Brand Identity */}
+      <div className="flex flex-col text-start">
+        <div className="flex items-center gap-1.5 leading-none">
           <span
-            className={`font-medium tracking-wide ${subTextSizes[size]} ${
-              isLight ? 'text-sky-300/90' : 'text-slate-500'
-            }`}
+            className={`font-black tracking-wider uppercase font-sans ${
+              size === 'sm' ? 'text-lg' : size === 'lg' ? 'text-2xl' : 'text-xl'
+            } ${isDark ? 'text-white' : 'text-[#032654]'}`}
           >
-            {language === 'ar'
-              ? 'أفيسينا للرعاية الطبية'
-              : language === 'fr'
-              ? 'Soins Médicaux Turquie'
-              : 'Medical Care Turkey'}
+            AVICINNA
           </span>
+          <span className="w-1.5 h-1.5 rounded-full bg-[#0097FB] inline-block mb-0.5"></span>
         </div>
-      )}
+
+        <span
+          className={`font-semibold tracking-wide mt-1 leading-none ${
+            size === 'sm' ? 'text-[9px]' : size === 'lg' ? 'text-xs' : 'text-[11px]'
+          } ${isDark ? 'text-[#00BFFF]' : 'text-[#0097FB]'}`}
+        >
+          {language === 'ar'
+            ? 'أفيسينا للرعاية الطبية'
+            : language === 'fr'
+            ? 'Soins Médicaux Turquie'
+            : 'Medical Care Turkey'}
+        </span>
+      </div>
     </Link>
   );
 };

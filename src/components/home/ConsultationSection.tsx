@@ -48,16 +48,16 @@ export const ConsultationSection: React.FC = () => {
   };
 
   return (
-    <section id="consultation" className="py-20 bg-[#0A192F] text-white relative overflow-hidden">
+    <section id="consultation" className="py-20 bg-[#032654] text-white relative overflow-hidden">
       {/* Background Accent Gradients */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 right-0 w-96 h-96 bg-[#0097FB]/15 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#00BFFF]/10 rounded-full blur-3xl pointer-events-none" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           {/* Left Column: Heading & Value Proposition (5 cols) */}
           <div className="lg:col-span-5 space-y-6">
-            <div className="inline-flex items-center gap-2 bg-sky-400/15 border border-sky-400/30 text-sky-300 text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-full">
+            <div className="inline-flex items-center gap-2 bg-[#0097FB]/15 border border-[#00BFFF]/30 text-[#00BFFF] text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-full">
               {language === 'ar' ? 'استشارة طبية مجانية 100%' : '100% Free Medical Assessment'}
             </div>
 
@@ -65,7 +65,7 @@ export const ConsultationSection: React.FC = () => {
               {t.cta.title}
             </h2>
 
-            <p className="text-base text-slate-300 leading-relaxed">
+            <p className="text-base text-slate-200/90 leading-relaxed">
               {t.cta.subtitle}
             </p>
 
@@ -139,10 +139,10 @@ export const ConsultationSection: React.FC = () => {
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="border-b border-slate-100 pb-4 mb-4">
-                    <h3 className="text-xl font-bold text-slate-900">
+                    <h3 className="text-xl font-bold text-[#032654]">
                       {t.cta.formTitle}
                     </h3>
-                    <p className="text-xs text-slate-500 mt-1">
+                    <p className="text-xs text-[#64748B] mt-1">
                       {language === 'ar' ? 'البيانات آمنة ومحمية بسرية تامة' : 'Your medical data is encrypted and confidential'}
                     </p>
                   </div>
@@ -150,7 +150,7 @@ export const ConsultationSection: React.FC = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* Full Name */}
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                      <label className="block text-xs font-bold text-[#163B63] mb-1.5">
                         {t.cta.fullName} *
                       </label>
                       <input
@@ -159,13 +159,13 @@ export const ConsultationSection: React.FC = () => {
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
                         placeholder={language === 'ar' ? 'مثال: محمد العمري' : 'e.g., John Smith'}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-sky-500 focus:bg-white transition-colors"
+                        className="w-full bg-[#F4F7FA] border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#0097FB] focus:bg-white transition-colors"
                       />
                     </div>
 
                     {/* Phone Number */}
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                      <label className="block text-xs font-bold text-[#163B63] mb-1.5">
                         {t.cta.phone} *
                       </label>
                       <input
@@ -175,7 +175,7 @@ export const ConsultationSection: React.FC = () => {
                         onChange={(e) => setPhone(e.target.value)}
                         placeholder="+966 5X XXX XXXX"
                         dir="ltr"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-sky-500 focus:bg-white transition-colors"
+                        className="w-full bg-[#F4F7FA] border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#0097FB] focus:bg-white transition-colors"
                       />
                     </div>
                   </div>
@@ -183,7 +183,7 @@ export const ConsultationSection: React.FC = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* Country */}
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                      <label className="block text-xs font-bold text-[#163B63] mb-1.5">
                         {t.cta.country} *
                       </label>
                       <input
@@ -192,20 +192,20 @@ export const ConsultationSection: React.FC = () => {
                         value={country}
                         onChange={(e) => setCountry(e.target.value)}
                         placeholder={language === 'ar' ? 'السعودية، الكويت، الجزائر...' : 'Country of residence'}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-sky-500 focus:bg-white transition-colors"
+                        className="w-full bg-[#F4F7FA] border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#0097FB] focus:bg-white transition-colors"
                       />
                     </div>
 
                     {/* Specialty Selection */}
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                      <label className="block text-xs font-bold text-[#163B63] mb-1.5">
                         {t.cta.specialty} *
                       </label>
                       <select
                         value={specialty}
                         onChange={(e) => setSpecialty(e.target.value)}
                         required
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-sky-500 focus:bg-white transition-colors cursor-pointer"
+                        className="w-full bg-[#F4F7FA] border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#0097FB] focus:bg-white transition-colors cursor-pointer"
                       >
                         <option value="">{language === 'ar' ? 'اختر التخصص المطلوب...' : 'Select specialty...'}</option>
                         {treatmentsData.map((item) => (
@@ -219,7 +219,7 @@ export const ConsultationSection: React.FC = () => {
 
                   {/* Case Notes */}
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    <label className="block text-xs font-bold text-[#163B63] mb-1.5">
                       {t.cta.caseNotes}
                     </label>
                     <textarea
@@ -227,16 +227,16 @@ export const ConsultationSection: React.FC = () => {
                       value={caseNotes}
                       onChange={(e) => setCaseNotes(e.target.value)}
                       placeholder={language === 'ar' ? 'يرجى كتابة التشخيص السابق أو الأعراض التي تشكو منها...' : 'Describe symptoms or medical history...'}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-sky-500 focus:bg-white transition-colors"
+                      className="w-full bg-[#F4F7FA] border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#0097FB] focus:bg-white transition-colors"
                     />
                   </div>
 
                   {/* Optional File Upload Placeholder */}
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    <label className="block text-xs font-bold text-[#163B63] mb-1.5">
                       {t.cta.uploadReport}
                     </label>
-                    <div className="relative border-2 border-dashed border-slate-200 hover:border-sky-400 rounded-xl p-3 text-center bg-slate-50 hover:bg-sky-50/50 transition-colors cursor-pointer">
+                    <div className="relative border-2 border-dashed border-slate-200 hover:border-[#0097FB] rounded-xl p-3 text-center bg-[#F4F7FA] hover:bg-[#EAF6FF]/50 transition-colors cursor-pointer">
                       <input
                         type="file"
                         onChange={(e) => {
@@ -246,8 +246,8 @@ export const ConsultationSection: React.FC = () => {
                         }}
                         className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                       />
-                      <div className="flex items-center justify-center gap-2 text-xs text-slate-500 font-medium">
-                        <Upload className="w-4 h-4 text-sky-600" />
+                      <div className="flex items-center justify-center gap-2 text-xs text-[#64748B] font-medium">
+                        <Upload className="w-4 h-4 text-[#0097FB]" />
                         <span>
                           {fileName || (language === 'ar' ? 'انقر لاختيار تقرير طبي (PDF أو صورة)' : 'Click to attach medical report (PDF / Image)')}
                         </span>
@@ -260,7 +260,7 @@ export const ConsultationSection: React.FC = () => {
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className="w-full flex items-center justify-center gap-2 bg-sky-500 hover:bg-sky-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-sky-500/25 transition-all duration-200 cursor-pointer text-sm"
+                      className="w-full flex items-center justify-center gap-2 bg-[#0097FB] hover:bg-[#0082d6] text-white font-bold py-4 rounded-xl shadow-lg shadow-[#0097FB]/25 transition-all duration-200 cursor-pointer text-sm"
                     >
                       {isLoading ? (
                         <span>{language === 'ar' ? 'جاري الإرسال...' : 'Submitting...'}</span>

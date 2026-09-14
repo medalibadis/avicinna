@@ -187,7 +187,7 @@ export default function AboutPage() {
   return (
     <div className="pt-24 pb-16 bg-slate-50 min-h-screen">
       {/* Breadcrumbs & Header */}
-      <div className="bg-gradient-to-b from-slate-900 to-[#0A192F] text-white py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      <div className="bg-gradient-to-b from-[#021838] to-[#032654] text-white py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:16px_16px]" />
         
         <div className="max-w-7xl mx-auto relative z-10">
@@ -336,7 +336,7 @@ export default function AboutPage() {
 
       {/* Consultation Anchor Form */}
       <div id="consultation-about" className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-20">
-        <div className="bg-gradient-to-r from-slate-900 via-[#0A192F] to-slate-900 rounded-3xl p-8 sm:p-12 text-white text-center shadow-xl relative overflow-hidden">
+        <div className="bg-gradient-to-r from-[#021838] via-[#032654] to-[#021838] rounded-3xl p-8 sm:p-12 text-white text-center shadow-xl relative overflow-hidden">
           <div className="relative z-10">
             <h2 className="text-2xl sm:text-3xl font-bold mb-3">
               {content.ctaTitle}

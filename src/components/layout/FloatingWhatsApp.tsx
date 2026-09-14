@@ -35,7 +35,7 @@ export const FloatingWhatsApp: React.FC = () => {
           }`}
         >
           {/* Header */}
-          <div className="bg-[#0A192F] text-white p-4 flex items-center justify-between">
+          <div className="bg-[#032654] text-white p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center text-white">
                 <MessageCircle className="w-5 h-5" />

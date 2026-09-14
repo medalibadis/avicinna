@@ -32,13 +32,13 @@ export const FeaturedDoctors: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-10">
-          <div className="inline-flex items-center gap-2 bg-sky-50 text-sky-700 text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-full mb-3 border border-sky-100">
+          <div className="inline-flex items-center gap-2 bg-[#EAF6FF] text-[#0097FB] text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-full mb-3 border border-[#0097FB]/20">
             {t.doctors.badge}
           </div>
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-[#0A192F] tracking-tight mb-4">
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-[#032654] tracking-tight mb-4">
             {t.doctors.title}
           </h2>
-          <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
+          <p className="text-sm sm:text-base text-[#64748B] leading-relaxed">
             {t.doctors.subtitle}
           </p>
         </div>
@@ -54,8 +54,8 @@ export const FeaturedDoctors: React.FC = () => {
                 type="button"
                 className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer ${
                   isActive
-                    ? 'bg-sky-500 text-white shadow-sm scale-105'
-                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    ? 'bg-[#0097FB] text-white shadow-sm shadow-[#0097FB]/25 scale-105'
+                    : 'bg-[#F4F7FA] text-[#163B63] hover:bg-[#EAF6FF]'
                 }`}
               >
                 {tab.label}
@@ -78,7 +78,7 @@ export const FeaturedDoctors: React.FC = () => {
                   alt={doctor.name[language]}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
-                <div className="absolute top-3 right-3 bg-sky-500 text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-md">
+                <div className="absolute top-3 right-3 bg-[#0097FB] text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-md">
                   {doctor.specialtyName[language]}
                 </div>
                 <div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-lg text-xs font-bold text-slate-800 flex items-center gap-1 shadow-sm">
@@ -91,17 +91,17 @@ export const FeaturedDoctors: React.FC = () => {
               {/* Content */}
               <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900 group-hover:text-sky-600 transition-colors">
+                  <h3 className="text-lg font-bold text-[#032654] group-hover:text-[#0097FB] transition-colors">
                     {doctor.name[language]}
                   </h3>
-                  <p className="text-xs font-medium text-sky-600 mb-2">
+                  <p className="text-xs font-medium text-[#0097FB] mb-2">
                     {doctor.title[language]}
                   </p>
-                  <div className="flex items-center gap-1.5 text-xs text-slate-500 mb-3">
+                  <div className="flex items-center gap-1.5 text-xs text-[#64748B] mb-3">
                     <Building2 className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
                     <span className="truncate">{doctor.hospital[language]}</span>
                   </div>
-                  <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
+                  <p className="text-xs text-[#64748B] line-clamp-2 leading-relaxed">
                     {doctor.biography[language]}
                   </p>
                 </div>
@@ -110,13 +110,13 @@ export const FeaturedDoctors: React.FC = () => {
                 <div className="pt-3 border-t border-slate-100 flex items-center gap-2">
                   <Link
                     href={`/doctors/${doctor.slug}`}
-                    className="flex-1 text-center py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors"
+                    className="flex-1 text-center py-2 px-3 rounded-xl bg-[#F4F7FA] hover:bg-[#EAF6FF] text-[#163B63] hover:text-[#0097FB] text-xs font-bold transition-colors"
                   >
                     {t.doctors.viewProfile}
                   </Link>
                   <a
                     href="#consultation"
-                    className="flex-1 text-center py-2 px-3 rounded-xl bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold transition-colors shadow-xs"
+                    className="flex-1 text-center py-2 px-3 rounded-xl bg-[#0097FB] hover:bg-[#0082d6] text-white text-xs font-bold transition-colors shadow-xs shadow-[#0097FB]/20"
                   >
                     {t.doctors.requestConsultation}
                   </a>
@@ -130,7 +130,7 @@ export const FeaturedDoctors: React.FC = () => {
         <div className="text-center">
           <Link
             href="/doctors"
-            className="inline-flex items-center gap-2 bg-[#0A192F] hover:bg-[#132A4A] text-white font-bold text-sm px-8 py-4 rounded-full shadow-md transition-all duration-200"
+            className="inline-flex items-center gap-2 bg-[#032654] hover:bg-[#163B63] text-white font-bold text-sm px-8 py-4 rounded-full shadow-md shadow-[#032654]/20 transition-all duration-200"
           >
             <span>{t.doctors.allDoctorsCta}</span>
             {isRtl ? <ArrowLeft className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}

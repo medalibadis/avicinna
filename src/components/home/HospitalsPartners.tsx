@@ -28,15 +28,15 @@ export const HospitalsPartners: React.FC = () => {
   ];
 
   return (
-    <section className="py-20 bg-[#0A192F] text-white relative overflow-hidden">
+    <section className="py-20 bg-[#032654] text-white relative overflow-hidden">
       {/* Subtle Background Glow */}
-      <div className="absolute top-0 right-1/4 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#0097FB]/15 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-[#00BFFF]/10 rounded-full blur-3xl pointer-events-none" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-2 bg-sky-400/15 border border-sky-400/30 text-sky-300 text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-full mb-3">
+          <div className="inline-flex items-center gap-2 bg-[#0097FB]/15 border border-[#00BFFF]/30 text-[#00BFFF] text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-full mb-3">
             {t.hospitals.badge}
           </div>
           <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight mb-4">
@@ -50,20 +50,20 @@ export const HospitalsPartners: React.FC = () => {
         {/* 2 Large Featured Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {/* Featured Card 1: Luxury Patient Suites */}
-          <div className="group relative rounded-3xl overflow-hidden bg-white/5 border border-white/10 shadow-2xl hover:border-sky-400/40 transition-all duration-300">
+          <div className="group relative rounded-3xl overflow-hidden bg-white/5 border border-white/10 shadow-2xl hover:border-[#00BFFF]/40 transition-all duration-300">
             <div className="h-72 overflow-hidden relative">
               <img
                 src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1200&auto=format&fit=crop"
                 alt="Luxury Patient Suite Istanbul"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0A192F] via-[#0A192F]/40 to-transparent" />
-              <div className="absolute top-4 right-4 bg-sky-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">
+              <div className="absolute inset-0 bg-gradient-to-t from-[#032654] via-[#032654]/40 to-transparent" />
+              <div className="absolute top-4 right-4 bg-[#0097FB] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">
                 VIP 5-Star Experience
               </div>
             </div>
             <div className="p-7">
-              <div className="flex items-center gap-2 text-xs font-semibold text-sky-400 uppercase tracking-wider mb-2">
+              <div className="flex items-center gap-2 text-xs font-semibold text-[#00BFFF] uppercase tracking-wider mb-2">
                 <Hotel className="w-4 h-4" />
                 <span>AVICINNA HOSPITALITY</span>
               </div>
@@ -82,20 +82,20 @@ export const HospitalsPartners: React.FC = () => {
           </div>
 
           {/* Featured Card 2: Acibadem Hospital Istanbul */}
-          <div className="group relative rounded-3xl overflow-hidden bg-white/5 border border-white/10 shadow-2xl hover:border-sky-400/40 transition-all duration-300">
+          <div className="group relative rounded-3xl overflow-hidden bg-white/5 border border-white/10 shadow-2xl hover:border-[#00BFFF]/40 transition-all duration-300">
             <div className="h-72 overflow-hidden relative">
               <img
                 src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=1200&auto=format&fit=crop"
                 alt="Acibadem Hospital Istanbul"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0A192F] via-[#0A192F]/40 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#032654] via-[#032654]/40 to-transparent" />
               <div className="absolute top-4 right-4 bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">
                 JCI Accredited
               </div>
             </div>
             <div className="p-7">
-              <div className="flex items-center gap-2 text-xs font-semibold text-sky-400 uppercase tracking-wider mb-2">
+              <div className="flex items-center gap-2 text-xs font-semibold text-[#00BFFF] uppercase tracking-wider mb-2">
                 <Building2 className="w-4 h-4" />
                 <span>PREMIER HOSPITAL NETWORK</span>
               </div>
@@ -121,9 +121,9 @@ export const HospitalsPartners: React.FC = () => {
             return (
               <div
                 key={idx}
-                className="flex items-start gap-4 p-5 rounded-2xl bg-white/5 border border-white/5 hover:border-sky-400/30 transition-colors"
+                className="flex items-start gap-4 p-5 rounded-2xl bg-white/5 border border-white/5 hover:border-[#00BFFF]/30 transition-colors"
               >
-                <div className="w-12 h-12 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center flex-shrink-0">
+                <div className="w-12 h-12 rounded-xl bg-[#0097FB]/20 text-[#00BFFF] flex items-center justify-center flex-shrink-0">
                   <Icon className="w-6 h-6" />
                 </div>
                 <div>
@@ -153,7 +153,7 @@ export const HospitalsPartners: React.FC = () => {
                 <div className="text-sm font-bold text-white mb-1">
                   {hosp.name[language]}
                 </div>
-                <div className="text-[11px] text-sky-300 font-medium">
+                <div className="text-[11px] text-[#00BFFF] font-medium">
                   {hosp.accreditation}
                 </div>
               </div>

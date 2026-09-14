@@ -86,16 +86,16 @@ export const StatsSection: React.FC = () => {
                 key={idx}
                 className="flex flex-col items-center text-center p-4 transition-transform duration-300 hover:scale-105"
               >
-                <div className="w-14 h-14 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center mb-4 border border-sky-100 shadow-sm">
+                <div className="w-14 h-14 rounded-2xl bg-[#EAF6FF] text-[#0097FB] flex items-center justify-center mb-4 border border-[#0097FB]/20 shadow-xs">
                   <Icon className="w-7 h-7" />
                 </div>
-                <div className="text-4xl sm:text-5xl font-black text-[#0A192F] tracking-tight font-sans mb-2">
+                <div className="text-4xl sm:text-5xl font-black text-[#032654] tracking-tight font-sans mb-2">
                   {stat.count}
                 </div>
-                <div className="text-base sm:text-lg font-bold text-slate-800 mb-1">
+                <div className="text-base sm:text-lg font-bold text-[#163B63] mb-1">
                   {stat.label}
                 </div>
-                <div className="text-xs font-medium text-slate-400">
+                <div className="text-xs font-medium text-[#64748B]">
                   {stat.desc}
                 </div>
               </div>

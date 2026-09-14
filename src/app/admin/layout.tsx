@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useData } from '@/context/DataContext';
+import { Logo } from '@/components/common/Logo';
 import {
   LayoutDashboard,
   Layers,
@@ -95,18 +96,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col lg:flex-row antialiased selection:bg-sky-100 selection:text-sky-900">
+    <div className="min-h-screen bg-[#F4F7FA] text-slate-900 flex flex-col lg:flex-row antialiased selection:bg-[#EAF6FF] selection:text-[#032654]">
       {/* Mobile Topbar */}
-      <div className="lg:hidden bg-[#0A192F] border-b border-slate-800 px-4 py-3.5 flex items-center justify-between sticky top-0 z-50">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-sky-400 to-sky-600 text-white flex items-center justify-center font-black text-sm shadow-md shadow-sky-500/20">
-            A
-          </div>
-          <div>
-            <span className="font-extrabold tracking-tight text-white text-sm">AVICINNA</span>
-            <span className="text-[10px] text-sky-400 block font-semibold -mt-1">ADMIN CMS</span>
-          </div>
-        </div>
+      <div className="lg:hidden bg-[#032654] border-b border-white/10 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
+        <Logo variant="dark" size="sm" />
         <button
           type="button"
           onClick={() => setMobileOpen(!mobileOpen)}
@@ -118,7 +111,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* Sidebar Navigation */}
       <aside
-        className={`fixed inset-y-0 right-0 rtl:right-0 rtl:left-auto ltr:left-0 ltr:right-auto z-40 w-72 bg-[#0A192F] text-slate-300 border-l rtl:border-l rtl:border-r-0 ltr:border-r ltr:border-l-0 border-slate-800/80 flex flex-col justify-between transition-transform duration-300 lg:translate-x-0 lg:static lg:h-screen ${
+        className={`fixed inset-y-0 right-0 rtl:right-0 rtl:left-auto ltr:left-0 ltr:right-auto z-40 w-72 bg-[#032654] text-slate-300 border-l rtl:border-l rtl:border-r-0 ltr:border-r ltr:border-l-0 border-white/10 flex flex-col justify-between transition-transform duration-300 lg:translate-x-0 lg:static lg:h-screen ${
           mobileOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'
         }`}
       >
@@ -126,32 +119,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           {/* Logo Brand Header */}
           <div className="p-6 border-b border-white/10">
             <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-sky-600 text-white flex items-center justify-center font-black text-lg shadow-lg shadow-sky-500/25 ring-2 ring-sky-400/20">
-                  A
-                </div>
-                <div>
-                  <div className="font-black text-base tracking-wider text-white">
-                    AVICINNA
-                  </div>
-                  <div className="text-[10px] text-sky-400 font-bold tracking-widest uppercase">
-                    Control Center
-                  </div>
-                </div>
-              </div>
+              <Logo variant="dark" size="md" />
               <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 text-[10px] font-extrabold border border-emerald-500/30 flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 LIVE
               </span>
             </div>
-            <p className="text-[11px] text-slate-400 leading-relaxed mt-2">
+            <p className="text-[11px] text-slate-300/70 leading-relaxed mt-3">
               منصة الإدارة الذكية للمحتوى الطبي، الأطباء والاستشارات الدولية
             </p>
           </div>
 
           {/* Navigation Links */}
           <nav className="p-4 space-y-1.5 flex-1">
-            <div className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 px-3 py-1.5">
+            <div className="text-[10px] font-extrabold uppercase tracking-widest text-[#00BFFF]/70 px-3 py-1.5">
               الوحدات البرمجية / Modules
             </div>
 
@@ -169,12 +150,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   onClick={() => setMobileOpen(false)}
                   className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
                     isActive
-                      ? 'bg-gradient-to-r from-sky-500/20 to-sky-500/10 text-sky-300 font-bold border border-sky-400/30 shadow-sm shadow-sky-500/10'
-                      : 'text-slate-300 hover:bg-white/5 hover:text-white border border-transparent'
+                      ? 'bg-gradient-to-r from-[#0097FB]/25 to-[#0097FB]/10 text-white font-bold border border-[#00BFFF]/40 shadow-sm shadow-[#0097FB]/15'
+                      : 'text-slate-300/80 hover:bg-white/5 hover:text-white border border-transparent'
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <Icon className={`w-4 h-4 ${isActive ? 'text-sky-400' : 'text-slate-400'}`} />
+                    <Icon className={`w-4 h-4 ${isActive ? 'text-[#00BFFF]' : 'text-slate-400'}`} />
                     <span>{item.label}</span>
                   </div>
 
@@ -213,7 +194,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </aside>
 
       {/* Main Admin Workspace */}
-      <main className="flex-1 flex flex-col min-w-0 overflow-y-auto min-h-screen bg-[#F8FAFC]">
+      <main className="flex-1 flex flex-col min-w-0 overflow-y-auto min-h-screen bg-[#F4F7FA]">
         {/* Top Header Bar */}
         <header className="bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-6 py-3.5 flex items-center justify-between sticky top-0 z-30 shadow-xs">
           <div className="flex items-center gap-3">
@@ -238,10 +219,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 type="button"
                 onClick={handleManualSync}
                 disabled={isRefreshing}
-                className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold text-[#163B63] hover:text-[#032654] bg-[#EAF6FF] hover:bg-sky-100 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
                 title="تحديث البيانات من قاعدة البيانات"
               >
-                <RotateCcw className={`w-3 h-3 ${isRefreshing ? 'animate-spin text-sky-600' : ''}`} />
+                <RotateCcw className={`w-3 h-3 ${isRefreshing ? 'animate-spin text-[#0097FB]' : 'text-[#0097FB]'}`} />
                 <span>مزامنة</span>
               </button>
             )}
@@ -250,7 +231,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="flex items-center gap-3">
             <Link
               href="/admin/doctors"
-              className="hidden sm:inline-flex items-center gap-1.5 bg-sky-600 hover:bg-sky-700 active:scale-98 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-sm shadow-sky-600/20 transition-all"
+              className="hidden sm:inline-flex items-center gap-1.5 bg-[#0097FB] hover:bg-[#0082d6] active:scale-98 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-sm shadow-[#0097FB]/25 transition-all"
             >
               <PlusCircle className="w-3.5 h-3.5" />
               <span>طبيب جديد</span>
@@ -258,19 +239,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
             <Link
               href="/admin/blog"
-              className="hidden sm:inline-flex items-center gap-1.5 bg-white hover:bg-slate-50 active:scale-98 text-slate-700 text-xs font-bold px-4 py-2 rounded-xl border border-slate-200 shadow-xs transition-all"
+              className="hidden sm:inline-flex items-center gap-1.5 bg-white hover:bg-[#EAF6FF] active:scale-98 text-[#032654] text-xs font-bold px-4 py-2 rounded-xl border border-slate-200 hover:border-[#0097FB]/40 shadow-xs transition-all"
             >
-              <PlusCircle className="w-3.5 h-3.5 text-sky-600" />
+              <PlusCircle className="w-3.5 h-3.5 text-[#0097FB]" />
               <span>مقال جديد</span>
             </Link>
 
             <div className="flex items-center gap-2 border-r rtl:border-r rtl:border-l-0 ltr:border-l ltr:border-r-0 border-slate-200 px-3">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-sky-500 to-sky-700 text-white font-black flex items-center justify-center text-xs shadow-sm">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#032654] to-[#0097FB] text-white font-black flex items-center justify-center text-xs shadow-sm">
                 AD
               </div>
               <div className="hidden md:block text-right rtl:text-right ltr:text-left">
-                <div className="text-xs font-bold text-slate-800">إدارة المنصة</div>
-                <div className="text-[10px] text-slate-400 font-medium">Administrator</div>
+                <div className="text-xs font-bold text-[#032654]">إدارة المنصة</div>
+                <div className="text-[10px] text-[#64748B] font-medium">Administrator</div>
               </div>
             </div>
           </div>

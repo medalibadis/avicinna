@@ -32,13 +32,13 @@ export const FinalCTA: React.FC = () => {
     : 'Get in touch with our team via WhatsApp or book a free consultation. Our board is available 24/7 to review your medical reports.');
 
   return (
-    <section className="py-20 bg-gradient-to-br from-[#06101E] via-[#0A192F] to-[#0F243E] text-white relative overflow-hidden">
+    <section className="py-20 bg-gradient-to-br from-[#021838] via-[#032654] to-[#0d3b73] text-white relative overflow-hidden">
       {/* Background Accent Rings */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-[#0097FB]/15 rounded-full blur-3xl pointer-events-none" />
 
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <div className="inline-flex items-center gap-2 bg-sky-500/20 border border-sky-400/40 px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold text-sky-200 mb-6">
-          <Heart className="w-4 h-4 text-sky-400 fill-current animate-pulse" />
+        <div className="inline-flex items-center gap-2 bg-[#0097FB]/20 border border-[#00BFFF]/40 px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold text-[#00BFFF] mb-6">
+          <Heart className="w-4 h-4 text-[#00BFFF] fill-current animate-pulse" />
           <span>{language === 'ar' ? 'صحتك في أيدٍ أمينة مع AVICINNA' : 'Your Health in Safe Hands with AVICINNA'}</span>
         </div>
 
@@ -46,7 +46,7 @@ export const FinalCTA: React.FC = () => {
           {headingText}
         </h2>
 
-        <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed mb-10">
+        <p className="text-base sm:text-lg text-slate-200/90 max-w-2xl mx-auto leading-relaxed mb-10">
           {subtitleText}
         </p>
 
@@ -63,7 +63,7 @@ export const FinalCTA: React.FC = () => {
 
           <a
             href="#consultation"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-sky-500 hover:bg-sky-600 text-white font-bold text-base px-8 py-4 rounded-full shadow-lg shadow-sky-500/30 transition-all duration-200 transform hover:-translate-y-0.5"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#0097FB] hover:bg-[#0082d6] text-white font-bold text-base px-8 py-4 rounded-full shadow-lg shadow-[#0097FB]/30 transition-all duration-200 transform hover:-translate-y-0.5"
           >
             <Calendar className="w-5 h-5" />
             <span>{t.nav.freeConsultation}</span>

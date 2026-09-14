@@ -198,7 +198,7 @@ export default function ContactPage() {
   return (
     <div className="pt-24 pb-16 bg-slate-50 min-h-screen">
       {/* Header Banner */}
-      <div className="bg-gradient-to-b from-slate-900 to-[#0A192F] text-white py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      <div className="bg-gradient-to-b from-[#021838] to-[#032654] text-white py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:16px_16px]" />
         <div className="max-w-7xl mx-auto relative z-10 text-center max-w-3xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/20 text-sky-300 text-xs font-semibold mb-4 border border-sky-500/30">

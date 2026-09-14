@@ -16,13 +16,13 @@ export const PatientStoriesPreview: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-2 bg-sky-50 text-sky-700 text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-full mb-3 border border-sky-100">
+          <div className="inline-flex items-center gap-2 bg-[#EAF6FF] text-[#0097FB] text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-full mb-3 border border-[#0097FB]/20">
             {t.patientStories.badge}
           </div>
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-[#0A192F] tracking-tight mb-4">
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-[#032654] tracking-tight mb-4">
             {t.patientStories.title}
           </h2>
-          <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
+          <p className="text-sm sm:text-base text-[#64748B] leading-relaxed">
             {t.patientStories.subtitle}
           </p>
         </div>
@@ -44,14 +44,14 @@ export const PatientStoriesPreview: React.FC = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 
                 {/* Treatment Pill */}
-                <div className="absolute top-3 right-3 bg-sky-500 text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-md">
+                <div className="absolute top-3 right-3 bg-[#0097FB] text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-md">
                   {story.treatment[language]}
                 </div>
 
                 {/* Video Indicator */}
                 {story.hasVideo && (
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-12 h-12 rounded-full bg-white/90 text-sky-600 flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:bg-sky-500 group-hover:text-white transition-all">
+                    <div className="w-12 h-12 rounded-full bg-white/90 text-[#0097FB] flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:bg-[#0097FB] group-hover:text-white transition-all">
                       <Play className="w-5 h-5 fill-current ml-0.5" />
                     </div>
                   </div>
@@ -60,7 +60,7 @@ export const PatientStoriesPreview: React.FC = () => {
                 {/* Patient Country & Duration */}
                 <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white text-xs">
                   <span className="font-bold flex items-center gap-1">
-                    <MapPin className="w-3.5 h-3.5 text-sky-300" />
+                    <MapPin className="w-3.5 h-3.5 text-[#00BFFF]" />
                     {story.country[language]}
                   </span>
                   <span className="bg-black/40 px-2 py-0.5 rounded backdrop-blur-xs">
@@ -78,11 +78,11 @@ export const PatientStoriesPreview: React.FC = () => {
                     ))}
                   </div>
 
-                  <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-2 leading-snug group-hover:text-sky-600 transition-colors">
+                  <h3 className="text-base sm:text-lg font-bold text-[#032654] mb-2 leading-snug group-hover:text-[#0097FB] transition-colors">
                     {story.title[language]}
                   </h3>
 
-                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed line-clamp-3">
+                  <p className="text-xs sm:text-sm text-[#64748B] leading-relaxed line-clamp-3">
                     {story.shortStory[language]}
                   </p>
                 </div>
@@ -91,7 +91,7 @@ export const PatientStoriesPreview: React.FC = () => {
                 <div className="pt-4 border-t border-slate-100">
                   <Link
                     href={`/patient-stories/${story.slug}`}
-                    className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-sky-600 hover:text-sky-700 transition-colors"
+                    className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-[#0097FB] hover:text-[#032654] transition-colors"
                   >
                     <span>{t.patientStories.readStory}</span>
                     {isRtl ? <ArrowLeft className="w-3.5 h-3.5" /> : <ArrowRight className="w-3.5 h-3.5" />}
@@ -106,7 +106,7 @@ export const PatientStoriesPreview: React.FC = () => {
         <div className="text-center">
           <Link
             href="/patient-stories"
-            className="inline-flex items-center gap-2 bg-[#0A192F] hover:bg-[#132A4A] text-white font-bold text-sm px-8 py-4 rounded-full shadow-md transition-all duration-200"
+            className="inline-flex items-center gap-2 bg-[#032654] hover:bg-[#163B63] text-white font-bold text-sm px-8 py-4 rounded-full shadow-md shadow-[#032654]/20 transition-all duration-200"
           >
             <span>{t.patientStories.allStoriesCta}</span>
             {isRtl ? <ArrowLeft className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}

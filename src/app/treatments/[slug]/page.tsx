@@ -337,7 +337,7 @@ export default function TreatmentDetailPage() {
             {/* Sidebar Column (4 cols) */}
             <div className="lg:col-span-4 space-y-6">
               {/* Consultation Box */}
-              <div className="bg-gradient-to-b from-slate-900 to-[#0A192F] text-white rounded-3xl p-6 sm:p-8 shadow-xl">
+              <div className="bg-gradient-to-b from-[#021838] to-[#032654] text-white rounded-3xl p-6 sm:p-8 shadow-xl">
                 <h3 className="text-xl font-bold mb-2">{content.requestConsultation}</h3>
                 <p className="text-xs sm:text-sm text-slate-300 mb-6 leading-relaxed">
                   احصل على دراسة مجانية لتقاريرك الطبية وعرض سعر تفصيلي شامل الفندق والمواصلات في إسطنبول.

@@ -35,8 +35,8 @@ export default function AdminOverviewPage() {
       subtitle: 'Doctors & Faculty',
       count: doctors.length,
       icon: Users,
-      iconBg: 'bg-sky-50 text-sky-600 border border-sky-100',
-      badgeColor: 'bg-sky-100 text-sky-800',
+      iconBg: 'bg-[#EAF6FF] text-[#0097FB] border border-[#0097FB]/20',
+      badgeColor: 'bg-[#EAF6FF] text-[#0097FB]',
       href: '/admin/doctors',
     },
     {
@@ -44,8 +44,8 @@ export default function AdminOverviewPage() {
       subtitle: 'Partner Hospitals',
       count: hospitals.length,
       icon: Building2,
-      iconBg: 'bg-cyan-50 text-cyan-600 border border-cyan-100',
-      badgeColor: 'bg-cyan-100 text-cyan-800',
+      iconBg: 'bg-[#EAF6FF] text-[#00BFFF] border border-[#00BFFF]/20',
+      badgeColor: 'bg-[#EAF6FF] text-[#00BFFF]',
       href: '/admin/hospitals',
     },
     {
@@ -91,16 +91,16 @@ export default function AdminOverviewPage() {
     <div className="space-y-8">
       {/* Welcome Banner */}
       <div className="bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-8 relative overflow-hidden shadow-xs">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-sky-50 via-sky-50/40 to-transparent rounded-full -mr-16 -mt-16 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-[#EAF6FF] via-[#EAF6FF]/40 to-transparent rounded-full -mr-16 -mt-16 pointer-events-none" />
         <div className="relative z-10 space-y-3 max-w-3xl">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-50 border border-sky-200/70 text-sky-700 text-xs font-bold">
-            <Sparkles className="w-3.5 h-3.5 text-sky-600" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EAF6FF] border border-[#0097FB]/20 text-[#0097FB] text-xs font-bold">
+            <Sparkles className="w-3.5 h-3.5 text-[#0097FB]" />
             <span>لوحة التحكم المباشرة AVICINNA CMS</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0A192F] tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#032654] tracking-tight">
             مرحباً بك في لوحة إدارة منصة أفيسينا الطبية
           </h1>
-          <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
+          <p className="text-[#64748B] text-xs sm:text-sm leading-relaxed">
             التحكم الكامل في محتويات الموقع: تعديل نصوص وأرقام الصفحة الرئيسية، إدارة شبكة الأطباء والمستشفيات الشريكة، نشر العمليات وقصص المرضى والمقالات، ومتابعة طلبات الاستشارة اللحظية.
           </p>
         </div>
@@ -114,7 +114,7 @@ export default function AdminOverviewPage() {
             <Link
               key={idx}
               href={m.href}
-              className="bg-white border border-slate-200/80 hover:border-sky-300 rounded-2xl p-5 hover:shadow-md transition-all duration-200 flex flex-col justify-between group"
+              className="bg-white border border-slate-200/80 hover:border-[#0097FB]/40 rounded-2xl p-5 hover:shadow-md transition-all duration-200 flex flex-col justify-between group"
             >
               <div className="flex items-center justify-between mb-4">
                 <div className={`w-11 h-11 rounded-xl ${m.iconBg} flex items-center justify-center transition-colors`}>
@@ -125,18 +125,18 @@ export default function AdminOverviewPage() {
                     {m.badge}
                   </span>
                 ) : (
-                  <div className="w-7 h-7 rounded-lg bg-slate-50 text-slate-400 group-hover:text-sky-600 group-hover:bg-sky-50 flex items-center justify-center transition-colors">
+                  <div className="w-7 h-7 rounded-lg bg-[#F4F7FA] text-slate-400 group-hover:text-[#0097FB] group-hover:bg-[#EAF6FF] flex items-center justify-center transition-colors">
                     <ArrowUpRight className="w-3.5 h-3.5" />
                   </div>
                 )}
               </div>
 
               <div>
-                <div className="text-3xl font-black text-slate-900 group-hover:text-sky-600 transition-colors">
+                <div className="text-3xl font-black text-[#032654] group-hover:text-[#0097FB] transition-colors">
                   {m.count}
                 </div>
-                <div className="text-xs font-bold text-slate-800 mt-1">{m.title}</div>
-                <div className="text-[11px] text-slate-500 mt-0.5">{m.subtitle}</div>
+                <div className="text-xs font-bold text-[#163B63] mt-1">{m.title}</div>
+                <div className="text-[11px] text-[#64748B] mt-0.5">{m.subtitle}</div>
               </div>
             </Link>
           );

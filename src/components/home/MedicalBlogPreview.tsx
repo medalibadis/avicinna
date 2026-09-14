@@ -19,17 +19,17 @@ export const MedicalBlogPreview: React.FC = () => {
       : articles.filter((art) => art.categorySlug === selectedCat).slice(0, 3);
 
   return (
-    <section id="blog" className="py-20 bg-[#F8FAFC]">
+    <section id="blog" className="py-20 bg-[#F4F7FA]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-10">
-          <div className="inline-flex items-center gap-2 bg-sky-100 text-sky-800 text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-full mb-3">
+          <div className="inline-flex items-center gap-2 bg-[#EAF6FF] text-[#0097FB] text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-full mb-3 border border-[#0097FB]/20">
             {t.blog.badge}
           </div>
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-[#0A192F] tracking-tight mb-4">
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-[#032654] tracking-tight mb-4">
             {t.blog.title}
           </h2>
-          <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
+          <p className="text-sm sm:text-base text-[#64748B] leading-relaxed">
             {t.blog.subtitle}
           </p>
         </div>
@@ -45,8 +45,8 @@ export const MedicalBlogPreview: React.FC = () => {
                 type="button"
                 className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer ${
                   isActive
-                    ? 'bg-sky-500 text-white shadow-sm scale-105'
-                    : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200/60'
+                    ? 'bg-[#0097FB] text-white shadow-sm shadow-[#0097FB]/25 scale-105'
+                    : 'bg-white text-[#163B63] hover:bg-[#EAF6FF] border border-slate-200/60'
                 }`}
               >
                 {cat.name[language]}
@@ -69,7 +69,7 @@ export const MedicalBlogPreview: React.FC = () => {
                   alt={article.title[language]}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
-                <div className="absolute top-3 right-3 bg-sky-500 text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-md">
+                <div className="absolute top-3 right-3 bg-[#0097FB] text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-md">
                   {article.categoryName[language]}
                 </div>
               </div>
@@ -80,7 +80,7 @@ export const MedicalBlogPreview: React.FC = () => {
                   {/* Meta: Source & Reading Time */}
                   <div className="flex items-center justify-between text-xs text-slate-400 mb-3">
                     <span className="flex items-center gap-1 truncate max-w-[180px]">
-                      <Building className="w-3.5 h-3.5 text-sky-500 flex-shrink-0" />
+                      <Building className="w-3.5 h-3.5 text-[#0097FB] flex-shrink-0" />
                       <span className="truncate">{article.sourceHospital[language]}</span>
                     </span>
                     <span className="flex items-center gap-1 flex-shrink-0">
@@ -91,11 +91,11 @@ export const MedicalBlogPreview: React.FC = () => {
                     </span>
                   </div>
 
-                  <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-2 leading-snug group-hover:text-sky-600 transition-colors">
+                  <h3 className="text-base sm:text-lg font-bold text-[#032654] mb-2 leading-snug group-hover:text-[#0097FB] transition-colors">
                     {article.title[language]}
                   </h3>
 
-                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed line-clamp-3">
+                  <p className="text-xs sm:text-sm text-[#64748B] leading-relaxed line-clamp-3">
                     {article.excerpt[language]}
                   </p>
                 </div>
@@ -104,7 +104,7 @@ export const MedicalBlogPreview: React.FC = () => {
                 <div className="pt-4 border-t border-slate-100">
                   <Link
                     href={`/blog/${article.slug}`}
-                    className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-sky-600 hover:text-sky-700 transition-colors"
+                    className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-[#0097FB] hover:text-[#032654] transition-colors"
                   >
                     <span>{t.blog.readMore}</span>
                     {isRtl ? <ArrowLeft className="w-3.5 h-3.5" /> : <ArrowRight className="w-3.5 h-3.5" />}
@@ -119,7 +119,7 @@ export const MedicalBlogPreview: React.FC = () => {
         <div className="text-center">
           <Link
             href="/blog"
-            className="inline-flex items-center gap-2 bg-[#0A192F] hover:bg-[#132A4A] text-white font-bold text-sm px-8 py-4 rounded-full shadow-md transition-all duration-200"
+            className="inline-flex items-center gap-2 bg-[#032654] hover:bg-[#163B63] text-white font-bold text-sm px-8 py-4 rounded-full shadow-md shadow-[#032654]/20 transition-all duration-200"
           >
             <span>{t.blog.allBlogCta}</span>
             {isRtl ? <ArrowLeft className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}

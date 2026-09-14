@@ -1,5 +1,39 @@
 @import "tailwindcss";
 
+@theme {
+  --color-brand-navy: #032654;
+  --color-brand-blue: #0097FB;
+  --color-brand-cyan: #00BFFF;
+  --color-brand-soft: #EAF6FF;
+  --color-brand-slate: #163B63;
+  --color-brand-cool: #F4F7FA;
+  --color-brand-gray: #64748B;
+
+  --color-sky-50: #EAF6FF;
+  --color-sky-100: #d8eeff;
+  --color-sky-200: #b5e0ff;
+  --color-sky-300: #7eccff;
+  --color-sky-400: #00BFFF;
+  --color-sky-500: #0097FB;
+  --color-sky-600: #0082d6;
+  --color-sky-700: #0068ac;
+  --color-sky-800: #163B63;
+  --color-sky-900: #032654;
+  --color-sky-950: #021838;
+}
+
+:root {
+  --brand-navy: #032654;
+  --brand-blue: #0097FB;
+  --brand-cyan: #00BFFF;
+  --brand-soft: #EAF6FF;
+  --brand-slate: #163B63;
+  --brand-cool: #F4F7FA;
+  --brand-gray: #64748B;
+  --brand-gradient: linear-gradient(135deg, #032654 0%, #0097FB 60%, #00BFFF 100%);
+  --brand-blue-gradient: linear-gradient(135deg, #0097FB 0%, #00BFFF 100%);
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
@@ -8,7 +42,7 @@
 
   body {
     background-color: #FFFFFF;
-    color: #0F172A;
+    color: #163B63;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
@@ -24,6 +58,47 @@
   }
 }
 
+/* Brand Utility Classes */
+.bg-brand-navy { background-color: #032654; }
+.text-brand-navy { color: #032654; }
+.border-brand-navy { border-color: #032654; }
+
+.bg-brand-blue { background-color: #0097FB; }
+.text-brand-blue { color: #0097FB; }
+.border-brand-blue { border-color: #0097FB; }
+
+.bg-brand-cyan { background-color: #00BFFF; }
+.text-brand-cyan { color: #00BFFF; }
+.border-brand-cyan { border-color: #00BFFF; }
+
+.bg-brand-soft { background-color: #EAF6FF; }
+.text-brand-soft { color: #EAF6FF; }
+.border-brand-soft { border-color: #EAF6FF; }
+
+.bg-brand-slate { background-color: #163B63; }
+.text-brand-slate { color: #163B63; }
+.border-brand-slate { border-color: #163B63; }
+
+.bg-brand-cool { background-color: #F4F7FA; }
+.text-brand-cool { color: #F4F7FA; }
+.border-brand-cool { border-color: #F4F7FA; }
+
+.bg-brand-gray { background-color: #64748B; }
+.text-brand-gray { color: #64748B; }
+.border-brand-gray { border-color: #64748B; }
+
+.gradient-brand {
+  background: linear-gradient(135deg, #032654 0%, #0097FB 60%, #00BFFF 100%);
+}
+
+.gradient-brand-blue {
+  background: linear-gradient(135deg, #0097FB 0%, #00BFFF 100%);
+}
+
+.gradient-brand-subtle {
+  background: linear-gradient(180deg, #FFFFFF 0%, #EAF6FF 100%);
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
@@ -31,7 +106,7 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #F4F7FA;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -40,5 +115,5 @@
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #0097FB;
 }

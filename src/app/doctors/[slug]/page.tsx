@@ -309,7 +309,7 @@ export default function DoctorDetailPage() {
             {/* Sidebar Column (4 cols) */}
             <div className="lg:col-span-4 space-y-6">
               {/* Consultation Quick Box */}
-              <div className="bg-gradient-to-b from-slate-900 to-[#0A192F] text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
+              <div className="bg-gradient-to-b from-[#021838] to-[#032654] text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
                 <h3 className="text-xl font-bold mb-2">
                   {content.bookingTitle} {doctor.name[language]}
                 </h3>

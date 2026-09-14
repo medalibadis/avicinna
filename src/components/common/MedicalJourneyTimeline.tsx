@@ -34,13 +34,13 @@ export const MedicalJourneyTimeline: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 bg-sky-50 text-sky-700 text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-full mb-3 border border-sky-100">
+          <div className="inline-flex items-center gap-2 bg-[#EAF6FF] text-[#0097FB] text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-full mb-3 border border-[#0097FB]/20">
             {t.journey.badge}
           </div>
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-[#0A192F] tracking-tight mb-4">
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-[#032654] tracking-tight mb-4">
             {t.journey.title}
           </h2>
-          <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
+          <p className="text-sm sm:text-base text-[#64748B] leading-relaxed">
             {t.journey.subtitle}
           </p>
         </div>
@@ -52,20 +52,20 @@ export const MedicalJourneyTimeline: React.FC = () => {
             return (
               <div
                 key={idx}
-                className="flex flex-col items-center text-center p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-sky-300 hover:bg-sky-50/40 transition-all duration-300 relative group"
+                className="flex flex-col items-center text-center p-4 rounded-2xl bg-[#F4F7FA] border border-slate-100 hover:border-[#0097FB]/30 hover:bg-[#EAF6FF]/40 transition-all duration-300 relative group"
               >
                 {/* Step Number Badge */}
-                <span className="text-[10px] font-black text-sky-600 bg-sky-100 px-2 py-0.5 rounded-full mb-3">
+                <span className="text-[10px] font-black text-[#0097FB] bg-[#EAF6FF] px-2 py-0.5 rounded-full mb-3 border border-[#0097FB]/20">
                   {step.num}
                 </span>
 
                 {/* Step Icon */}
-                <div className="w-12 h-12 rounded-xl bg-white shadow-xs border border-slate-200/60 text-sky-600 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:bg-sky-500 group-hover:text-white transition-all">
+                <div className="w-12 h-12 rounded-xl bg-white shadow-xs border border-slate-200/60 text-[#0097FB] flex items-center justify-center mb-3 group-hover:scale-110 group-hover:bg-[#0097FB] group-hover:text-white transition-all">
                   <Icon className="w-5 h-5 stroke-[1.75]" />
                 </div>
 
                 {/* Step Title */}
-                <h4 className="text-xs font-bold text-slate-800 leading-snug">
+                <h4 className="text-xs font-bold text-[#163B63] leading-snug">
                   {step.title.replace(/^\d+\.\s*/, '')}
                 </h4>
               </div>

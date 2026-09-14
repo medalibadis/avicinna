@@ -85,10 +85,10 @@ export const Header: React.FC = () => {
                         href={link.href}
                         className={`inline-flex items-center gap-1 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                           isActive
-                            ? 'bg-sky-500 text-white shadow-sm font-semibold'
+                            ? 'bg-[#0097FB] text-white shadow-sm shadow-[#0097FB]/25 font-semibold'
                             : !isScrolled && isDarkHeroPage
                             ? 'text-white/90 hover:text-white hover:bg-white/10'
-                            : 'text-slate-700 hover:text-sky-600 hover:bg-slate-100'
+                            : 'text-[#163B63] hover:text-[#0097FB] hover:bg-[#EAF6FF]'
                         }`}
                       >
                         {link.label}
@@ -98,7 +98,7 @@ export const Header: React.FC = () => {
                       {/* Dropdown Menu */}
                       {servicesDropdownOpen && (
                         <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 w-72 bg-white rounded-2xl shadow-xl border border-slate-100 p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-                          <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 px-3 py-1.5 border-b border-slate-100">
+                          <div className="text-[11px] font-semibold uppercase tracking-wider text-[#64748B] px-3 py-1.5 border-b border-slate-100">
                             {t.specialties.badge}
                           </div>
                           <div className="py-1 max-h-72 overflow-y-auto">
@@ -106,7 +106,7 @@ export const Header: React.FC = () => {
                               <Link
                                 key={item.slug}
                                 href={`/treatments/${item.slug}`}
-                                className="block px-3 py-2 rounded-xl text-sm font-medium text-slate-700 hover:bg-sky-50 hover:text-sky-700 transition-colors"
+                                className="block px-3 py-2 rounded-xl text-sm font-medium text-[#163B63] hover:bg-[#EAF6FF] hover:text-[#0097FB] transition-colors"
                               >
                                 {item.title[language]}
                               </Link>
@@ -115,7 +115,7 @@ export const Header: React.FC = () => {
                           <div className="border-t border-slate-100 p-1.5 mt-1">
                             <Link
                               href="/treatments"
-                              className="block text-center text-xs font-semibold text-sky-600 hover:text-sky-700 py-1"
+                              className="block text-center text-xs font-semibold text-[#0097FB] hover:text-[#032654] py-1"
                             >
                               {t.specialties.cta} →
                             </Link>
@@ -132,10 +132,10 @@ export const Header: React.FC = () => {
                     href={link.href}
                     className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                       isActive
-                        ? 'bg-sky-500 text-white shadow-sm font-semibold'
+                        ? 'bg-[#0097FB] text-white shadow-sm shadow-[#0097FB]/25 font-semibold'
                         : !isScrolled && isDarkHeroPage
                         ? 'text-white/90 hover:text-white hover:bg-white/10'
-                        : 'text-slate-700 hover:text-sky-600 hover:bg-slate-100'
+                        : 'text-[#163B63] hover:text-[#0097FB] hover:bg-[#EAF6FF]'
                     }`}
                   >
                     {link.label}
@@ -150,7 +150,7 @@ export const Header: React.FC = () => {
 
               <a
                 href="#consultation"
-                className="inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-600 text-white text-sm font-semibold px-5 py-2.5 rounded-full shadow-md shadow-sky-500/20 hover:shadow-sky-500/30 transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+                className="inline-flex items-center gap-2 bg-[#0097FB] hover:bg-[#0082d6] text-white text-sm font-semibold px-5 py-2.5 rounded-full shadow-md shadow-[#0097FB]/25 hover:shadow-[#0097FB]/35 transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
               >
                 <Calendar className="w-4 h-4" />
                 <span>{t.nav.freeConsultation}</span>
@@ -167,7 +167,7 @@ export const Header: React.FC = () => {
                 className={`p-2 rounded-xl transition-colors ${
                   !isScrolled && isDarkHeroPage
                     ? 'text-white hover:bg-white/10'
-                    : 'text-slate-700 hover:bg-slate-100'
+                    : 'text-[#163B63] hover:bg-slate-100'
                 }`}
                 aria-label="Toggle menu"
               >
@@ -193,8 +193,8 @@ export const Header: React.FC = () => {
                     href={link.href}
                     className={`block px-4 py-2.5 rounded-xl text-base font-medium transition-colors ${
                       isActive
-                        ? 'bg-sky-50 text-sky-600 font-bold'
-                        : 'text-slate-700 hover:bg-slate-50'
+                        ? 'bg-[#EAF6FF] text-[#0097FB] font-bold'
+                        : 'text-[#163B63] hover:bg-slate-50'
                     }`}
                   >
                     {link.label}
@@ -207,7 +207,7 @@ export const Header: React.FC = () => {
               <a
                 href="#consultation"
                 onClick={() => setMobileMenuOpen(false)}
-                className="w-full flex items-center justify-center gap-2 bg-sky-500 hover:bg-sky-600 text-white font-semibold py-3 rounded-xl shadow-md transition-colors"
+                className="w-full flex items-center justify-center gap-2 bg-[#0097FB] hover:bg-[#0082d6] text-white font-semibold py-3 rounded-xl shadow-md shadow-[#0097FB]/20 transition-colors"
               >
                 <Calendar className="w-5 h-5" />
                 <span>{t.nav.freeConsultation}</span>
