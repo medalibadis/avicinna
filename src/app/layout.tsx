@@ -87,6 +87,10 @@ export const metadata: Metadata = {
   verification: {
     google: 'cmFnJanscmk0ia48oNs2uu0f5E1W7WmZxORJBPENKmI',
   },
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
+  },
 };
 
 import { AppShell } from "@/components/layout/AppShell";
