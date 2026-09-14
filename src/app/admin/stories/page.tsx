@@ -13,6 +13,7 @@ import {
   Search,
   X,
 } from 'lucide-react';
+import { ImageUploadField } from '@/components/admin/ImageUploadField';
 
 export default function AdminStoriesPage() {
   const { stories, treatments, addStory, updateStory, deleteStory } = useData();
@@ -405,18 +406,14 @@ export default function AdminStoriesPage() {
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  رابط صورة المريض (Photo URL)
-                </label>
-                <input
-                  type="url"
-                  required
-                  value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
-                  className="w-full bg-slate-50/70 border border-slate-200 focus:bg-white focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 rounded-xl px-4 py-2 text-xs text-slate-900 dir-ltr font-mono outline-none transition-all"
-                />
-              </div>
+              <ImageUploadField
+                label="صورة المريض أو نتيجة العلاج (Photo) *"
+                value={imageUrl}
+                onChange={setImageUrl}
+                folder="stories"
+                aspectRatio="square"
+                helperText="يمكنك سحب صورة من جهازك، أو اختيارها مباشرة، أو لصق رابط مباشر"
+              />
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">

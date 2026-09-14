@@ -26,6 +26,39 @@ export const supabase: SupabaseClient | null = isSupabaseConfigured
   : null;
 
 // ==============================================================================
+// STORAGE HELPERS (Image Upload)
+// ==============================================================================
+export async function uploadImageFile(file: File, folder = 'uploads'): Promise<string | null> {
+  if (supabase) {
+    try {
+      const fileExt = file.name.split('.').pop() || 'jpg';
+      const fileName = `${folder}/${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
+      const { data, error } = await supabase.storage.from('avicinna-media').upload(fileName, file, {
+        cacheControl: '3600',
+        upsert: false,
+      });
+
+      if (!error && data) {
+        const { data: publicUrlData } = supabase.storage.from('avicinna-media').getPublicUrl(data.path);
+        if (publicUrlData?.publicUrl) {
+          return publicUrlData.publicUrl;
+        }
+      }
+    } catch (e) {
+      console.warn('Storage upload error, falling back to base64:', e);
+    }
+  }
+
+  // Fallback: Read as base64 Data URL so it always works immediately on any device
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = (error) => reject(error);
+    reader.readAsDataURL(file);
+  });
+}
+
+// ==============================================================================
 // 1. SITE SECTIONS HELPERS
 // ==============================================================================
 export async function fetchSectionsFromDb(): Promise<Partial<SiteSectionsData> | null> {

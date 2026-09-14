@@ -15,6 +15,7 @@ import {
   ShieldCheck,
   Star,
 } from 'lucide-react';
+import { ImageUploadField } from '@/components/admin/ImageUploadField';
 
 export default function AdminHospitalsPage() {
   const { hospitals, addHospital, updateHospital, deleteHospital } = useData();
@@ -424,14 +425,13 @@ export default function AdminHospitalsPage() {
                   />
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
-                    رابط صورة الصرح الطبي (Image URL)
-                  </label>
-                  <input
-                    type="url"
+                  <ImageUploadField
+                    label="صورة الصرح الطبي (Hospital Image) *"
                     value={image}
-                    onChange={(e) => setImage(e.target.value)}
-                    className="w-full bg-slate-50/70 border border-slate-200 focus:bg-white focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 rounded-xl px-3.5 py-2 text-sm text-slate-900 outline-none dir-ltr transition-all"
+                    onChange={setImage}
+                    folder="hospitals"
+                    aspectRatio="video"
+                    helperText="يمكنك سحب صورة من جهازك، أو اختيارها مباشرة، أو لصق رابط مباشر"
                   />
                 </div>
               </div>

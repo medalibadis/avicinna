@@ -208,3 +208,32 @@ CREATE TRIGGER update_treatments_updated_at BEFORE UPDATE ON public.treatments F
 CREATE TRIGGER update_patient_stories_updated_at BEFORE UPDATE ON public.patient_stories FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_articles_updated_at BEFORE UPDATE ON public.articles FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_consultation_inquiries_updated_at BEFORE UPDATE ON public.consultation_inquiries FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- ==============================================================================
+-- SUPABASE STORAGE: PUBLIC BUCKET FOR MEDIA UPLOADS
+-- ==============================================================================
+INSERT INTO storage.buckets (id, name, public) 
+VALUES ('avicinna-media', 'avicinna-media', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Storage RLS Policies: Allow public read and public uploads
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_policies 
+        WHERE schemaname = 'storage' AND tablename = 'objects' AND policyname = 'Public Access for avicinna-media'
+    ) THEN
+        CREATE POLICY "Public Access for avicinna-media" 
+        ON storage.objects FOR SELECT 
+        USING (bucket_id = 'avicinna-media');
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_policies 
+        WHERE schemaname = 'storage' AND tablename = 'objects' AND policyname = 'Allow Uploads for avicinna-media'
+    ) THEN
+        CREATE POLICY "Allow Uploads for avicinna-media" 
+        ON storage.objects FOR INSERT 
+        WITH CHECK (bucket_id = 'avicinna-media');
+    END IF;
+END $$;

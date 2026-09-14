@@ -14,6 +14,7 @@ import {
   X,
   Stethoscope,
 } from 'lucide-react';
+import { ImageUploadField } from '@/components/admin/ImageUploadField';
 
 export default function AdminDoctorsPage() {
   const { doctors, treatments, addDoctor, updateDoctor, deleteDoctor } = useData();
@@ -420,18 +421,14 @@ export default function AdminDoctorsPage() {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  رابط صورة الطبيب (Photo URL)
-                </label>
-                <input
-                  type="url"
-                  required
-                  value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
-                  className="w-full bg-slate-50/70 border border-slate-200 focus:bg-white focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 rounded-xl px-4 py-2 text-xs text-slate-900 dir-ltr font-mono outline-none transition-all"
-                />
-              </div>
+              <ImageUploadField
+                label="صورة الطبيب الشخصية (Photo) *"
+                value={imageUrl}
+                onChange={setImageUrl}
+                folder="doctors"
+                aspectRatio="portrait"
+                helperText="يمكنك سحب صورة من جهازك، أو اختيارها مباشرة، أو لصق رابط مباشر"
+              />
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
