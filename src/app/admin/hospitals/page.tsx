@@ -290,24 +290,29 @@ export default function AdminHospitalsPage() {
 
       {/* Modal: Add/Edit Hospital */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto animate-in fade-in duration-200">
-          <div className="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full p-6 sm:p-8 relative max-h-[90vh] overflow-y-auto shadow-2xl">
-            {/* Close Button */}
-            <button
-              type="button"
-              onClick={() => setModalOpen(false)}
-              className="absolute top-6 left-6 rtl:left-6 rtl:right-auto ltr:right-6 ltr:left-auto text-slate-400 hover:text-slate-700 p-2 rounded-xl bg-slate-100 hover:bg-slate-200 cursor-pointer transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            <div className="mb-6">
-              <h2 className="text-xl font-bold text-slate-900">
-                {editingHospital ? 'تعديل بيانات المستشفى' : 'إضافة مستشفى شريك جديد'}
-              </h2>
-              <p className="text-slate-500 text-xs mt-1">
-                املأ البيانات باللغتين العربية والإنجليزية لضمان عرض المستشفى بشكل متقن في كافة نسخ الموقع.
-              </p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="bg-white border border-slate-200/90 rounded-[32px] max-w-2xl w-full p-6 sm:p-8 max-h-[90vh] overflow-y-auto space-y-5 shadow-2xl shadow-slate-900/20 text-slate-900 ring-1 ring-black/5 animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center ring-4 ring-sky-500/10 shadow-xs">
+                  <Building2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-base sm:text-lg font-black text-slate-900">
+                    {editingHospital ? 'تعديل بيانات المستشفى' : 'إضافة مستشفى شريك جديد'}
+                  </h2>
+                  <p className="text-xs text-slate-400">
+                    {editingHospital ? 'تحديث الاعتمادات والتخصصات والمعلومات' : 'أدخل بيانات الصرح الطبي لاعتماده وعرضه في منصة AVICINNA'}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setModalOpen(false)}
+                className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
             <form onSubmit={handleFormSubmit} className="space-y-4">

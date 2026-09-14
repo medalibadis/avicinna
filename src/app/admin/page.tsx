@@ -21,9 +21,10 @@ import {
   ChevronRight,
   TrendingUp,
 } from 'lucide-react';
+import { StatusDropdown } from '@/components/admin/StatusDropdown';
 
 export default function AdminOverviewPage() {
-  const { doctors, treatments, stories, articles, hospitals, inquiries } = useData();
+  const { doctors, treatments, stories, articles, hospitals, inquiries, updateInquiryStatus } = useData();
 
   const newInquiries = inquiries.filter((inq) => inq.status === 'new');
   const recentInquiries = inquiries.slice(0, 5);
@@ -230,25 +231,10 @@ export default function AdminOverviewPage() {
                   <td className="py-3.5 px-3 text-slate-600 dir-ltr">{inq.phone}</td>
                   <td className="py-3.5 px-3 text-slate-700">{inq.specialty || 'عام'}</td>
                   <td className="py-3.5 px-3">
-                    <span
-                      className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold ${
-                        inq.status === 'new'
-                          ? 'bg-rose-50 text-rose-700 border border-rose-200'
-                          : inq.status === 'in_review'
-                          ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                          : inq.status === 'contacted'
-                          ? 'bg-sky-50 text-sky-700 border border-sky-200'
-                          : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                      }`}
-                    >
-                      {inq.status === 'new'
-                        ? 'جديد'
-                        : inq.status === 'in_review'
-                        ? 'قيد المراجعة'
-                        : inq.status === 'contacted'
-                        ? 'تم التواصل'
-                        : 'تم الحجز'}
-                    </span>
+                    <StatusDropdown
+                      currentStatus={inq.status}
+                      onStatusChange={(newStatus) => updateInquiryStatus(inq.id, newStatus)}
+                    />
                   </td>
                   <td className="py-3.5 px-3">
                     <a

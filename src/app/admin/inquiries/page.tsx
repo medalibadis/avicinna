@@ -13,6 +13,7 @@ import {
   Trash2,
   MessageSquare,
 } from 'lucide-react';
+import { StatusDropdown } from '@/components/admin/StatusDropdown';
 
 export default function AdminInquiriesPage() {
   const { inquiries, updateInquiryStatus, deleteInquiry } = useData();
@@ -134,35 +135,11 @@ export default function AdminInquiriesPage() {
                   </div>
 
                   <div className="flex items-center gap-2">
-                    {/* Status Dropdown */}
-                    <select
-                      value={inq.status}
-                      onChange={(e) =>
-                        updateInquiryStatus(inq.id, e.target.value as ConsultationInquiry['status'])
-                      }
-                      className={`text-xs font-bold px-3 py-1.5 rounded-xl border outline-none cursor-pointer transition-colors ${
-                        inq.status === 'new'
-                          ? 'bg-rose-50 text-rose-700 border-rose-200'
-                          : inq.status === 'in_review'
-                          ? 'bg-amber-50 text-amber-700 border-amber-200'
-                          : inq.status === 'contacted'
-                          ? 'bg-sky-50 text-sky-700 border-sky-200'
-                          : 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                      }`}
-                    >
-                      <option value="new">
-                        جديد (New)
-                      </option>
-                      <option value="in_review">
-                        قيد المراجعة (In Review)
-                      </option>
-                      <option value="contacted">
-                        تم التواصل (Contacted)
-                      </option>
-                      <option value="scheduled">
-                        تم الحجز (Scheduled)
-                      </option>
-                    </select>
+                    {/* Custom Luxury Status Dropdown */}
+                    <StatusDropdown
+                      currentStatus={inq.status}
+                      onStatusChange={(newStatus) => updateInquiryStatus(inq.id, newStatus)}
+                    />
 
                     <button
                       type="button"
