@@ -1,0 +1,13 @@
+{
+  "name": "avicinna-wordpress-headless",
+  "version": "1.0.0",
+  "description": "AVICINNA Headless WordPress CMS & Bridge for Local Development and Production",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": ["wordpress", "headless", "cms", "nextjs", "bridge", "seo"],
+  "author": "AVICINNA Healthcare",
+  "license": "ISC"
+}

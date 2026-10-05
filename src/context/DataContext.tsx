@@ -1,11 +1,11 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { Doctor } from '@/data/doctors';
-import { Treatment } from '@/data/treatments';
-import { PatientStory } from '@/data/stories';
-import { Article } from '@/data/articles';
-import { HospitalPartner } from '@/data/hospitals';
+import { Doctor, doctorsData } from '@/data/doctors';
+import { Treatment, treatmentsData } from '@/data/treatments';
+import { PatientStory, patientStoriesData } from '@/data/stories';
+import { Article, articlesData } from '@/data/articles';
+import { HospitalPartner, hospitalsData } from '@/data/hospitals';
 import {
   isSupabaseConfigured,
   fetchSectionsFromDb,
@@ -280,16 +280,27 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (parsed.doctors) setDoctors(parsed.doctors);
-        if (parsed.treatments) setTreatments(parsed.treatments);
-        if (parsed.stories) setStories(parsed.stories);
-        if (parsed.articles) setArticles(parsed.articles);
-        if (parsed.hospitals) setHospitals(parsed.hospitals);
+        setDoctors(parsed.doctors?.length ? parsed.doctors : doctorsData);
+        setTreatments(parsed.treatments?.length ? parsed.treatments : treatmentsData);
+        setStories(parsed.stories?.length ? parsed.stories : patientStoriesData);
+        setArticles(parsed.articles?.length ? parsed.articles : articlesData);
+        setHospitals(parsed.hospitals?.length ? parsed.hospitals : hospitalsData);
         if (parsed.sections) setSections(parsed.sections);
         if (parsed.inquiries) setInquiries(parsed.inquiries);
+      } else {
+        setDoctors(doctorsData);
+        setTreatments(treatmentsData);
+        setStories(patientStoriesData);
+        setArticles(articlesData);
+        setHospitals(hospitalsData);
       }
     } catch (e) {
       console.error('Failed to load CMS data from localStorage:', e);
+      setDoctors(doctorsData);
+      setTreatments(treatmentsData);
+      setStories(patientStoriesData);
+      setArticles(articlesData);
+      setHospitals(hospitalsData);
     }
     setIsLoaded(true);
 
