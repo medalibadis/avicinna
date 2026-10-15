@@ -11,40 +11,70 @@ async function handleRevalidation(req: NextRequest) {
 
   try {
     let slug = req.nextUrl.searchParams.get('slug') || '';
+
     if (!slug && req.method === 'POST') {
       try {
-        const body = await req.json();
-        slug = body.slug || '';
+        const rawBody = await req.text();
+        if (rawBody && rawBody.length < 10240) {
+          const body = JSON.parse(rawBody);
+          if (body && typeof body.slug === 'string') {
+            slug = body.slug;
+          }
+        }
       } catch {
-        // Body may be empty
+        // Body may be empty or invalid JSON, ignore
       }
     }
 
+    // Sanitize slug strictly to prevent path traversal or injection
+    const sanitizedSlug = slug
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9\-_]/g, '')
+      .slice(0, 120);
+
     // Revalidate paths for blog listing, dynamic sitemap, and specific article
-    revalidatePath('/blog');
-    revalidatePath('/sitemap.xml');
+    try {
+      revalidatePath('/blog');
+      revalidatePath('/sitemap.xml');
+    } catch (e) {
+      console.warn('revalidatePath warning:', e);
+    }
+
     try {
       revalidateTag('wordpress-blog', 'seconds');
     } catch {
-      // fallback
+      try {
+        (revalidateTag as any)('wordpress-blog');
+      } catch {}
     }
 
-    if (slug) {
-      revalidatePath(`/blog/${slug}`);
+    if (sanitizedSlug) {
       try {
-        revalidateTag(`wordpress-post-${slug}`, 'seconds');
+        revalidatePath(`/blog/${sanitizedSlug}`);
+      } catch (e) {
+        console.warn('revalidatePath slug warning:', e);
+      }
+
+      try {
+        revalidateTag(`wordpress-post-${sanitizedSlug}`, 'seconds');
       } catch {
-        // fallback
+        try {
+          (revalidateTag as any)(`wordpress-post-${sanitizedSlug}`);
+        } catch {}
       }
     }
 
     return NextResponse.json({
       revalidated: true,
-      slug: slug || 'all',
+      slug: sanitizedSlug || 'all',
       timestamp: Date.now(),
     });
   } catch (err: any) {
-    return NextResponse.json({ message: 'Error revalidating', error: err.message }, { status: 500 });
+    return NextResponse.json(
+      { message: 'Error during revalidation', error: String(err?.message || err) },
+      { status: 500 }
+    );
   }
 }
 
