@@ -2,7 +2,7 @@
 
 const AUTH_SECRET = process.env.ADMIN_SECRET || process.env.WORDPRESS_PREVIEW_SECRET || 'avicinna_super_secure_jwt_secret_key_2026';
 const ADMIN_USER = process.env.ADMIN_USER || 'avicinna_core_admin';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Av!c#99_TrK$Xp2026!mZ';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Avic#99_TrK!Xp2026_mZ#99';
 const ADMIN_PIN = process.env.ADMIN_PIN || '937104'; // 6-digit Master Security PIN
 
 export interface AdminSessionPayload {
