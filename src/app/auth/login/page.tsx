@@ -182,7 +182,7 @@ function LoginForm() {
               disabled={isLocked}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="admin"
+              placeholder="اسم المستخدم / Username"
               autoComplete="username"
               className="w-full pl-9 pr-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0097FB] focus:border-transparent transition-all disabled:opacity-50"
             />
