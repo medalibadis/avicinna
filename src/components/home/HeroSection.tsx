@@ -208,7 +208,7 @@ export const HeroSection: React.FC = () => {
   };
 
   return (
-    <section className="relative min-h-[90vh] flex items-center justify-center pt-28 pb-16 overflow-hidden bg-[#032654]">
+    <section className="relative z-30 min-h-[90vh] flex items-center justify-center pt-28 pb-16 bg-[#032654]">
       {/* 1. AUTO-PLAYING AMBIENT MEDICAL VIDEO BACKGROUND */}
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
         <video
@@ -255,52 +255,225 @@ export const HeroSection: React.FC = () => {
         </p>
 
         {/* ─── Search / Consultation Entry Component with Live Autocomplete ─── */}
-        <div ref={containerRef} className="max-w-2xl mx-auto mb-10 relative">
-          <form
-            onSubmit={handleSearch}
-            className="relative flex items-center bg-white/95 dark:bg-slate-900/85 backdrop-blur-xl rounded-2xl sm:rounded-full p-2 shadow-2xl shadow-black/40 border border-white/20 dark:border-white/10 transition-all focus-within:ring-2 focus-within:ring-[#0097FB]"
-          >
-            <div className="flex items-center justify-center rtl:pr-3 rtl:pl-2 ltr:pl-3 ltr:pr-2 text-[#0097FB]">
-              <Search className="w-5 h-5" />
-            </div>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setIsDropdownOpen(true);
-              }}
-              onFocus={() => {
-                if (searchQuery.trim().length > 0) {
-                  setIsDropdownOpen(true);
-                }
-              }}
-              placeholder={dict.searchPlaceholder}
-              className="w-full bg-transparent text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-400 text-sm sm:text-base font-medium focus:outline-none px-2 py-2"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => {
-                  setSearchQuery('');
-                  setIsDropdownOpen(false);
-                }}
-                className="p-1.5 text-slate-400 hover:text-slate-600 dark:text-slate-400 dark:hover:text-slate-200 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors mr-1 cursor-pointer"
-                aria-label="Clear search"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
-            <button
-              type="submit"
-              className="bg-[#0097FB] hover:bg-[#0082d6] text-white font-semibold text-sm px-6 py-3 rounded-xl sm:rounded-full transition-all duration-200 shadow-md shadow-[#0097FB]/30 flex-shrink-0 cursor-pointer"
+        <div ref={containerRef} className="max-w-2xl mx-auto mb-10 relative z-30">
+          {/* Search Bar + Floating Dropdown Anchor */}
+          <div className="relative">
+            <form
+              onSubmit={handleSearch}
+              className="relative flex items-center bg-white/95 dark:bg-slate-900/90 backdrop-blur-xl rounded-2xl sm:rounded-full p-2 shadow-2xl shadow-black/40 border border-white/20 dark:border-white/10 transition-all focus-within:ring-2 focus-within:ring-[#0097FB] z-20"
             >
-              {dict.quickSearchBtn}
-            </button>
-          </form>
+              <div className="flex items-center justify-center rtl:pr-3 rtl:pl-2 ltr:pl-3 ltr:pr-2 text-[#0097FB]">
+                <Search className="w-5 h-5" />
+              </div>
+              <input
+                type="text"
+                dir="auto"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setIsDropdownOpen(true);
+                }}
+                onFocus={() => {
+                  if (searchQuery.trim().length > 0) {
+                    setIsDropdownOpen(true);
+                  }
+                }}
+                placeholder={dict.searchPlaceholder}
+                className="w-full bg-transparent text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-400 text-sm sm:text-base font-medium focus:outline-none px-2 py-2"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery('');
+                    setIsDropdownOpen(false);
+                  }}
+                  className="p-1.5 text-slate-400 hover:text-slate-600 dark:text-slate-400 dark:hover:text-slate-200 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors mx-1.5 cursor-pointer"
+                  aria-label="Clear search"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+              <button
+                type="submit"
+                className="bg-[#0097FB] hover:bg-[#0082d6] text-white font-semibold text-sm px-6 py-3 rounded-xl sm:rounded-full transition-all duration-200 shadow-md shadow-[#0097FB]/30 flex-shrink-0 cursor-pointer"
+              >
+                {dict.quickSearchBtn}
+              </button>
+            </form>
+
+            {/* ─── Live Autocomplete Dropdown (Direct deep links to Doctor, Hospital, Treatment) ─── */}
+            {isDropdownOpen && searchQuery.trim().length >= 1 && (
+              <div
+                dir={direction}
+                className="absolute left-0 right-0 top-full mt-2.5 bg-[#0d1627]/98 dark:bg-[#08101e]/98 backdrop-blur-2xl border border-sky-400/40 rounded-2xl shadow-2xl shadow-black/90 overflow-hidden text-start z-50 max-h-[380px] sm:max-h-[440px] overflow-y-auto animate-in fade-in zoom-in-98 duration-150 [scrollbar-width:thin] [scrollbar-color:rgba(56,189,248,0.3)_transparent] ring-1 ring-white/10"
+              >
+                {hasMatches ? (
+                  <div className="p-3 space-y-4">
+                    {/* Category 1: Doctors */}
+                    {suggestions.matchingDoctors.length > 0 && (
+                      <div>
+                        <div className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold text-sky-400 uppercase tracking-wider">
+                          <Users className="w-3.5 h-3.5" />
+                          <span>{dict.doctorsCategory}</span>
+                        </div>
+                        <div className="space-y-1 mt-1">
+                          {suggestions.matchingDoctors.map((doc) => {
+                            const docName = doc.name?.[langKey] || doc.name?.ar || doc.name?.en || 'Doctor';
+                            const docTitle = doc.title?.[langKey] || doc.title?.en || '';
+                            const docSpec = doc.specialtyName?.[langKey] || doc.specialtyName?.en || '';
+                            return (
+                              <Link
+                                key={doc.id}
+                                href={`/doctors/${doc.slug}`}
+                                onClick={() => setIsDropdownOpen(false)}
+                                className="flex items-center justify-between p-2.5 rounded-xl hover:bg-white/10 transition-colors group cursor-pointer border border-transparent hover:border-white/10"
+                              >
+                                <div className="flex items-center gap-3 min-w-0">
+                                  <img
+                                    src={doc.image}
+                                    alt={docName}
+                                    className="w-10 h-10 rounded-full object-cover border border-white/20 flex-shrink-0"
+                                  />
+                                  <div className="min-w-0">
+                                    <div className="text-sm font-bold text-white group-hover:text-sky-400 transition-colors truncate">
+                                      {docName}
+                                    </div>
+                                    <div className="text-xs text-slate-400 truncate">
+                                      {docTitle ? `${docTitle} • ` : ''}
+                                      {docSpec}
+                                    </div>
+                                  </div>
+                                </div>
+                                <span className="text-[11px] text-sky-400 font-semibold px-2 py-1 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center gap-1 flex-shrink-0 ml-2 rtl:ml-0 rtl:mr-2">
+                                  <span>{dict.viewDoctor}</span>
+                                  <ArrowIcon className="w-3 h-3" />
+                                </span>
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Category 2: Hospitals */}
+                    {suggestions.matchingHospitals.length > 0 && (
+                      <div>
+                        <div className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold text-emerald-400 uppercase tracking-wider">
+                          <Building2 className="w-3.5 h-3.5" />
+                          <span>{dict.hospitalsCategory}</span>
+                        </div>
+                        <div className="space-y-1 mt-1">
+                          {suggestions.matchingHospitals.map((hosp) => {
+                            const hospName = hosp.name?.[langKey] || hosp.name?.ar || hosp.name?.en || 'Hospital';
+                            const city = hosp.city?.[langKey] || hosp.city?.ar || hosp.city?.en || '';
+                            return (
+                              <Link
+                                key={hosp.id}
+                                href={`/hospitals?id=${hosp.id}`}
+                                onClick={() => setIsDropdownOpen(false)}
+                                className="flex items-center justify-between p-2.5 rounded-xl hover:bg-white/10 transition-colors group cursor-pointer border border-transparent hover:border-white/10"
+                              >
+                                <div className="flex items-center gap-3 min-w-0">
+                                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 flex-shrink-0">
+                                    <Building2 className="w-5 h-5" />
+                                  </div>
+                                  <div className="min-w-0">
+                                    <div className="text-sm font-bold text-white group-hover:text-emerald-400 transition-colors truncate">
+                                      {hospName}
+                                    </div>
+                                    <div className="text-xs text-slate-400 truncate">
+                                      {city} • {hosp.accreditationBadge || 'JCI'}
+                                    </div>
+                                  </div>
+                                </div>
+                                <span className="text-[11px] text-emerald-400 font-semibold px-2 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-1 flex-shrink-0 ml-2 rtl:ml-0 rtl:mr-2">
+                                  <span>{dict.viewHospital}</span>
+                                  <ArrowIcon className="w-3 h-3" />
+                                </span>
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Category 3: Treatments */}
+                    {suggestions.matchingTreatments.length > 0 && (
+                      <div>
+                        <div className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold text-purple-400 uppercase tracking-wider">
+                          <Stethoscope className="w-3.5 h-3.5" />
+                          <span>{dict.treatmentsCategory}</span>
+                        </div>
+                        <div className="space-y-1 mt-1">
+                          {suggestions.matchingTreatments.map((tr) => {
+                            const trTitle = tr.title?.[langKey] || tr.title?.ar || tr.title?.en || 'Treatment';
+                            const trDesc = tr.shortDescription?.[langKey] || tr.shortDescription?.en || '';
+                            return (
+                              <Link
+                                key={tr.id}
+                                href={`/treatments/${tr.slug}`}
+                                onClick={() => setIsDropdownOpen(false)}
+                                className="flex items-center justify-between p-2.5 rounded-xl hover:bg-white/10 transition-colors group cursor-pointer border border-transparent hover:border-white/10"
+                              >
+                                <div className="flex items-center gap-3 min-w-0">
+                                  <div className="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center text-purple-400 flex-shrink-0">
+                                    <Stethoscope className="w-5 h-5" />
+                                  </div>
+                                  <div className="min-w-0">
+                                    <div className="text-sm font-bold text-white group-hover:text-purple-400 transition-colors truncate">
+                                      {trTitle}
+                                    </div>
+                                    <div className="text-xs text-slate-400 truncate">
+                                      {trDesc}
+                                    </div>
+                                  </div>
+                                </div>
+                                <span className="text-[11px] text-purple-400 font-semibold px-2 py-1 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center gap-1 flex-shrink-0 ml-2 rtl:ml-0 rtl:mr-2">
+                                  <span>{dict.viewTreatment}</span>
+                                  <ArrowIcon className="w-3 h-3" />
+                                </span>
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="p-8 text-center text-slate-400">
+                    <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-2 text-slate-400">
+                      <Search className="w-5 h-5" />
+                    </div>
+                    <p className="text-xs font-bold text-white mb-1">
+                      {dict.noResults} &ldquo;{searchQuery}&rdquo;
+                    </p>
+                    <p className="text-[11px] text-slate-400 max-w-md mx-auto leading-relaxed">
+                      {dict.noResultsSub}
+                    </p>
+                  </div>
+                )}
+
+                {/* Search all footer */}
+                <div className="p-3 bg-black/40 border-t border-white/10 flex items-center justify-between text-xs text-slate-300">
+                  <span>
+                    {dict.searchAll} &ldquo;<span className="text-white font-bold">{searchQuery}</span>&rdquo;
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleSearch}
+                    className="text-xs font-bold text-sky-400 hover:text-sky-300 flex items-center gap-1 cursor-pointer"
+                  >
+                    <span>{dict.quickSearchBtn}</span>
+                    <ArrowIcon className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Quick-Filter Popular Specialty Chips */}
-          <div className="mt-3.5 flex flex-wrap items-center justify-center gap-2">
+          <div className="mt-3.5 flex flex-wrap items-center justify-center gap-2 relative z-10">
             {[
               language === 'ar' ? 'جراحة الأورام' : language === 'fr' ? 'Oncologie' : 'Oncology',
               language === 'ar' ? 'جراحة القلب' : language === 'fr' ? 'Chirurgie Cardiaque' : 'Heart Surgery',
@@ -321,160 +494,6 @@ export const HeroSection: React.FC = () => {
               </button>
             ))}
           </div>
-
-          {/* ─── Live Autocomplete Dropdown (Direct deep links to Doctor, Hospital, Treatment) ─── */}
-          {isDropdownOpen && searchQuery.trim().length >= 1 && (
-            <div
-              dir={direction}
-              className="absolute left-0 right-0 top-full mt-2 bg-[#121620]/95 backdrop-blur-xl border border-white/15 rounded-2xl shadow-2xl shadow-black/80 overflow-hidden text-start z-50 max-h-[75vh] overflow-y-auto animate-in fade-in zoom-in-98 duration-150 [scrollbar-width:thin] [scrollbar-color:rgba(255,255,255,0.2)_transparent]"
-            >
-              {hasMatches ? (
-                <div className="p-3 space-y-4">
-                  {/* Category 1: Doctors */}
-                  {suggestions.matchingDoctors.length > 0 && (
-                    <div>
-                      <div className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold text-sky-400 uppercase tracking-wider">
-                        <Users className="w-3.5 h-3.5" />
-                        <span>{dict.doctorsCategory}</span>
-                      </div>
-                      <div className="space-y-1 mt-1">
-                        {suggestions.matchingDoctors.map((doc) => {
-                          const docName = doc.name?.[langKey] || doc.name?.ar || doc.name?.en || 'Doctor';
-                          const docTitle = doc.title?.[langKey] || doc.title?.en || '';
-                          const docSpec = doc.specialtyName?.[langKey] || doc.specialtyName?.en || '';
-                          return (
-                            <Link
-                              key={doc.id}
-                              href={`/doctors/${doc.slug}`}
-                              onClick={() => setIsDropdownOpen(false)}
-                              className="flex items-center justify-between p-2.5 rounded-xl hover:bg-white/10 transition-colors group cursor-pointer border border-transparent hover:border-white/10"
-                            >
-                              <div className="flex items-center gap-3 min-w-0">
-                                <img
-                                  src={doc.image}
-                                  alt={docName}
-                                  className="w-10 h-10 rounded-full object-cover border border-white/20 flex-shrink-0"
-                                />
-                                <div className="min-w-0">
-                                  <div className="text-sm font-bold text-white group-hover:text-sky-400 transition-colors truncate">
-                                    {docName}
-                                  </div>
-                                  <div className="text-xs text-slate-400 truncate">
-                                    {docTitle ? `${docTitle} • ` : ''}
-                                    {docSpec}
-                                  </div>
-                                </div>
-                              </div>
-                              <span className="text-[11px] text-sky-400 font-semibold px-2 py-1 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center gap-1 flex-shrink-0 ml-2">
-                                <span>{dict.viewDoctor}</span>
-                                <ArrowIcon className="w-3 h-3" />
-                              </span>
-                            </Link>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Category 2: Hospitals */}
-                  {suggestions.matchingHospitals.length > 0 && (
-                    <div>
-                      <div className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold text-emerald-400 uppercase tracking-wider">
-                        <Building2 className="w-3.5 h-3.5" />
-                        <span>{dict.hospitalsCategory}</span>
-                      </div>
-                      <div className="space-y-1 mt-1">
-                        {suggestions.matchingHospitals.map((hosp) => {
-                          const hospName = hosp.name?.[langKey] || hosp.name?.ar || hosp.name?.en || 'Hospital';
-                          const city = hosp.city?.[langKey] || hosp.city?.ar || hosp.city?.en || '';
-                          return (
-                            <Link
-                              key={hosp.id}
-                              href={`/hospitals?id=${hosp.id}`}
-                              onClick={() => setIsDropdownOpen(false)}
-                              className="flex items-center justify-between p-2.5 rounded-xl hover:bg-white/10 transition-colors group cursor-pointer border border-transparent hover:border-white/10"
-                            >
-                              <div className="flex items-center gap-3 min-w-0">
-                                <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 flex-shrink-0">
-                                  <Building2 className="w-5 h-5" />
-                                </div>
-                                <div className="min-w-0">
-                                  <div className="text-sm font-bold text-white group-hover:text-emerald-400 transition-colors truncate">
-                                    {hospName}
-                                  </div>
-                                  <div className="text-xs text-slate-400 truncate">
-                                    {city} • {hosp.accreditationBadge || 'JCI'}
-                                  </div>
-                                </div>
-                              </div>
-                              <span className="text-[11px] text-emerald-400 font-semibold px-2 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-1 flex-shrink-0 ml-2">
-                                <span>{dict.viewHospital}</span>
-                                <ArrowIcon className="w-3 h-3" />
-                              </span>
-                            </Link>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Category 3: Treatments */}
-                  {suggestions.matchingTreatments.length > 0 && (
-                    <div>
-                      <div className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold text-purple-400 uppercase tracking-wider">
-                        <Stethoscope className="w-3.5 h-3.5" />
-                        <span>{dict.treatmentsCategory}</span>
-                      </div>
-                      <div className="space-y-1 mt-1">
-                        {suggestions.matchingTreatments.map((tr) => {
-                          const trTitle = tr.title?.[langKey] || tr.title?.ar || tr.title?.en || 'Treatment';
-                          const trDesc = tr.shortDescription?.[langKey] || tr.shortDescription?.en || '';
-                          return (
-                            <Link
-                              key={tr.id}
-                              href={`/treatments/${tr.slug}`}
-                              onClick={() => setIsDropdownOpen(false)}
-                              className="flex items-center justify-between p-2.5 rounded-xl hover:bg-white/10 transition-colors group cursor-pointer border border-transparent hover:border-white/10"
-                            >
-                              <div className="flex items-center gap-3 min-w-0">
-                                <div className="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center text-purple-400 flex-shrink-0">
-                                  <Stethoscope className="w-5 h-5" />
-                                </div>
-                                <div className="min-w-0">
-                                  <div className="text-sm font-bold text-white group-hover:text-purple-400 transition-colors truncate">
-                                    {trTitle}
-                                  </div>
-                                  <div className="text-xs text-slate-400 truncate">
-                                    {trDesc}
-                                  </div>
-                                </div>
-                              </div>
-                              <span className="text-[11px] text-purple-400 font-semibold px-2 py-1 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center gap-1 flex-shrink-0 ml-2">
-                                <span>{dict.viewTreatment}</span>
-                                <ArrowIcon className="w-3 h-3" />
-                              </span>
-                            </Link>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="p-8 text-center text-slate-400">
-                  <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-2 text-slate-400">
-                    <Search className="w-5 h-5" />
-                  </div>
-                  <p className="text-xs font-bold text-white mb-1">
-                    {dict.noResults} &ldquo;{searchQuery}&rdquo;
-                  </p>
-                  <p className="text-[11px] text-slate-400 max-w-md mx-auto leading-relaxed">
-                    {dict.noResultsSub}
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
         </div>
 
         {/* Dual Primary / Secondary CTAs */}

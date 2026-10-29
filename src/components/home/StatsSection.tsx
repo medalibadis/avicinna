@@ -91,7 +91,7 @@ export const StatsSection: React.FC = () => {
   ];
 
   return (
-    <section ref={sectionRef} className="relative z-20 -mt-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section ref={sectionRef} className="relative z-10 -mt-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="bg-white dark:bg-slate-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 p-6 sm:p-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 divide-y md:divide-y-0 md:divide-x rtl:md:divide-x-reverse divide-slate-100 dark:divide-slate-800">
           {stats.map((stat, idx) => {
