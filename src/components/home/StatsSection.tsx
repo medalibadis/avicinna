@@ -91,26 +91,26 @@ export const StatsSection: React.FC = () => {
   ];
 
   return (
-    <section ref={sectionRef} className="relative z-10 -mt-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="bg-white dark:bg-slate-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 p-6 sm:p-10">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 divide-y md:divide-y-0 md:divide-x rtl:md:divide-x-reverse divide-slate-100 dark:divide-slate-800">
+    <section ref={sectionRef} className="relative z-10 -mt-6 sm:-mt-10 max-w-6xl mx-auto px-3 sm:px-6 lg:px-8">
+      <div className="bg-white dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 p-3 sm:p-10">
+        <div className="grid grid-cols-3 gap-1.5 sm:gap-8 divide-x rtl:divide-x-reverse divide-slate-100 dark:divide-slate-800">
           {stats.map((stat, idx) => {
             const Icon = stat.icon;
             return (
               <div
                 key={idx}
-                className="flex flex-col items-center text-center p-4 transition-transform duration-300 hover:scale-105"
+                className="flex flex-col items-center text-center p-1 sm:p-4 transition-transform duration-300 hover:scale-105"
               >
-                <div className="w-14 h-14 rounded-2xl bg-[#EAF6FF] dark:bg-sky-950/60 text-[#0097FB] dark:text-sky-400 flex items-center justify-center mb-4 border border-[#0097FB]/20 dark:border-sky-800/60 shadow-xs">
-                  <Icon className="w-7 h-7" />
+                <div className="w-9 h-9 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-[#EAF6FF] dark:bg-sky-950/60 text-[#0097FB] dark:text-sky-400 flex items-center justify-center mb-1.5 sm:mb-4 border border-[#0097FB]/20 dark:border-sky-800/60 shadow-xs">
+                  <Icon className="w-4 h-4 sm:w-7 sm:h-7" />
                 </div>
-                <div className="text-4xl sm:text-5xl font-black text-[#032654] dark:text-white tracking-tight font-sans mb-2">
+                <div className="text-lg sm:text-4xl lg:text-5xl font-black text-[#032654] dark:text-white tracking-tight font-sans mb-0.5 sm:mb-2">
                   {stat.count}
                 </div>
-                <div className="text-base sm:text-lg font-bold text-[#163B63] dark:text-slate-200 mb-1">
+                <div className="text-[11px] sm:text-base lg:text-lg font-bold text-[#163B63] dark:text-slate-200 mb-0.5 sm:mb-1 line-clamp-2 leading-tight sm:leading-normal">
                   {stat.label}
                 </div>
-                <div className="text-xs font-medium text-[#64748B] dark:text-slate-400">
+                <div className="hidden sm:block text-xs font-medium text-[#64748B] dark:text-slate-400">
                   {stat.desc}
                 </div>
               </div>

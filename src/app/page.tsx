@@ -20,7 +20,7 @@ export default function HomePage() {
   return (
     <>
       <MedicalOrganizationSchema />
-      <main className="flex-1">
+      <main className="flex-1 w-full max-w-full overflow-x-hidden">
         {/* 1. Hero */}
         <HeroSection />
 

@@ -33,7 +33,7 @@ export const FinalCTA: React.FC = () => {
     : 'Get in touch with our team via WhatsApp or book a free consultation. Our board is available 24/7 to review your medical reports.');
 
   return (
-    <section className="py-20 bg-gradient-to-br from-[#021838] via-[#032654] to-[#0d3b73] text-white relative overflow-hidden">
+    <section className="py-12 sm:py-20 pb-28 sm:pb-20 bg-gradient-to-br from-[#021838] via-[#032654] to-[#0d3b73] text-white relative overflow-hidden">
       {/* Background Accent Rings */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-[#0097FB]/15 rounded-full blur-3xl pointer-events-none" />
 
@@ -41,8 +41,8 @@ export const FinalCTA: React.FC = () => {
         {/* Placement D: Signature Watermark Trust Seal */}
         <FooterVideoTrustSeal locale={language as any} />
 
-        <div className="inline-flex items-center gap-2 bg-[#0097FB]/20 border border-[#00BFFF]/40 px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold text-[#00BFFF] mb-6">
-          <Heart className="w-4 h-4 text-[#00BFFF] fill-current animate-pulse" />
+        <div className="inline-flex items-center gap-2 bg-[#0097FB]/20 border border-[#00BFFF]/40 px-3.5 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold text-[#00BFFF] mb-4 sm:mb-6">
+          <Heart className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#00BFFF] fill-current animate-pulse" />
           <span>
             {language === 'ar'
               ? 'صحتك في أيدٍ أمينة مع AVICINNA'
@@ -52,20 +52,20 @@ export const FinalCTA: React.FC = () => {
           </span>
         </div>
 
-        <h2 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight mb-6 max-w-3xl mx-auto">
+        <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight mb-4 sm:mb-6 max-w-3xl mx-auto">
           {headingText}
         </h2>
 
-        <p className="text-base sm:text-lg text-slate-200/90 max-w-2xl mx-auto leading-relaxed mb-10">
+        <p className="text-xs sm:text-base lg:text-lg text-slate-200/90 max-w-2xl mx-auto leading-relaxed mb-6 sm:mb-10">
           {subtitleText}
         </p>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 max-w-sm sm:max-w-none mx-auto">
           <a
             href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-base px-8 py-4 rounded-full shadow-lg shadow-emerald-500/30 transition-all duration-200 transform hover:-translate-y-0.5"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm sm:text-base px-6 sm:px-8 py-3.5 sm:py-4 rounded-full shadow-lg shadow-emerald-500/30 transition-all duration-200 transform hover:-translate-y-0.5"
           >
             <MessageCircle className="w-5 h-5 fill-current" />
             <span>{t.common.whatsapp}</span>
@@ -73,7 +73,7 @@ export const FinalCTA: React.FC = () => {
 
           <a
             href="#consultation"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#0097FB] hover:bg-[#0082d6] text-white font-bold text-base px-8 py-4 rounded-full shadow-lg shadow-[#0097FB]/30 transition-all duration-200 transform hover:-translate-y-0.5"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#0097FB] hover:bg-[#0082d6] text-white font-bold text-sm sm:text-base px-6 sm:px-8 py-3.5 sm:py-4 rounded-full shadow-lg shadow-[#0097FB]/30 transition-all duration-200 transform hover:-translate-y-0.5"
           >
             <Calendar className="w-5 h-5" />
             <span>{t.nav.freeConsultation}</span>

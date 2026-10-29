@@ -208,7 +208,7 @@ export const HeroSection: React.FC = () => {
   };
 
   return (
-    <section className="relative z-30 min-h-[90vh] flex items-center justify-center pt-28 pb-16 bg-[#032654]">
+    <section className="relative z-30 min-h-0 sm:min-h-[90vh] flex items-center justify-center pt-20 sm:pt-28 pb-10 sm:pb-16 bg-[#032654] w-full max-w-full overflow-x-clip">
       {/* 1. AUTO-PLAYING AMBIENT MEDICAL VIDEO BACKGROUND */}
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
         <video
@@ -231,17 +231,17 @@ export const HeroSection: React.FC = () => {
         <div className="absolute -bottom-24 right-1/4 h-72 w-72 rounded-full bg-teal-500/15 blur-[120px] pointer-events-none" />
       </div>
 
-      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 text-center text-white">
         {/* Trust Eyebrow Badge */}
-        <div className="inline-flex items-center gap-2 bg-[#0097FB]/15 border border-[#00BFFF]/30 backdrop-blur-md px-4 py-1.5 rounded-full mb-5 shadow-xs">
+        <div className="inline-flex items-center gap-2 bg-[#0097FB]/15 border border-[#00BFFF]/30 backdrop-blur-md px-3.5 sm:px-4 py-1 sm:py-1.5 rounded-full mb-4 sm:mb-5 shadow-xs">
           <Sparkles className="w-3.5 h-3.5 text-[#00BFFF] animate-spin duration-3000" />
-          <span className="text-xs sm:text-sm font-semibold text-[#00BFFF] tracking-wide">
+          <span className="text-[11px] sm:text-sm font-semibold text-[#00BFFF] tracking-wide">
             {eyebrow}
           </span>
         </div>
 
         {/* Main Headline (Optimized typography hierarchy & line balance) */}
-        <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-[1.2] mb-5 max-w-3xl mx-auto">
+        <h1 className="text-xl sm:text-3xl lg:text-5xl font-black tracking-tight leading-tight sm:leading-[1.2] mb-3 sm:mb-5 max-w-3xl mx-auto">
           <span>{cleanPart1}</span>{' '}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0097FB] via-[#00BFFF] to-[#0097FB] inline">
             {cleanHighlight}
@@ -250,20 +250,20 @@ export const HeroSection: React.FC = () => {
         </h1>
 
         {/* Supporting Subtitle */}
-        <p className="text-sm sm:text-base lg:text-lg text-slate-200/90 max-w-2xl mx-auto leading-relaxed mb-8 font-normal">
+        <p className="text-xs sm:text-base lg:text-lg text-slate-200/90 max-w-2xl mx-auto leading-relaxed mb-6 sm:mb-8 font-normal line-clamp-3 sm:line-clamp-none">
           {subtitle}
         </p>
 
         {/* ─── Search / Consultation Entry Component with Live Autocomplete ─── */}
-        <div ref={containerRef} className="max-w-2xl mx-auto mb-10 relative z-30">
+        <div ref={containerRef} className="w-full max-w-2xl mx-auto mb-10 relative z-30">
           {/* Search Bar + Floating Dropdown Anchor */}
-          <div className="relative">
+          <div className="relative w-full">
             <form
               onSubmit={handleSearch}
-              className="relative flex items-center bg-white/95 dark:bg-slate-900/90 backdrop-blur-xl rounded-2xl sm:rounded-full p-2 shadow-2xl shadow-black/40 border border-white/20 dark:border-white/10 transition-all focus-within:ring-2 focus-within:ring-[#0097FB] z-20"
+              className="relative flex items-center bg-white/95 dark:bg-slate-900/90 backdrop-blur-xl rounded-2xl sm:rounded-full p-1.5 sm:p-2 shadow-2xl shadow-black/40 border border-white/20 dark:border-white/10 transition-all focus-within:ring-2 focus-within:ring-[#0097FB] z-20 w-full"
             >
-              <div className="flex items-center justify-center rtl:pr-3 rtl:pl-2 ltr:pl-3 ltr:pr-2 text-[#0097FB]">
-                <Search className="w-5 h-5" />
+              <div className="flex items-center justify-center rtl:pr-2.5 rtl:pl-1.5 ltr:pl-2.5 ltr:pr-1.5 text-[#0097FB] shrink-0">
+                <Search className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
               <input
                 type="text"
@@ -279,7 +279,7 @@ export const HeroSection: React.FC = () => {
                   }
                 }}
                 placeholder={dict.searchPlaceholder}
-                className="w-full bg-transparent text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-400 text-sm sm:text-base font-medium focus:outline-none px-2 py-2"
+                className="w-full min-w-0 flex-1 bg-transparent text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-400 text-xs sm:text-base font-medium focus:outline-none px-1.5 sm:px-2 py-1.5 sm:py-2"
               />
               {searchQuery && (
                 <button
@@ -288,15 +288,15 @@ export const HeroSection: React.FC = () => {
                     setSearchQuery('');
                     setIsDropdownOpen(false);
                   }}
-                  className="p-1.5 text-slate-400 hover:text-slate-600 dark:text-slate-400 dark:hover:text-slate-200 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors mx-1.5 cursor-pointer"
+                  className="p-1 sm:p-1.5 text-slate-400 hover:text-slate-600 dark:text-slate-400 dark:hover:text-slate-200 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors mx-1 sm:mx-1.5 cursor-pointer"
                   aria-label="Clear search"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </button>
               )}
               <button
                 type="submit"
-                className="bg-[#0097FB] hover:bg-[#0082d6] text-white font-semibold text-sm px-6 py-3 rounded-xl sm:rounded-full transition-all duration-200 shadow-md shadow-[#0097FB]/30 flex-shrink-0 cursor-pointer"
+                className="bg-[#0097FB] hover:bg-[#0082d6] text-white font-bold text-xs sm:text-sm px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-full transition-all duration-200 shadow-md shadow-[#0097FB]/30 flex-shrink-0 cursor-pointer"
               >
                 {dict.quickSearchBtn}
               </button>
@@ -473,7 +473,7 @@ export const HeroSection: React.FC = () => {
           </div>
 
           {/* Quick-Filter Popular Specialty Chips */}
-          <div className="mt-3.5 flex flex-wrap items-center justify-center gap-2 relative z-10">
+          <div className="mt-3 flex items-center sm:justify-center gap-1.5 sm:gap-2 overflow-x-auto sm:flex-wrap no-scrollbar px-1 sm:px-0 py-1 relative z-10 w-full max-w-full">
             {[
               language === 'ar' ? 'جراحة الأورام' : language === 'fr' ? 'Oncologie' : 'Oncology',
               language === 'ar' ? 'جراحة القلب' : language === 'fr' ? 'Chirurgie Cardiaque' : 'Heart Surgery',
@@ -488,7 +488,7 @@ export const HeroSection: React.FC = () => {
                   setSearchQuery(chip);
                   setIsDropdownOpen(true);
                 }}
-                className="rounded-full border border-white/20 bg-white/10 hover:bg-white/20 px-3.5 py-1 text-xs font-semibold text-slate-200 backdrop-blur-md transition-all hover:border-[#00BFFF]/60 hover:text-white cursor-pointer"
+                className="rounded-full border border-white/20 bg-white/10 hover:bg-white/20 px-3 sm:px-3.5 py-1 text-[11px] sm:text-xs font-semibold text-slate-200 backdrop-blur-md transition-all hover:border-[#00BFFF]/60 hover:text-white cursor-pointer shrink-0 whitespace-nowrap"
               >
                 {chip}
               </button>
@@ -497,18 +497,18 @@ export const HeroSection: React.FC = () => {
         </div>
 
         {/* Dual Primary / Secondary CTAs */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-8 sm:mb-12">
           <a
             href="#consultation"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-[#0097FB] hover:bg-[#0082d6] text-white font-bold text-base px-8 py-4 rounded-full shadow-lg shadow-[#0097FB]/25 transition-all duration-200 transform hover:-translate-y-0.5 cursor-pointer"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-[#0097FB] hover:bg-[#0082d6] text-white font-bold text-sm sm:text-base px-6 sm:px-8 py-3.5 sm:py-4 rounded-full shadow-lg shadow-[#0097FB]/25 transition-all duration-200 transform hover:-translate-y-0.5 cursor-pointer"
           >
-            <Calendar className="w-5 h-5" />
+            <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
             <span>{t.hero.primaryCta}</span>
           </a>
 
           <a
             href="/treatments"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 border border-white/25 text-white font-semibold text-base px-8 py-4 rounded-full backdrop-blur-md transition-all duration-200"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 border border-white/25 text-white font-semibold text-sm sm:text-base px-6 sm:px-8 py-3.5 sm:py-4 rounded-full backdrop-blur-md transition-all duration-200"
           >
             <span>{t.hero.secondaryCta}</span>
             {isRtl ? <ArrowLeft className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}

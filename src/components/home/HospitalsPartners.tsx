@@ -210,13 +210,13 @@ const DraggableHospitalRow: React.FC<DraggableHospitalRowProps> = ({
             onClick={handleCardClick}
             draggable={false}
             dir={language === 'ar' ? 'rtl' : 'ltr'}
-            className={`group relative w-72 sm:w-80 shrink-0 rounded-2xl overflow-hidden border border-white/10 bg-white/5 backdrop-blur-md p-3.5 shadow-xl transition-all duration-300 hover:scale-105 select-none ${
+            className={`group relative w-[260px] sm:w-80 shrink-0 rounded-2xl overflow-hidden border border-white/10 bg-white/5 backdrop-blur-md p-3 sm:p-3.5 shadow-xl transition-all duration-300 hover:scale-105 select-none ${
               accentColor === 'teal'
                 ? 'hover:border-teal-400/60 hover:bg-white/10 hover:shadow-teal-500/20'
                 : 'hover:border-sky-400/60 hover:bg-white/10 hover:shadow-sky-500/20'
             }`}
           >
-            <div className="relative h-32 w-full overflow-hidden rounded-xl bg-slate-900 pointer-events-none">
+            <div className="relative h-28 sm:h-32 w-full overflow-hidden rounded-xl bg-slate-900 pointer-events-none">
               <img
                 src={hosp.image}
                 alt={hosp.name[language]}
@@ -224,30 +224,30 @@ const DraggableHospitalRow: React.FC<DraggableHospitalRowProps> = ({
                 className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110 pointer-events-none"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
-              <span className="absolute top-2.5 right-2.5 rtl:right-auto rtl:left-2.5 flex items-center gap-1 rounded-full bg-emerald-500/90 backdrop-blur-xs px-2.5 py-0.5 text-[10px] font-black text-white shadow-md">
-                <ShieldCheck className="h-3 w-3" />
+              <span className="absolute top-2 right-2 sm:top-2.5 sm:right-2.5 rtl:right-auto rtl:left-2 rtl:sm:left-2.5 flex items-center gap-1 rounded-full bg-emerald-500/90 backdrop-blur-xs px-2 sm:px-2.5 py-0.5 text-[9px] sm:text-[10px] font-black text-white shadow-md">
+                <ShieldCheck className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                 <span>{hosp.accreditationBadge || 'JCI Gold'}</span>
               </span>
-              <span className="absolute bottom-2 left-2.5 right-2.5 flex items-center justify-between text-[11px] text-slate-200">
-                <span className="flex items-center gap-1 font-semibold">
-                  <MapPin className="h-3 w-3 text-[#00BFFF]" />
-                  {hosp.city[language]}
+              <span className="absolute bottom-1.5 sm:bottom-2 left-2 right-2 sm:left-2.5 sm:right-2.5 flex items-center justify-between text-[10px] sm:text-[11px] text-slate-200">
+                <span className="flex items-center gap-1 font-semibold truncate max-w-[150px]">
+                  <MapPin className="h-3 w-3 text-[#00BFFF] shrink-0" />
+                  <span className="truncate">{hosp.city[language]}</span>
                 </span>
-                <span className="flex items-center gap-1 text-amber-300 font-bold">
+                <span className="flex items-center gap-1 text-amber-300 font-bold shrink-0">
                   <Star className="h-3 w-3 fill-current" />
                   {hosp.rating || '4.9'}
                 </span>
               </span>
             </div>
-            <div className="pt-3 pointer-events-none">
+            <div className="pt-2 sm:pt-3 pointer-events-none">
               <h4
-                className={`text-sm font-bold text-white transition-colors line-clamp-1 leading-snug ${
+                className={`text-xs sm:text-sm font-bold text-white transition-colors line-clamp-1 leading-snug ${
                   accentColor === 'teal' ? 'group-hover:text-teal-300' : 'group-hover:text-sky-300'
                 }`}
               >
                 {hosp.name[language]}
               </h4>
-              <div className="mt-2 flex items-center justify-between text-[11px] text-slate-300">
+              <div className="mt-1.5 sm:mt-2 flex items-center justify-between text-[10px] sm:text-[11px] text-slate-300">
                 <span className="flex items-center gap-1 text-slate-300/90 font-medium">
                   <Bed
                     className={`h-3 w-3 ${
@@ -434,19 +434,19 @@ export const HospitalsPartners: React.FC = () => {
         </div>
 
         {/* 3 Supporting Value Items */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-white/10 mb-14">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-6 pt-4 sm:pt-6 border-t border-white/10 mb-8 sm:mb-14">
           {supportingItems.map((item, idx) => {
             const Icon = item.icon;
             return (
               <div
                 key={idx}
-                className="flex items-start gap-4 p-5 rounded-2xl bg-white/5 border border-white/5 hover:border-[#00BFFF]/30 transition-colors"
+                className="flex items-start gap-3.5 sm:gap-4 p-4 sm:p-5 rounded-2xl bg-white/5 border border-white/5 hover:border-[#00BFFF]/30 transition-colors"
               >
-                <div className="w-12 h-12 rounded-xl bg-[#0097FB]/20 text-[#00BFFF] flex items-center justify-center flex-shrink-0">
-                  <Icon className="w-6 h-6" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#0097FB]/20 text-[#00BFFF] flex items-center justify-center shrink-0">
+                  <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 <div>
-                  <h4 className="text-base font-bold text-white mb-1">
+                  <h4 className="text-sm sm:text-base font-bold text-white mb-0.5 sm:mb-1">
                     {item.title}
                   </h4>
                   <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
@@ -459,11 +459,11 @@ export const HospitalsPartners: React.FC = () => {
         </div>
 
         {/* ─── Infinite Kinetic Interactive Draggable River ─── */}
-        <div className="relative -mx-4 sm:-mx-6 lg:-mx-8 overflow-hidden py-4">
+        <div className="relative -mx-4 sm:-mx-6 lg:-mx-8 overflow-hidden py-3 sm:py-4">
           {/* Header Bar with Strategic Title and Animated Hand Manipulation Indicator */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 px-4 sm:px-6 lg:px-8">
-            <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#00BFFF]">
-              <Building2 className="w-4 h-4 text-[#00BFFF]" />
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6 px-4 sm:px-6 lg:px-8">
+            <div className="inline-flex items-center gap-2 text-[11px] sm:text-xs font-bold uppercase tracking-wider sm:tracking-widest text-[#00BFFF] text-center sm:text-start">
+              <Building2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#00BFFF] shrink-0" />
               <span>
                 {language === 'ar'
                   ? 'شبكتنا الاستراتيجية من المستشفيات والمراكز المعتمدة دولياً JCI'
@@ -475,17 +475,17 @@ export const HospitalsPartners: React.FC = () => {
 
             {/* Interactive Hand Manipulation Indicator Pill */}
             <div
-              className={`inline-flex items-center gap-2.5 px-4 py-2 rounded-full text-xs font-bold backdrop-blur-md transition-all duration-300 shadow-md ${
+              className={`inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-[11px] sm:text-xs font-bold backdrop-blur-md transition-all duration-300 shadow-md ${
                 isAnyRowDragging
                   ? 'bg-sky-500/30 border border-sky-400 text-white shadow-sky-500/30 ring-2 ring-sky-400/40 scale-105'
                   : 'bg-white/10 hover:bg-white/15 border border-white/20 text-sky-200'
               }`}
             >
-              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-sky-500/30 text-sky-300 shadow-xs">
+              <span className="flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-sky-500/30 text-sky-300 shadow-xs shrink-0">
                 {isAnyRowDragging ? (
-                  <Grab className="w-3.5 h-3.5 text-white animate-pulse" />
+                  <Grab className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white animate-pulse" />
                 ) : (
-                  <Hand className="w-3.5 h-3.5 text-sky-300 animate-hand-pan" />
+                  <Hand className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-sky-300 animate-hand-pan" />
                 )}
               </span>
               <span>

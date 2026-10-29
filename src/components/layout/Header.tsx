@@ -64,10 +64,10 @@ export const Header: React.FC = () => {
             : 'bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 py-3.5'
         }`}
       >
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between gap-4">
+        <div className="max-w-[1600px] mx-auto px-2.5 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between gap-1 sm:gap-4">
             {/* Logo */}
-            <div className="flex-shrink-0">
+            <div className="shrink-0">
               <AnimatedNavbarLogo locale={language as any} />
             </div>
 
@@ -182,7 +182,7 @@ export const Header: React.FC = () => {
             </div>
 
             {/* Mobile & Tablet Controls (< xl) */}
-            <div className="flex items-center gap-2 xl:hidden flex-shrink-0">
+            <div className="flex items-center gap-1 sm:gap-2 xl:hidden flex-shrink-0">
               <LanguageSwitcher isScrolled={isScrolled || !isDarkHeroPage} id="header-mobile" />
 
               <CelestialThemeSwitch theme={theme} onToggle={toggleTheme} />
@@ -198,7 +198,7 @@ export const Header: React.FC = () => {
                     }
                   }
                 }}
-                className="hidden sm:inline-flex items-center gap-1.5 bg-[#0097FB] hover:bg-[#0082d6] text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm"
+                className="hidden md:inline-flex items-center gap-1.5 bg-[#0097FB] hover:bg-[#0082d6] text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm"
               >
                 <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
                 <span>{language === 'fr' ? 'Consultation' : language === 'ar' ? 'استشارة' : 'Consult'}</span>
@@ -207,14 +207,14 @@ export const Header: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className={`p-2 rounded-xl transition-colors ${
+                className={`p-1.5 sm:p-2 rounded-xl transition-colors cursor-pointer ${
                   !isScrolled && isDarkHeroPage
                     ? 'text-white hover:bg-white/10'
                     : 'text-[#163B63] dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
                 }`}
                 aria-label="Toggle menu"
               >
-                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                {mobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
               </button>
             </div>
           </div>
@@ -222,7 +222,7 @@ export const Header: React.FC = () => {
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="lg:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-xl px-4 pt-3 pb-6 space-y-2 animate-in slide-in-from-top-4 duration-200">
+          <div className="xl:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-xl px-4 pt-3 pb-6 space-y-2 animate-in slide-in-from-top-4 duration-200">
             <div className="space-y-1">
               {navLinks.map((link) => {
                 const isActive =

@@ -101,7 +101,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ar" dir="rtl" className={`${inter.variable} h-full antialiased`}>
+    <html lang="ar" dir="rtl" className={`${inter.variable} h-full antialiased overflow-x-hidden w-full max-w-full`}>
       <head>
         {/* Google Fonts: Cairo for Arabic */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -123,7 +123,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-full flex flex-col bg-white text-slate-900 dark:bg-[#0B1120] dark:text-slate-100">
+      <body className="min-h-full flex flex-col bg-white text-slate-900 dark:bg-[#0B1120] dark:text-slate-100 overflow-x-hidden w-full max-w-full relative">
         <AppShell>{children}</AppShell>
       </body>
     </html>

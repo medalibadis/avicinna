@@ -131,7 +131,7 @@ export function DopamineLanguageSwitcher({
   return (
     <div
       dir="ltr"
-      className={`relative inline-flex shrink-0 items-center rounded-full p-1 border transition-all duration-200 backdrop-blur-md ${
+      className={`relative inline-flex shrink-0 items-center rounded-full p-0.5 sm:p-1 border transition-all duration-200 backdrop-blur-md ${
         isScrolled
           ? 'bg-slate-100/90 dark:bg-slate-800/90 border-slate-200/90 dark:border-slate-700 text-slate-800 dark:text-slate-100 shadow-2xs'
           : 'bg-white/15 border-white/25 text-white shadow-2xs'
@@ -144,7 +144,7 @@ export function DopamineLanguageSwitcher({
             key={code}
             type="button"
             onClick={() => onChange(code)}
-            className={`relative px-2.5 2xl:px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer select-none ${
+            className={`relative px-1.5 sm:px-2.5 2xl:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer select-none ${
               isActive
                 ? 'text-white font-extrabold'
                 : isScrolled

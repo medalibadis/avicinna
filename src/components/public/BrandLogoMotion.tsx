@@ -151,9 +151,9 @@ export function AnimatedNavbarLogo({
           videoRef.current.play().catch(() => {});
         }
       }}
-      className="group inline-flex items-center gap-3 focus:outline-none cursor-pointer"
+      className="group inline-flex items-center gap-2 sm:gap-3 focus:outline-none cursor-pointer"
     >
-      <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-2xl border border-sky-400/30 bg-slate-950 shadow-md shadow-sky-500/20 transition-transform duration-300 group-hover:scale-108 group-hover:border-teal-400/60 ring-2 ring-sky-500/10">
+      <div className="relative h-9 w-9 sm:h-11 sm:w-11 shrink-0 overflow-hidden rounded-xl sm:rounded-2xl border border-sky-400/30 bg-slate-950 shadow-md shadow-sky-500/20 transition-transform duration-300 group-hover:scale-108 group-hover:border-teal-400/60 ring-2 ring-sky-500/10">
         <video
           ref={videoRef}
           src="/videos/logo-reveal.mp4"
@@ -165,10 +165,10 @@ export function AnimatedNavbarLogo({
         />
       </div>
       <div className="flex flex-col">
-        <span className="text-lg font-black tracking-tight text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
+        <span className="text-base sm:text-lg font-black tracking-tight text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
           AVICINNA
         </span>
-        <span className="text-[10px] sm:text-[11px] font-semibold text-sky-600 dark:text-sky-400 line-clamp-1">
+        <span className="hidden sm:inline-block text-[10px] sm:text-[11px] font-semibold text-sky-600 dark:text-sky-400 line-clamp-1">
           {subtitle}
         </span>
       </div>
