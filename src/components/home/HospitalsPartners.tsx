@@ -1,15 +1,282 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
-import { Hotel, Car, Languages, Check, Building2, MapPin, ArrowRight, ArrowLeft, ShieldCheck, Bed, Star } from 'lucide-react';
+import { HospitalPartner } from '@/data/hospitals';
+import {
+  Hotel,
+  Car,
+  Languages,
+  Building2,
+  MapPin,
+  ArrowRight,
+  ArrowLeft,
+  ShieldCheck,
+  Bed,
+  Star,
+  Hand,
+  Grab,
+  Compass,
+} from 'lucide-react';
+
+interface DraggableHospitalRowProps {
+  items: HospitalPartner[];
+  direction?: 'left' | 'right';
+  speed?: number;
+  language: 'ar' | 'en' | 'fr';
+  rowId: string;
+  onDragStateChange?: (isDragging: boolean) => void;
+  accentColor?: 'sky' | 'teal';
+}
+
+const DraggableHospitalRow: React.FC<DraggableHospitalRowProps> = ({
+  items,
+  direction = 'left',
+  speed = 0.8,
+  language,
+  rowId,
+  onDragStateChange,
+  accentColor = 'sky',
+}) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const singleSetWidthRef = useRef<number>(0);
+
+  const offsetRef = useRef<number>(-3500);
+  const velocityRef = useRef<number>(0);
+  const momentumRef = useRef<number>(0);
+  const isPointerDownRef = useRef<boolean>(false);
+  const startXRef = useRef<number>(0);
+  const lastXRef = useRef<number>(0);
+  const lastTimeRef = useRef<number>(0);
+  const hasMovedRef = useRef<boolean>(false);
+  const isHoveredRef = useRef<boolean>(false);
+  const [isDraggingLocal, setIsDraggingLocal] = useState(false);
+
+  // Repeat items 4 times so it spans 9,000px+ to ensure the screen is 100% full
+  const repeatedHospitals = useMemo(() => {
+    if (!items || items.length === 0) return [];
+    return [...items, ...items, ...items, ...items];
+  }, [items]);
+
+  // Dynamically measure the width of one single cycle
+  const measureWidth = useCallback(() => {
+    if (trackRef.current && items.length > 0) {
+      const totalWidth = trackRef.current.scrollWidth;
+      const setWidth = totalWidth / 4;
+      if (setWidth > 150) {
+        singleSetWidthRef.current = setWidth;
+        if (offsetRef.current > -setWidth || offsetRef.current < -2 * setWidth) {
+          offsetRef.current = -setWidth * 1.5;
+        }
+      }
+    }
+  }, [items.length]);
+
+  useEffect(() => {
+    measureWidth();
+    const handleResize = () => measureWidth();
+    window.addEventListener('resize', handleResize);
+    const timer = setTimeout(measureWidth, 600);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      clearTimeout(timer);
+    };
+  }, [measureWidth]);
+
+  // Silky smooth 60fps continuous auto-scroll + momentum animation
+  useEffect(() => {
+    let animId: number;
+    const baseStep = direction === 'left' ? -speed : speed;
+
+    const animate = () => {
+      if (!isPointerDownRef.current) {
+        let step = baseStep;
+        if (isHoveredRef.current) {
+          step *= 0.3; // Gentle slowdown on hover for high readability
+        }
+        if (Math.abs(momentumRef.current) > 0.04) {
+          step += momentumRef.current;
+          momentumRef.current *= 0.94; // Realistic inertial decay
+        }
+        offsetRef.current += step;
+      }
+
+      // Mathematical infinite toroidal wrap: zero gap, zero jump
+      const setW = singleSetWidthRef.current;
+      if (setW > 0) {
+        while (offsetRef.current <= -2 * setW) {
+          offsetRef.current += setW;
+        }
+        while (offsetRef.current >= -setW) {
+          offsetRef.current -= setW;
+        }
+      }
+
+      if (trackRef.current) {
+        trackRef.current.style.transform = `translate3d(${offsetRef.current}px, 0, 0)`;
+      }
+
+      animId = requestAnimationFrame(animate);
+    };
+
+    animId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animId);
+  }, [direction, speed]);
+
+  // Pointer event handlers for tactile cursor manipulation
+  const onPointerDown = (e: React.PointerEvent) => {
+    if (e.button !== 0) return;
+    isPointerDownRef.current = true;
+    startXRef.current = e.clientX;
+    lastXRef.current = e.clientX;
+    lastTimeRef.current = performance.now();
+    hasMovedRef.current = false;
+    momentumRef.current = 0;
+    velocityRef.current = 0;
+    setIsDraggingLocal(true);
+    onDragStateChange?.(true);
+    try {
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    } catch (_) {}
+  };
+
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (!isPointerDownRef.current) return;
+    const dx = e.clientX - lastXRef.current;
+    if (Math.abs(e.clientX - startXRef.current) > 5) {
+      hasMovedRef.current = true;
+    }
+    offsetRef.current += dx;
+
+    const now = performance.now();
+    const dt = Math.max(1, now - lastTimeRef.current);
+    velocityRef.current = (dx / dt) * 16.67;
+    lastXRef.current = e.clientX;
+    lastTimeRef.current = now;
+  };
+
+  const onPointerUp = (e: React.PointerEvent) => {
+    if (!isPointerDownRef.current) return;
+    isPointerDownRef.current = false;
+    try {
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch (_) {}
+
+    momentumRef.current = Math.max(-16, Math.min(16, velocityRef.current));
+
+    setTimeout(() => {
+      setIsDraggingLocal(false);
+      onDragStateChange?.(false);
+      hasMovedRef.current = false;
+    }, 80);
+  };
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    if (hasMovedRef.current || isDraggingLocal) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  };
+
+  return (
+    <div
+      ref={containerRef}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerUp}
+      onMouseEnter={() => {
+        isHoveredRef.current = true;
+      }}
+      onMouseLeave={() => {
+        isHoveredRef.current = false;
+      }}
+      className="relative overflow-hidden cursor-grab active:cursor-grabbing select-none py-2 touch-pan-y"
+      style={{ touchAction: 'pan-y' }}
+      dir="ltr" // Guarantees deterministic X-translation regardless of page RTL/LTR
+    >
+      <div
+        ref={trackRef}
+        className="flex items-center gap-4 w-max will-change-transform"
+      >
+        {repeatedHospitals.map((hosp, idx) => (
+          <Link
+            key={`${rowId}-${hosp.id}-${idx}`}
+            href={`/hospitals?id=${hosp.id}`}
+            onClick={handleCardClick}
+            draggable={false}
+            dir={language === 'ar' ? 'rtl' : 'ltr'}
+            className={`group relative w-72 sm:w-80 shrink-0 rounded-2xl overflow-hidden border border-white/10 bg-white/5 backdrop-blur-md p-3.5 shadow-xl transition-all duration-300 hover:scale-105 select-none ${
+              accentColor === 'teal'
+                ? 'hover:border-teal-400/60 hover:bg-white/10 hover:shadow-teal-500/20'
+                : 'hover:border-sky-400/60 hover:bg-white/10 hover:shadow-sky-500/20'
+            }`}
+          >
+            <div className="relative h-32 w-full overflow-hidden rounded-xl bg-slate-900 pointer-events-none">
+              <img
+                src={hosp.image}
+                alt={hosp.name[language]}
+                draggable={false}
+                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110 pointer-events-none"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
+              <span className="absolute top-2.5 right-2.5 rtl:right-auto rtl:left-2.5 flex items-center gap-1 rounded-full bg-emerald-500/90 backdrop-blur-xs px-2.5 py-0.5 text-[10px] font-black text-white shadow-md">
+                <ShieldCheck className="h-3 w-3" />
+                <span>{hosp.accreditationBadge || 'JCI Gold'}</span>
+              </span>
+              <span className="absolute bottom-2 left-2.5 right-2.5 flex items-center justify-between text-[11px] text-slate-200">
+                <span className="flex items-center gap-1 font-semibold">
+                  <MapPin className="h-3 w-3 text-[#00BFFF]" />
+                  {hosp.city[language]}
+                </span>
+                <span className="flex items-center gap-1 text-amber-300 font-bold">
+                  <Star className="h-3 w-3 fill-current" />
+                  {hosp.rating || '4.9'}
+                </span>
+              </span>
+            </div>
+            <div className="pt-3 pointer-events-none">
+              <h4
+                className={`text-sm font-bold text-white transition-colors line-clamp-1 leading-snug ${
+                  accentColor === 'teal' ? 'group-hover:text-teal-300' : 'group-hover:text-sky-300'
+                }`}
+              >
+                {hosp.name[language]}
+              </h4>
+              <div className="mt-2 flex items-center justify-between text-[11px] text-slate-300">
+                <span className="flex items-center gap-1 text-slate-300/90 font-medium">
+                  <Bed
+                    className={`h-3 w-3 ${
+                      accentColor === 'teal' ? 'text-teal-400' : 'text-sky-400'
+                    }`}
+                  />
+                  {hosp.bedsCount}{' '}
+                  {language === 'ar' ? 'سريراً' : language === 'fr' ? 'lits' : 'beds'}
+                </span>
+                <span
+                  className={`font-semibold group-hover:underline ${
+                    accentColor === 'teal' ? 'text-teal-400' : 'text-sky-400'
+                  }`}
+                >
+                  {language === 'ar' ? 'التفاصيل ←' : 'Details →'}
+                </span>
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 export const HospitalsPartners: React.FC = () => {
   const { t, language } = useLanguage();
   const { hospitals } = useData();
+  const [isAnyRowDragging, setIsAnyRowDragging] = useState(false);
 
   const supportingItems = [
     {
@@ -28,6 +295,30 @@ export const HospitalsPartners: React.FC = () => {
       desc: t.hospitals.coordinationDesc,
     },
   ];
+
+  // Distribute hospitals across two rich, diverse tracks
+  const { row1Hospitals, row2Hospitals } = useMemo(() => {
+    if (!hospitals || hospitals.length === 0) {
+      return { row1Hospitals: [], row2Hospitals: [] };
+    }
+    const r1: HospitalPartner[] = [];
+    const r2: HospitalPartner[] = [];
+    hospitals.forEach((hosp, idx) => {
+      if (idx % 2 === 0) {
+        r1.push(hosp);
+      } else {
+        r2.push(hosp);
+      }
+    });
+    // Ensure both rows have at least 5-6 items for balanced density
+    if (r2.length < r1.length && r1.length > 0) {
+      r2.push(r1[0]);
+    }
+    return {
+      row1Hospitals: r1.length > 0 ? r1 : hospitals,
+      row2Hospitals: r2.length > 0 ? r2 : hospitals,
+    };
+  }, [hospitals]);
 
   return (
     <section className="py-20 bg-[#032654] text-white relative overflow-hidden">
@@ -167,114 +458,83 @@ export const HospitalsPartners: React.FC = () => {
           })}
         </div>
 
-        {/* Infinite Kinetic Marquee + 3D Tilt Cards */}
+        {/* ─── Infinite Kinetic Interactive Draggable River ─── */}
         <div className="relative -mx-4 sm:-mx-6 lg:-mx-8 overflow-hidden py-4">
-          <div className="text-center text-xs font-bold uppercase tracking-widest text-[#00BFFF] mb-6 px-4">
-            {language === 'ar'
-              ? 'شبكتنا الاستراتيجية من المستشفيات والمراكز المعتمدة دولياً JCI'
-              : language === 'fr'
-              ? 'Notre Réseau Stratégique d’Hôpitaux et Centres Certifiés JCI'
-              : 'Our Strategic Network of JCI-Accredited Hospitals & Centers'}
-          </div>
+          {/* Header Bar with Strategic Title and Animated Hand Manipulation Indicator */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 px-4 sm:px-6 lg:px-8">
+            <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#00BFFF]">
+              <Building2 className="w-4 h-4 text-[#00BFFF]" />
+              <span>
+                {language === 'ar'
+                  ? 'شبكتنا الاستراتيجية من المستشفيات والمراكز المعتمدة دولياً JCI'
+                  : language === 'fr'
+                  ? 'Notre Réseau Stratégique d’Hôpitaux et Centres Certifiés JCI'
+                  : 'Our Strategic Network of JCI-Accredited Hospitals & Centers'}
+              </span>
+            </div>
 
-          {/* Row 1: Kinetic Marquee Moving Left */}
-          <div className="relative mb-4 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
-            <div className="animate-marquee-left gap-4 flex items-center">
-              {[...hospitals.slice(0, Math.ceil(hospitals.length / 2)), ...hospitals.slice(0, Math.ceil(hospitals.length / 2))].map((hosp, idx) => (
-                <Link
-                  key={`r1-${hosp.id}-${idx}`}
-                  href={`/hospitals?id=${hosp.id}`}
-                  className="group relative w-72 sm:w-80 shrink-0 rounded-2xl overflow-hidden border border-white/10 bg-white/5 backdrop-blur-md p-3.5 shadow-xl transition-all duration-300 hover:scale-105 hover:border-sky-400/60 hover:bg-white/10 hover:shadow-sky-500/20"
-                >
-                  <div className="relative h-32 w-full overflow-hidden rounded-xl bg-slate-900">
-                    <img
-                      src={hosp.image}
-                      alt={hosp.name[language]}
-                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
-                    <span className="absolute top-2.5 right-2.5 rtl:right-auto rtl:left-2.5 flex items-center gap-1 rounded-full bg-emerald-500/90 backdrop-blur-xs px-2.5 py-0.5 text-[10px] font-black text-white shadow-md">
-                      <ShieldCheck className="h-3 w-3" />
-                      <span>{hosp.accreditationBadge || 'JCI Gold'}</span>
-                    </span>
-                    <span className="absolute bottom-2 left-2.5 right-2.5 flex items-center justify-between text-[11px] text-slate-200">
-                      <span className="flex items-center gap-1 font-semibold">
-                        <MapPin className="h-3 w-3 text-[#00BFFF]" />
-                        {hosp.city[language]}
-                      </span>
-                      <span className="flex items-center gap-1 text-amber-300 font-bold">
-                        <Star className="h-3 w-3 fill-current" />
-                        {hosp.rating || '4.9'}
-                      </span>
-                    </span>
-                  </div>
-                  <div className="pt-3">
-                    <h4 className="text-sm font-bold text-white group-hover:text-sky-300 transition-colors line-clamp-1 leading-snug">
-                      {hosp.name[language]}
-                    </h4>
-                    <div className="mt-2 flex items-center justify-between text-[11px] text-slate-300">
-                      <span className="flex items-center gap-1 text-slate-300/90 font-medium">
-                        <Bed className="h-3 w-3 text-sky-400" />
-                        {hosp.bedsCount} {language === 'ar' ? 'سريراً' : language === 'fr' ? 'lits' : 'beds'}
-                      </span>
-                      <span className="font-semibold text-sky-400 group-hover:underline">
-                        {language === 'ar' ? 'التفاصيل ←' : 'Details →'}
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              ))}
+            {/* Interactive Hand Manipulation Indicator Pill */}
+            <div
+              className={`inline-flex items-center gap-2.5 px-4 py-2 rounded-full text-xs font-bold backdrop-blur-md transition-all duration-300 shadow-md ${
+                isAnyRowDragging
+                  ? 'bg-sky-500/30 border border-sky-400 text-white shadow-sky-500/30 ring-2 ring-sky-400/40 scale-105'
+                  : 'bg-white/10 hover:bg-white/15 border border-white/20 text-sky-200'
+              }`}
+            >
+              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-sky-500/30 text-sky-300 shadow-xs">
+                {isAnyRowDragging ? (
+                  <Grab className="w-3.5 h-3.5 text-white animate-pulse" />
+                ) : (
+                  <Hand className="w-3.5 h-3.5 text-sky-300 animate-hand-pan" />
+                )}
+              </span>
+              <span>
+                {isAnyRowDragging
+                  ? language === 'ar'
+                    ? 'جاري التصفح بالسحب • اترك للإكمال التلقائي'
+                    : language === 'fr'
+                    ? 'Défilement actif • Relâchez pour continuer'
+                    : 'Interactive drag active • Release to auto-scroll'
+                  : language === 'ar'
+                  ? 'اسحب بالماوس يميناً ويساراً لتصفح المستشفيات'
+                  : language === 'fr'
+                  ? 'Glissez avec le curseur pour explorer'
+                  : 'Drag with cursor or swipe to explore'}
+              </span>
+              <span className="hidden sm:inline-flex text-[10px] px-2 py-0.5 rounded-full bg-white/15 text-sky-300 font-mono tracking-wider font-semibold border border-white/10">
+                {isAnyRowDragging ? 'ACTIVE' : 'TOUCH / DRAG'}
+              </span>
             </div>
           </div>
 
-          {/* Row 2: Kinetic Marquee Moving Right */}
-          <div className="relative mb-6 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
-            <div className="animate-marquee-right gap-4 flex items-center">
-              {[...hospitals.slice(Math.ceil(hospitals.length / 2)), ...hospitals.slice(Math.ceil(hospitals.length / 2))].map((hosp, idx) => (
-                <Link
-                  key={`r2-${hosp.id}-${idx}`}
-                  href={`/hospitals?id=${hosp.id}`}
-                  className="group relative w-72 sm:w-80 shrink-0 rounded-2xl overflow-hidden border border-white/10 bg-white/5 backdrop-blur-md p-3.5 shadow-xl transition-all duration-300 hover:scale-105 hover:border-teal-400/60 hover:bg-white/10 hover:shadow-teal-500/20"
-                >
-                  <div className="relative h-32 w-full overflow-hidden rounded-xl bg-slate-900">
-                    <img
-                      src={hosp.image}
-                      alt={hosp.name[language]}
-                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
-                    <span className="absolute top-2.5 right-2.5 rtl:right-auto rtl:left-2.5 flex items-center gap-1 rounded-full bg-sky-500/90 backdrop-blur-xs px-2.5 py-0.5 text-[10px] font-black text-white shadow-md">
-                      <ShieldCheck className="h-3 w-3" />
-                      <span>{hosp.accreditationBadge || 'JCI Gold'}</span>
-                    </span>
-                    <span className="absolute bottom-2 left-2.5 right-2.5 flex items-center justify-between text-[11px] text-slate-200">
-                      <span className="flex items-center gap-1 font-semibold">
-                        <MapPin className="h-3 w-3 text-[#00BFFF]" />
-                        {hosp.city[language]}
-                      </span>
-                      <span className="flex items-center gap-1 text-amber-300 font-bold">
-                        <Star className="h-3 w-3 fill-current" />
-                        {hosp.rating || '4.9'}
-                      </span>
-                    </span>
-                  </div>
-                  <div className="pt-3">
-                    <h4 className="text-sm font-bold text-white group-hover:text-teal-300 transition-colors line-clamp-1 leading-snug">
-                      {hosp.name[language]}
-                    </h4>
-                    <div className="mt-2 flex items-center justify-between text-[11px] text-slate-300">
-                      <span className="flex items-center gap-1 text-slate-300/90 font-medium">
-                        <Bed className="h-3 w-3 text-teal-400" />
-                        {hosp.bedsCount} {language === 'ar' ? 'سريراً' : language === 'fr' ? 'lits' : 'beds'}
-                      </span>
-                      <span className="font-semibold text-teal-400 group-hover:underline">
-                        {language === 'ar' ? 'التفاصيل ←' : 'Details →'}
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
+          {/* Luxury Left/Right Vignette Blur Scrims */}
+          <div className="absolute left-0 top-16 bottom-16 w-12 sm:w-28 z-20 pointer-events-none bg-gradient-to-r from-[#032654] to-transparent" />
+          <div className="absolute right-0 top-16 bottom-16 w-12 sm:w-28 z-20 pointer-events-none bg-gradient-to-l from-[#032654] to-transparent" />
+
+          {/* Row 1: Smooth Glide Left (Draggable with Cursor) */}
+          <div className="relative mb-3">
+            <DraggableHospitalRow
+              rowId="row-1"
+              items={row1Hospitals}
+              direction="left"
+              speed={0.8}
+              language={language}
+              accentColor="sky"
+              onDragStateChange={(dragging) => setIsAnyRowDragging(dragging)}
+            />
+          </div>
+
+          {/* Row 2: Smooth Glide Right (Draggable with Cursor) */}
+          <div className="relative mb-6">
+            <DraggableHospitalRow
+              rowId="row-2"
+              items={row2Hospitals}
+              direction="right"
+              speed={0.75}
+              language={language}
+              accentColor="teal"
+              onDragStateChange={(dragging) => setIsAnyRowDragging(dragging)}
+            />
           </div>
 
           {/* CTA to Full Hospitals Page */}
@@ -297,6 +557,13 @@ export const HospitalsPartners: React.FC = () => {
                 <ArrowRight className="w-4 h-4" />
               )}
             </Link>
+            <p className="text-xs text-slate-400 mt-2.5">
+              {language === 'ar'
+                ? 'انقر على أي مستشفى للاطلاع على التجهيزات الجراحية والتقنيات وسعة الأسرّة'
+                : language === 'fr'
+                ? 'Cliquez sur un hôpital pour découvrir ses équipements chirurgicaux et accréditations'
+                : 'Click on any hospital to explore surgical suites, medical equipment, and clinical facilities'}
+            </p>
           </div>
         </div>
       </div>

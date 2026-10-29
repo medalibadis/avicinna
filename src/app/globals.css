@@ -278,4 +278,19 @@
   animation-play-state: paused;
 }
 
+/* Interactive Hand Drag Cue Animation */
+@keyframes hand-pan {
+  0%, 100% {
+    transform: translateX(-6px) rotate(-8deg);
+  }
+  50% {
+    transform: translateX(6px) rotate(8deg);
+  }
+}
+
+.animate-hand-pan {
+  animation: hand-pan 2s ease-in-out infinite;
+  transform-origin: center bottom;
+}
+
 
