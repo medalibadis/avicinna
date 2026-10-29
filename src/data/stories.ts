@@ -1,7 +1,11 @@
 export interface PatientStory {
   id: string;
   slug: string;
-  patientName: string;
+  patientName: {
+    ar: string;
+    en: string;
+    fr: string;
+  } | string;
   country: {
     ar: string;
     en: string;
@@ -53,11 +57,32 @@ export interface PatientStory {
   rating: number;
 }
 
+const KNOWN_PATIENT_NAMES: Record<string, { en: string; fr: string }> = {
+  'عمر التميمي': { en: 'Omar Al-Tamimi', fr: 'Omar Al-Tamimi' },
+  'سارة لوموان': { en: 'Sarah Lemoine', fr: 'Sarah Lemoine' },
+  'خالد الكندري': { en: 'Khalid Al-Kandari', fr: 'Khalid Al-Kandari' },
+};
+
+export function getPatientName(name: PatientStory['patientName'], lang: string = 'en'): string {
+  if (!name) return '';
+  if (typeof name === 'string') {
+    if (lang !== 'ar' && KNOWN_PATIENT_NAMES[name]) {
+      return (lang === 'fr' ? KNOWN_PATIENT_NAMES[name].fr : KNOWN_PATIENT_NAMES[name].en) || name;
+    }
+    return name;
+  }
+  return name[lang as 'ar' | 'en' | 'fr'] || name.en || name.ar || '';
+}
+
 export const patientStoriesData: PatientStory[] = [
   {
     id: 'story-1',
     slug: 'omar-cardiac-valve-recovery',
-    patientName: 'عمر التميمي',
+    patientName: {
+      ar: 'عمر التميمي',
+      en: 'Omar Al-Tamimi',
+      fr: 'Omar Al-Tamimi',
+    },
     country: {
       ar: 'المملكة العربية السعودية (الرياض)',
       en: 'Saudi Arabia (Riyadh)',
@@ -129,7 +154,11 @@ export const patientStoriesData: PatientStory[] = [
   {
     id: 'story-2',
     slug: 'sarah-robotic-spine-success',
-    patientName: 'سارة لوموان',
+    patientName: {
+      ar: 'سارة لوموان',
+      en: 'Sarah Lemoine',
+      fr: 'Sarah Lemoine',
+    },
     country: {
       ar: 'فرنسا (باريس)',
       en: 'France (Paris)',
@@ -199,7 +228,11 @@ export const patientStoriesData: PatientStory[] = [
   {
     id: 'story-3',
     slug: 'khalid-robotic-knee-arthroplasty',
-    patientName: 'خالد الكندري',
+    patientName: {
+      ar: 'خالد الكندري',
+      en: 'Khalid Al-Kandari',
+      fr: 'Khalid Al-Kandari',
+    },
     country: {
       ar: 'دولة الكويت (الكويت)',
       en: 'Kuwait (Kuwait City)',

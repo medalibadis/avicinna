@@ -15,14 +15,64 @@ import {
   CheckCircle2,
   Sparkles,
 } from 'lucide-react';
+import type { Metadata } from 'next';
 import { fetchWordPressPostBySlug, fetchWordPressPosts, getPublicSiteUrl } from '@/lib/wordpress';
 import { ArticleFaqAccordion, CopyArticleButton } from '@/components/blog/ArticleInteractive';
+import { ArticleReaderClient } from '@/components/blog/ArticleReaderClient';
 
 export const revalidate = 60; // ISR revalidation
 
 type Props = {
   params: Promise<{ slug: string }>;
 };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const article = await fetchWordPressPostBySlug(slug);
+
+  if (!article) {
+    return {
+      title: 'المقال الطبي غير موجود | AVICINNA Healthcare',
+      description: 'المقال الطبي المطلوب غير متوفر حالياً.',
+    };
+  }
+
+  const publicBaseUrl = getPublicSiteUrl();
+  const canonicalUrl = `${publicBaseUrl}/blog/${article.slug}`;
+  const title = article.seo?.title || `${article.title.ar} | AVICINNA Healthcare`;
+  const description = article.seo?.description || article.excerpt.ar;
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    openGraph: {
+      title,
+      description,
+      url: canonicalUrl,
+      siteName: 'AVICINNA Healthcare Turkey',
+      images: [
+        {
+          url: article.image,
+          width: 1200,
+          height: 630,
+          alt: article.title.ar,
+        },
+      ],
+      type: 'article',
+      publishedTime: article.publishedDate,
+      authors: [article.author.name.ar],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [article.image],
+    },
+  };
+}
 
 export default async function ArticleDetailPage({ params }: Props) {
   const { slug } = await params;
@@ -168,196 +218,55 @@ export default async function ArticleDetailPage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(fullSeoSchema) }}
       />
 
-      <div className="pt-24 pb-16 bg-slate-50 min-h-screen">
+      <div className="pt-24 pb-16 bg-slate-50 dark:bg-slate-950 min-h-screen text-slate-800 dark:text-slate-100 transition-colors">
         {/* Breadcrumbs for SEO */}
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs sm:text-sm text-slate-500 flex-wrap">
-            <Link href="/" className="hover:text-sky-600 transition-colors">
+          <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs sm:text-sm text-slate-500 dark:text-slate-400 flex-wrap">
+            <Link href="/" className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
               الرئيسية
             </Link>
-            <ChevronLeft className="w-3.5 h-3.5 text-slate-400" />
-            <Link href="/blog" className="hover:text-sky-600 transition-colors">
+            <ChevronLeft className="w-3.5 h-3.5 text-slate-400 dark:text-slate-600" />
+            <Link href="/blog" className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
               المدونة الطبية
             </Link>
-            <ChevronLeft className="w-3.5 h-3.5 text-slate-400" />
-            <span className="text-slate-900 font-semibold truncate max-w-[200px] sm:max-w-none">
+            <ChevronLeft className="w-3.5 h-3.5 text-slate-400 dark:text-slate-600" />
+            <span className="text-slate-900 dark:text-white font-semibold truncate max-w-[200px] sm:max-w-none">
               {article.title.ar}
             </span>
           </nav>
         </div>
 
-        {/* Article Container */}
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-2">
-          <article className="bg-white rounded-3xl p-6 sm:p-12 shadow-sm border border-slate-100 space-y-8">
-            {/* Header Meta */}
-            <header className="space-y-4">
-              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                <span className="bg-sky-50 text-sky-700 text-xs font-bold px-3 py-1 rounded-full border border-sky-100">
-                  {article.categoryName.ar}
-                </span>
+        {/* Article Container with Instant Multilingual Reader */}
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-2 space-y-8">
+          <ArticleReaderClient article={article} />
 
-                <span className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full border border-emerald-200 shadow-xs">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>مراجعة وتدقيق طبي معتمد (JCI Verified)</span>
-                </span>
+          {/* FAQ Accordion Section with Rich Schema Matching */}
+          <ArticleFaqAccordion
+            faqs={faqs}
+            title={`الأسئلة الشائعة حول ${article.categoryName.ar} (FAQ)`}
+          />
 
-                <span className="inline-flex items-center gap-1 text-xs text-slate-400 bg-slate-50 px-2.5 py-1 rounded-full">
-                  <Clock className="w-3.5 h-3.5 text-slate-400" />
-                  <span>{article.readingTimeMinutes} دقائق قراءة</span>
-                </span>
-
-                {article.isFromWordPress && (
-                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">
-                    <Sparkles className="w-3 h-3 text-amber-600" />
-                    <span>WordPress Headless CMS</span>
-                  </span>
-                )}
-              </div>
-
-              {/* Exact H1 for Target Focus Keywords */}
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 leading-tight">
-                {article.title.ar}
-              </h1>
-
-              <p className="text-base sm:text-lg text-slate-600 font-medium leading-relaxed">
-                {article.excerpt.ar}
-              </p>
-
-              {/* Author & Hospital Strip (E-E-A-T Signal) */}
-              <div className="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-4 text-xs sm:text-sm text-slate-600">
-                <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-2xl bg-sky-50 text-sky-700 flex items-center justify-center font-bold ring-4 ring-sky-50">
-                    <User className="w-5 h-5 text-sky-600" />
-                  </div>
-                  <div>
-                    <div className="font-bold text-slate-900">
-                      {article.author.name.ar}
-                    </div>
-                    <div className="text-slate-500 text-xs">
-                      {article.author.role.ar} • {article.sourceHospital.ar}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4 text-xs text-slate-400">
-                  <span className="font-mono">
-                    تاريخ النشر: {article.publishedDate}
-                  </span>
-                  <CopyArticleButton text="مشاركة المقال" copiedText="تم نسخ الرابط!" />
-                </div>
-              </div>
-            </header>
-
-            {/* Featured Image with eager loading for fast LCP */}
-            <div className="relative rounded-2xl overflow-hidden aspect-[16/9] shadow-md bg-slate-100">
-              <img
-                src={article.image}
-                alt={article.title.ar}
-                className="w-full h-full object-cover"
-                loading="eager"
-              />
+          {/* Medical Disclaimer for Google Medic / YMYL guidelines */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 space-y-2 text-xs text-slate-500 dark:text-slate-400 shadow-xs">
+            <div className="flex items-center gap-2 font-bold text-slate-700 dark:text-slate-200">
+              <AlertCircle className="w-4 h-4 text-amber-500" />
+              <span>إخلاء مسؤولية طبي هام (Medical Disclaimer)</span>
             </div>
-
-            {/* Featured Snippet Box (Zero-Click Answer for Google SERP Position #0) */}
-            <div className="bg-sky-50/70 border border-sky-100 rounded-2xl p-5 sm:p-6 space-y-3">
-              <div className="flex items-center gap-2 text-sky-900 font-black text-sm">
-                <Sparkles className="w-4 h-4 text-sky-600" />
-                <span>أبرز النقاط المستفادة (Key Clinical Takeaways)</span>
-              </div>
-              <ul className="space-y-2 text-xs sm:text-sm text-slate-700">
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-sky-500 shrink-0 mt-0.5" />
-                  <span>معلومات طبية موثقة وفق أحدث المعايير الدولية والاعتمادات الصحية (JCI).</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-sky-500 shrink-0 mt-0.5" />
-                  <span>مقارنة شفافة للتكاليف ونسب النجاح المعتمدة في كبرى المستشفيات التركية.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-sky-500 shrink-0 mt-0.5" />
-                  <span>إمكانية الحصول على رأي طبي ثانٍ مجاني من أطبائنا الاستشاريين في إسطنبول.</span>
-                </li>
-              </ul>
-            </div>
-
-            {/* Article Content: Handles Gutenberg HTML or Paragraphs */}
-            <div className="prose prose-slate max-w-none space-y-5 text-slate-700 leading-relaxed text-base sm:text-lg prose-headings:text-slate-900 prose-headings:font-bold prose-h2:text-xl sm:prose-h2:text-2xl prose-h3:text-lg prose-a:text-sky-600 prose-a:no-underline hover:prose-a:underline">
-              {article.htmlContent ? (
-                <div dangerouslySetInnerHTML={{ __html: article.htmlContent }} />
-              ) : (
-                <div className="space-y-5">
-                  {(article.paragraphs || []).map((paragraph, idx) => (
-                    <p key={idx} className="leading-relaxed">
-                      {paragraph}
-                    </p>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* FAQ Accordion Section with Rich Schema Matching */}
-            <ArticleFaqAccordion
-              faqs={faqs}
-              title={`الأسئلة الشائعة حول ${article.categoryName.ar} (FAQ)`}
-            />
-
-            {/* High Conversion Consultation Banner */}
-            <div className="bg-gradient-to-r from-[#021838] via-[#032654] to-[#021838] rounded-3xl p-6 sm:p-10 text-white space-y-4 shadow-xl border border-sky-900/50 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
-              <div className="relative z-10 space-y-3">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-400/20 text-sky-300 text-xs font-semibold border border-sky-400/30">
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>استشارة أولية ورأي طبي ثانٍ مجاناً 100%</span>
-                </div>
-                <h3 className="text-lg sm:text-2xl font-black">
-                  هل تحتاج استشارة طبية متخصصة حول هذه الحالة؟
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-2xl">
-                  أرسل تقاريرك الطبية الآن لمراجعتها مجاناً من قبل نفس الفريق الطبي في إسطنبول وتقديم خطة علاجية مخصصة وعرض أسعار شامل خلال 24 ساعة.
-                </p>
-                <div className="flex flex-wrap gap-3 pt-3">
-                  <Link
-                    href="/contact"
-                    className="inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-400 text-white font-bold px-6 py-3 rounded-full text-xs sm:text-sm transition-all shadow-lg shadow-sky-500/25 active:scale-95"
-                  >
-                    <CalendarCheck className="w-4 h-4" />
-                    <span>طلب دراسة الحالة مجاناً</span>
-                  </Link>
-                  <a
-                    href={`https://wa.me/905000000000?text=${whatsappText}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-6 py-3 rounded-full text-xs sm:text-sm transition-all shadow-lg shadow-emerald-600/25 active:scale-95"
-                  >
-                    <PhoneCall className="w-4 h-4" />
-                    <span>استشارة فورية عبر واتساب</span>
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            {/* Medical Disclaimer for Google Medic / YMYL guidelines */}
-            <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-5 space-y-2 text-xs text-slate-500">
-              <div className="flex items-center gap-2 font-bold text-slate-700">
-                <AlertCircle className="w-4 h-4 text-amber-500" />
-                <span>إخلاء مسؤولية طبي هام (Medical Disclaimer)</span>
-              </div>
-              <p className="leading-relaxed">
-                المعلومات الواردة في هذا المقال مقدمة لأغراض تثقيفية وتوعوية عامة فقط، ولا تعتبر بديلاً عن الاستشارة أو التشخيص الطبي المتخصص من قبل طبيب مرخص. نوصي دائماً باستشارة طبيبك أو فريقنا الاستشاري قبل اتخاذ أي قرار علاجي.
-              </p>
-            </div>
-          </article>
+            <p className="leading-relaxed">
+              المعلومات الواردة في هذا المقال مقدمة لأغراض تثقيفية وتوعوية عامة فقط، ولا تعتبر بديلاً عن الاستشارة أو التشخيص الطبي المتخصص من قبل طبيب مرخص. نوصي دائماً باستشارة طبيبك أو فريقنا الاستشاري قبل اتخاذ أي قرار علاجي.
+            </p>
+          </div>
 
           {/* Related Articles Section for Internal Linking Juice */}
           {relatedArticles.length > 0 && (
             <div className="mt-12 space-y-6">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg sm:text-xl font-bold text-slate-900">
+                <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">
                   مقالات طبية ذات صلة وموصى بها
                 </h3>
                 <Link
                   href="/blog"
-                  className="text-xs font-semibold text-sky-600 hover:text-sky-700 transition-colors flex items-center gap-1"
+                  className="text-xs font-semibold text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 transition-colors flex items-center gap-1"
                 >
                   <span>عرض كافة المقالات</span>
                   <ChevronLeft className="w-3.5 h-3.5" />
@@ -369,26 +278,26 @@ export default async function ArticleDetailPage({ params }: Props) {
                   <Link
                     key={rel.id}
                     href={`/blog/${rel.slug}`}
-                    className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 hover:border-sky-300 hover:shadow-md transition-all flex flex-col justify-between group"
+                    className="bg-white dark:bg-slate-900 rounded-2xl p-4 shadow-sm border border-slate-100 dark:border-slate-800 hover:border-sky-300 dark:hover:border-sky-500/50 hover:shadow-md transition-all flex flex-col justify-between group"
                   >
                     <div className="space-y-3">
-                      <div className="aspect-[16/9] rounded-xl overflow-hidden bg-slate-100">
+                      <div className="aspect-[16/9] rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800">
                         <img
                           src={rel.image}
                           alt={rel.title.ar}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                       </div>
-                      <span className="text-[10px] font-bold text-sky-600 bg-sky-50 px-2 py-0.5 rounded-md">
+                      <span className="text-[10px] font-bold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/60 px-2 py-0.5 rounded-md border border-sky-100 dark:border-sky-900/40">
                         {rel.categoryName.ar}
                       </span>
-                      <h4 className="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-sky-600 transition-colors line-clamp-2 leading-snug">
+                      <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors line-clamp-2 leading-snug">
                         {rel.title.ar}
                       </h4>
                     </div>
-                    <div className="mt-3 pt-3 border-t border-slate-100 text-[11px] text-slate-400 flex items-center justify-between">
+                    <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-400 dark:text-slate-500 flex items-center justify-between">
                       <span>{rel.readingTimeMinutes} د</span>
-                      <span className="font-semibold text-sky-600 flex items-center gap-0.5">
+                      <span className="font-semibold text-sky-600 dark:text-sky-400 flex items-center gap-0.5">
                         اقرأ المزيد
                         <ChevronLeft className="w-3 h-3" />
                       </span>

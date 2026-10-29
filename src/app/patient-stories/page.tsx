@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
+import { getPatientName } from '@/data/stories';
 import {
   Star,
   Play,
@@ -111,7 +112,7 @@ export default function PatientStoriesPage() {
   };
 
   return (
-    <div className="pt-24 pb-16 bg-slate-50 min-h-screen">
+    <div className="pt-24 pb-16 bg-slate-50 dark:bg-[#080E1A] min-h-screen transition-colors">
       {/* Hero Header */}
       <div className="bg-gradient-to-b from-[#021838] to-[#032654] text-white py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:16px_16px]" />
@@ -131,7 +132,7 @@ export default function PatientStoriesPage() {
 
       {/* Filter Tabs Ribbon */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-20">
-        <div className="bg-white rounded-3xl shadow-xl border border-slate-100 p-4 sm:p-6">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-xl border border-slate-100 dark:border-slate-800 p-4 sm:p-6">
           <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin">
             <button
               type="button"
@@ -139,7 +140,7 @@ export default function PatientStoriesPage() {
               className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all cursor-pointer ${
                 selectedSpecialty === 'all'
                   ? 'bg-sky-500 text-white shadow-sm'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
               }`}
             >
               {content.allSpecialties}
@@ -152,7 +153,7 @@ export default function PatientStoriesPage() {
                 className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all cursor-pointer ${
                   selectedSpecialty === item.slug
                     ? 'bg-sky-500 text-white shadow-sm'
-                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                 }`}
               >
                 {item.title[language]}
@@ -166,31 +167,37 @@ export default function PatientStoriesPage() {
       <div ref={gridRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 scroll-mt-28">
         {/* Results Counter */}
         {totalStories > 0 && (
-          <div className="flex items-center justify-between pb-4 mb-6 border-b border-slate-200/80 text-xs sm:text-sm text-slate-500">
+          <div className="flex items-center justify-between pb-4 mb-6 border-b border-slate-200/80 dark:border-slate-800 text-xs sm:text-sm text-slate-500 dark:text-slate-400">
             <span>{content.showingResults(startIndex + 1, endIndex, totalStories)}</span>
             <span>
-              صفحة {currentPage} من {totalPages}
+              {language === 'ar'
+                ? `صفحة ${currentPage} من ${totalPages}`
+                : language === 'fr'
+                ? `Page ${currentPage} sur ${totalPages}`
+                : `Page ${currentPage} of ${totalPages}`}
             </span>
           </div>
         )}
 
         {paginatedStories.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-3xl border border-slate-200 shadow-sm">
-            <BookOpen className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-            <p className="text-slate-600 text-base">{content.noStories}</p>
+          <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
+            <BookOpen className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+            <p className="text-slate-600 dark:text-slate-400 text-base">{content.noStories}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {paginatedStories.map((story) => (
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] gap-8">
+            {paginatedStories.map((story) => {
+              const displayName = getPatientName(story.patientName, language);
+              return (
               <div
                 key={story.id}
-                className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-xl hover:border-sky-200 transition-all duration-300 flex flex-col group"
+                className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden hover:shadow-xl hover:border-sky-200 dark:hover:border-sky-500/40 transition-all duration-300 flex flex-col group"
               >
                 {/* Image & Video Badge */}
-                <div className="relative h-60 overflow-hidden bg-slate-100">
+                <div className="relative h-60 overflow-hidden bg-slate-100 dark:bg-slate-800">
                   <img
                     src={story.image}
-                    alt={story.patientName}
+                    alt={displayName}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent" />
@@ -198,15 +205,15 @@ export default function PatientStoriesPage() {
                   {/* Video Indicator */}
                   {story.hasVideo && (
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-12 h-12 rounded-full bg-white/90 backdrop-blur-md text-sky-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                      <div className="w-12 h-12 rounded-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-md text-sky-600 dark:text-sky-400 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                         <Play className="w-5 h-5 fill-current ml-0.5" />
                       </div>
                     </div>
                   )}
 
                   {/* Country Badge */}
-                  <div className="absolute top-4 left-4 rtl:left-auto rtl:right-4 bg-white/95 backdrop-blur-sm text-slate-900 px-3 py-1 rounded-full text-xs font-bold shadow-sm flex items-center gap-1.5">
-                    <MapPin className="w-3.5 h-3.5 text-sky-600" />
+                  <div className="absolute top-4 left-4 rtl:left-auto rtl:right-4 bg-white/95 dark:bg-slate-900/90 backdrop-blur-sm text-slate-900 dark:text-white px-3 py-1 rounded-full text-xs font-bold shadow-sm flex items-center gap-1.5">
+                    <MapPin className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
                     <span>{story.country[language]}</span>
                   </div>
 
@@ -221,7 +228,7 @@ export default function PatientStoriesPage() {
                 <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-bold text-sky-600 uppercase">
+                      <span className="text-xs font-bold text-sky-600 dark:text-sky-400 uppercase">
                         {story.treatment[language]}
                       </span>
                       <div className="flex items-center gap-1 text-amber-400">
@@ -231,18 +238,18 @@ export default function PatientStoriesPage() {
                       </div>
                     </div>
 
-                    <h3 className="text-lg font-bold text-slate-900 group-hover:text-sky-600 transition-colors leading-snug">
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors leading-snug">
                       {story.title[language]}
                     </h3>
 
-                    <p className="text-xs sm:text-sm text-slate-600 mt-2 line-clamp-3 leading-relaxed">
+                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-2 line-clamp-3 leading-relaxed">
                       &ldquo;{story.shortStory[language]}&rdquo;
                     </p>
 
-                    <div className="mt-4 pt-3 border-t border-slate-100 space-y-1 text-xs text-slate-600">
+                    <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 space-y-1 text-xs text-slate-600 dark:text-slate-400">
                       <div className="flex items-center gap-1.5">
                         <User className="w-3.5 h-3.5 text-sky-500" />
-                        <span className="font-semibold text-slate-800">{story.patientName}</span>
+                        <span className="font-semibold text-slate-800 dark:text-white">{displayName}</span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <Building2 className="w-3.5 h-3.5 text-sky-500" />
@@ -252,10 +259,10 @@ export default function PatientStoriesPage() {
                   </div>
 
                   {/* Action Link */}
-                  <div className="pt-4 border-t border-slate-100">
+                  <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
                     <Link
                       href={`/patient-stories/${story.slug}`}
-                      className="w-full py-2.5 px-4 rounded-xl bg-sky-50 hover:bg-sky-500 text-sky-700 hover:text-white font-semibold text-xs transition-colors text-center flex items-center justify-center gap-1.5 cursor-pointer"
+                      className="w-full py-2.5 px-4 rounded-xl bg-sky-50 dark:bg-sky-950/40 hover:bg-sky-500 text-sky-700 dark:text-sky-300 hover:text-white font-semibold text-xs transition-colors text-center flex items-center justify-center gap-1.5 cursor-pointer"
                     >
                       <span>{content.readStory}</span>
                       <ArrowIcon className="w-3.5 h-3.5" />
@@ -263,27 +270,28 @@ export default function PatientStoriesPage() {
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
+            );
+          })}
+        </div>
         )}
 
         {/* Dynamic Pagination Ribbon */}
         {totalPages > 1 && (
           <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <div className="bg-white border border-slate-200/90 shadow-sm rounded-2xl p-2 flex items-center gap-1.5">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-sm rounded-2xl p-2 flex items-center gap-1.5">
               {/* Previous Button */}
               <button
                 type="button"
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-100 text-slate-700"
+                className="px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300"
               >
                 <PrevIcon className="w-4 h-4" />
                 <span>{content.prevPage}</span>
               </button>
 
               {/* Number Buttons */}
-              <div className="flex items-center gap-1 px-1 border-x border-slate-100">
+              <div className="flex items-center gap-1 px-1 border-x border-slate-100 dark:border-slate-800">
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNumber) => (
                   <button
                     key={pageNumber}
@@ -292,7 +300,7 @@ export default function PatientStoriesPage() {
                     className={`w-9 h-9 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center ${
                       currentPage === pageNumber
                         ? 'bg-sky-500 text-white shadow-md shadow-sky-500/25 ring-2 ring-sky-500/20 scale-105'
-                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
                     }`}
                   >
                     {pageNumber}
@@ -305,7 +313,7 @@ export default function PatientStoriesPage() {
                 type="button"
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className="px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-100 text-slate-700"
+                className="px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300"
               >
                 <span>{content.nextPage}</span>
                 <NextIcon className="w-4 h-4" />

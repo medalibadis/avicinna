@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import { useLanguage } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
 import { Star, Building2, Calendar, ArrowRight, ArrowLeft } from 'lucide-react';
@@ -15,11 +16,26 @@ export const FeaturedDoctors: React.FC = () => {
 
   const filterTabs = [
     { slug: 'all', label: t.doctors.filterAll },
-    { slug: 'cardiac-surgery', label: language === 'ar' ? 'جراحة القلب' : 'Cardiology' },
-    { slug: 'neurosurgery', label: language === 'ar' ? 'جراحة الأعصاب' : 'Neurosurgery' },
-    { slug: 'orthopedics', label: language === 'ar' ? 'جراحة العظام' : 'Orthopedics' },
-    { slug: 'hair-transplant', label: language === 'ar' ? 'زراعة الشعر' : 'Hair' },
-    { slug: 'dentistry', label: language === 'ar' ? 'طب الأسنان' : 'Dentistry' },
+    {
+      slug: 'cardiac-surgery',
+      label: language === 'ar' ? 'جراحة القلب' : language === 'fr' ? 'Chirurgie Cardiaque' : 'Cardiology',
+    },
+    {
+      slug: 'neurosurgery',
+      label: language === 'ar' ? 'جراحة الأعصاب' : language === 'fr' ? 'Neurochirurgie' : 'Neurosurgery',
+    },
+    {
+      slug: 'orthopedics',
+      label: language === 'ar' ? 'جراحة العظام' : language === 'fr' ? 'Orthopédie' : 'Orthopedics',
+    },
+    {
+      slug: 'hair-transplant',
+      label: language === 'ar' ? 'زراعة الشعر' : language === 'fr' ? 'Greffe de Cheveux' : 'Hair Transplant',
+    },
+    {
+      slug: 'dentistry',
+      label: language === 'ar' ? 'طب الأسنان' : language === 'fr' ? 'Dentisterie' : 'Dentistry',
+    },
   ];
 
   const filteredDoctors =
@@ -28,17 +44,17 @@ export const FeaturedDoctors: React.FC = () => {
       : doctors.filter((doc) => doc.specialtySlug === selectedSpecialty);
 
   return (
-    <section id="doctors" className="py-20 bg-white">
+    <section id="doctors" className="py-20 bg-white dark:bg-[#080E1A]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-10">
-          <div className="inline-flex items-center gap-2 bg-[#EAF6FF] text-[#0097FB] text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-full mb-3 border border-[#0097FB]/20">
+          <div className="inline-flex items-center gap-2 bg-[#EAF6FF] dark:bg-sky-950/60 text-[#0097FB] dark:text-sky-400 text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-full mb-3 border border-[#0097FB]/20 dark:border-sky-500/30">
             {t.doctors.badge}
           </div>
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-[#032654] tracking-tight mb-4">
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-[#032654] dark:text-white tracking-tight mb-4">
             {t.doctors.title}
           </h2>
-          <p className="text-sm sm:text-base text-[#64748B] leading-relaxed">
+          <p className="text-sm sm:text-base text-[#64748B] dark:text-slate-400 leading-relaxed">
             {t.doctors.subtitle}
           </p>
         </div>
@@ -55,7 +71,7 @@ export const FeaturedDoctors: React.FC = () => {
                 className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer ${
                   isActive
                     ? 'bg-[#0097FB] text-white shadow-sm shadow-[#0097FB]/25 scale-105'
-                    : 'bg-[#F4F7FA] text-[#163B63] hover:bg-[#EAF6FF]'
+                    : 'bg-[#F4F7FA] dark:bg-slate-800 text-[#163B63] dark:text-slate-200 hover:bg-[#EAF6FF] dark:hover:bg-slate-700'
                 }`}
               >
                 {tab.label}
@@ -66,13 +82,23 @@ export const FeaturedDoctors: React.FC = () => {
 
         {/* Doctor Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          {filteredDoctors.map((doctor) => (
-            <div
+          {filteredDoctors.map((doctor, idx) => (
+            <motion.div
               key={doctor.id}
-              className="bg-white rounded-3xl overflow-hidden border border-slate-200/80 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group"
+              initial={{ opacity: 0, y: 18 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{
+                type: 'spring',
+                stiffness: 350,
+                damping: 26,
+                delay: idx * 0.08,
+              }}
+              whileHover={{ y: -5, transition: { duration: 0.2 } }}
+              className="bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-200/80 dark:border-slate-800 shadow-sm hover:shadow-xl transition-colors duration-300 flex flex-col group cursor-pointer"
             >
               {/* Image & Specialty Badge */}
-              <div className="relative h-64 overflow-hidden bg-slate-100">
+              <div className="relative h-64 overflow-hidden bg-slate-100 dark:bg-slate-800">
                 <img
                   src={doctor.image}
                   alt={doctor.name[language]}
@@ -81,7 +107,7 @@ export const FeaturedDoctors: React.FC = () => {
                 <div className="absolute top-3 right-3 bg-[#0097FB] text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-md">
                   {doctor.specialtyName[language]}
                 </div>
-                <div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-lg text-xs font-bold text-slate-800 flex items-center gap-1 shadow-sm">
+                <div className="absolute bottom-3 left-3 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md px-2.5 py-1 rounded-lg text-xs font-bold text-slate-800 dark:text-white flex items-center gap-1 shadow-sm border border-slate-100 dark:border-slate-800">
                   <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                   <span>{doctor.rating}</span>
                   <span className="text-[10px] text-slate-400">({doctor.reviewCount})</span>
@@ -91,38 +117,38 @@ export const FeaturedDoctors: React.FC = () => {
               {/* Content */}
               <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
                 <div>
-                  <h3 className="text-lg font-bold text-[#032654] group-hover:text-[#0097FB] transition-colors">
+                  <h3 className="text-lg font-bold text-[#032654] dark:text-white group-hover:text-[#0097FB] transition-colors">
                     {doctor.name[language]}
                   </h3>
                   <p className="text-xs font-medium text-[#0097FB] mb-2">
                     {doctor.title[language]}
                   </p>
-                  <div className="flex items-center gap-1.5 text-xs text-[#64748B] mb-3">
+                  <div className="flex items-center gap-1.5 text-xs text-[#64748B] dark:text-slate-400 mb-3">
                     <Building2 className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
                     <span className="truncate">{doctor.hospital[language]}</span>
                   </div>
-                  <p className="text-xs text-[#64748B] line-clamp-2 leading-relaxed">
+                  <p className="text-xs text-[#64748B] dark:text-slate-400 line-clamp-2 leading-relaxed">
                     {doctor.biography[language]}
                   </p>
                 </div>
 
                 {/* Actions */}
-                <div className="pt-3 border-t border-slate-100 flex items-center gap-2">
+                <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2">
                   <Link
                     href={`/doctors/${doctor.slug}`}
-                    className="flex-1 text-center py-2 px-3 rounded-xl bg-[#F4F7FA] hover:bg-[#EAF6FF] text-[#163B63] hover:text-[#0097FB] text-xs font-bold transition-colors"
+                    className="flex-1 text-center py-2 px-3 rounded-xl bg-[#F4F7FA] dark:bg-slate-800 hover:bg-[#EAF6FF] dark:hover:bg-slate-700 text-[#163B63] dark:text-slate-200 hover:text-[#0097FB] dark:hover:text-sky-400 text-xs font-bold transition-colors cursor-pointer"
                   >
                     {t.doctors.viewProfile}
                   </Link>
                   <a
                     href="#consultation"
-                    className="flex-1 text-center py-2 px-3 rounded-xl bg-[#0097FB] hover:bg-[#0082d6] text-white text-xs font-bold transition-colors shadow-xs shadow-[#0097FB]/20"
+                    className="flex-1 text-center py-2 px-3 rounded-xl bg-[#0097FB] hover:bg-[#0082d6] text-white text-xs font-bold transition-colors shadow-xs shadow-[#0097FB]/20 cursor-pointer"
                   >
                     {t.doctors.requestConsultation}
                   </a>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
 

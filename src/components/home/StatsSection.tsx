@@ -59,26 +59,41 @@ export const StatsSection: React.FC = () => {
       count: hasAnimated ? sections.stats.patientsCount : `+${patients}`,
       label: sections.stats.patientsLabel[language],
       icon: Users,
-      desc: language === 'ar' ? 'من أكثر من 35 دولة' : 'From over 35 countries',
+      desc:
+        language === 'ar'
+          ? 'من أكثر من 35 دولة'
+          : language === 'fr'
+          ? 'Originaires de plus de 35 pays'
+          : 'From over 35 countries',
     },
     {
       count: hasAnimated ? sections.stats.hospitalsCount : `+${hospitals}`,
       label: sections.stats.hospitalsLabel[language],
       icon: Building2,
-      desc: language === 'ar' ? 'معتمدة دولياً من JCI' : 'JCI & ISO accredited',
+      desc:
+        language === 'ar'
+          ? 'معتمدة دولياً من JCI'
+          : language === 'fr'
+          ? 'Accrédités JCI et normes ISO'
+          : 'JCI & ISO accredited',
     },
     {
       count: hasAnimated ? sections.stats.experienceCount : `+${specialties}`,
       label: sections.stats.experienceLabel[language],
       icon: Stethoscope,
-      desc: language === 'ar' ? 'بأحدث التقنيات الجراحية' : 'Advanced surgical care',
+      desc:
+        language === 'ar'
+          ? 'بأحدث التقنيات الجراحية'
+          : language === 'fr'
+          ? 'Technologies chirurgicales avancées'
+          : 'Advanced surgical care',
     },
   ];
 
   return (
     <section ref={sectionRef} className="relative z-20 -mt-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 p-6 sm:p-10">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 divide-y md:divide-y-0 md:divide-x md:divide-x-reverse divide-slate-100">
+      <div className="bg-white dark:bg-slate-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 p-6 sm:p-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 divide-y md:divide-y-0 md:divide-x rtl:md:divide-x-reverse divide-slate-100 dark:divide-slate-800">
           {stats.map((stat, idx) => {
             const Icon = stat.icon;
             return (
@@ -86,16 +101,16 @@ export const StatsSection: React.FC = () => {
                 key={idx}
                 className="flex flex-col items-center text-center p-4 transition-transform duration-300 hover:scale-105"
               >
-                <div className="w-14 h-14 rounded-2xl bg-[#EAF6FF] text-[#0097FB] flex items-center justify-center mb-4 border border-[#0097FB]/20 shadow-xs">
+                <div className="w-14 h-14 rounded-2xl bg-[#EAF6FF] dark:bg-sky-950/60 text-[#0097FB] dark:text-sky-400 flex items-center justify-center mb-4 border border-[#0097FB]/20 dark:border-sky-800/60 shadow-xs">
                   <Icon className="w-7 h-7" />
                 </div>
-                <div className="text-4xl sm:text-5xl font-black text-[#032654] tracking-tight font-sans mb-2">
+                <div className="text-4xl sm:text-5xl font-black text-[#032654] dark:text-white tracking-tight font-sans mb-2">
                   {stat.count}
                 </div>
-                <div className="text-base sm:text-lg font-bold text-[#163B63] mb-1">
+                <div className="text-base sm:text-lg font-bold text-[#163B63] dark:text-slate-200 mb-1">
                   {stat.label}
                 </div>
-                <div className="text-xs font-medium text-[#64748B]">
+                <div className="text-xs font-medium text-[#64748B] dark:text-slate-400">
                   {stat.desc}
                 </div>
               </div>

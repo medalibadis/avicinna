@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { motion } from 'framer-motion';
 import { useLanguage } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
 import { FileText, Building, HeartPulse, MessageSquare, MessageCircle, CheckCircle } from 'lucide-react';
@@ -9,7 +10,7 @@ export const WhyChooseAvicinna: React.FC = () => {
   const { t, language } = useLanguage();
   const { sections } = useData();
 
-  const phoneRaw = (sections.whyChoose.whatsappNumber || '+90 500 000 00 00').replace(/[^0-9]/g, '');
+  const phoneRaw = (sections.whyChoose.whatsappNumber || '+90 544 282 27 69').replace(/[^0-9]/g, '') || '905442822769';
   const defaultMsg: Record<string, string> = {
     ar: 'مرحباً، أود الحصول على استشارة طبية مجانية عبر منصة AVICINNA بخصوص حالتي.',
     en: 'Hello, I would like to request a free medical consultation with the AVICINNA team regarding treatment in Turkey.',
@@ -42,20 +43,20 @@ export const WhyChooseAvicinna: React.FC = () => {
   ];
 
   return (
-    <section className="py-20 bg-white">
+    <section className="py-20 bg-white dark:bg-[#080E1A]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           {/* Content Column (7 cols) */}
           <div className="lg:col-span-7 space-y-6">
-            <div className="inline-flex items-center gap-2 bg-[#EAF6FF] text-[#0097FB] text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-full border border-[#0097FB]/20">
+            <div className="inline-flex items-center gap-2 bg-[#EAF6FF] dark:bg-sky-950/60 text-[#0097FB] dark:text-sky-400 text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-full border border-[#0097FB]/20 dark:border-sky-500/30">
               {t.whyChoose.badge}
             </div>
 
-            <h2 className="text-2xl sm:text-4xl font-extrabold text-[#032654] tracking-tight leading-tight">
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-[#032654] dark:text-white tracking-tight leading-tight">
               {t.whyChoose.title}
             </h2>
 
-            <p className="text-sm sm:text-base text-[#64748B] leading-relaxed">
+            <p className="text-sm sm:text-base text-[#64748B] dark:text-slate-300 leading-relaxed">
               {t.whyChoose.subtitle}
             </p>
 
@@ -64,20 +65,30 @@ export const WhyChooseAvicinna: React.FC = () => {
               {features.map((feat, idx) => {
                 const Icon = feat.icon;
                 return (
-                  <div
+                  <motion.div
                     key={idx}
-                    className="p-5 rounded-2xl bg-white border border-slate-100 shadow-xs hover:border-[#0097FB]/30 transition-all duration-300 hover:bg-[#EAF6FF]/30"
+                    initial={{ opacity: 0, y: 16 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: '-40px' }}
+                    transition={{
+                      type: 'spring',
+                      stiffness: 350,
+                      damping: 26,
+                      delay: idx * 0.08,
+                    }}
+                    whileHover={{ y: -4, transition: { duration: 0.18 } }}
+                    className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-xs hover:border-[#0097FB]/30 dark:hover:border-sky-500/40 transition-colors duration-300 hover:bg-[#EAF6FF]/30 dark:hover:bg-slate-800/60 cursor-pointer"
                   >
-                    <div className="w-10 h-10 rounded-xl bg-[#EAF6FF] shadow-xs border border-[#0097FB]/20 text-[#0097FB] flex items-center justify-center mb-3">
+                    <div className="w-10 h-10 rounded-xl bg-[#EAF6FF] dark:bg-sky-950/70 shadow-xs border border-[#0097FB]/20 dark:border-sky-500/30 text-[#0097FB] dark:text-sky-400 flex items-center justify-center mb-3">
                       <Icon className="w-5 h-5" />
                     </div>
-                    <h3 className="text-base font-bold text-[#163B63] mb-1.5">
+                    <h3 className="text-base font-bold text-[#163B63] dark:text-slate-100 mb-1.5">
                       {feat.title}
                     </h3>
-                    <p className="text-xs sm:text-sm text-[#64748B] leading-relaxed">
+                    <p className="text-xs sm:text-sm text-[#64748B] dark:text-slate-400 leading-relaxed">
                       {feat.desc}
                     </p>
-                  </div>
+                  </motion.div>
                 );
               })}
             </div>
@@ -98,7 +109,7 @@ export const WhyChooseAvicinna: React.FC = () => {
 
           {/* Visual Column (5 cols) */}
           <div className="lg:col-span-5 relative">
-            <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-slate-100">
+            <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-slate-100 dark:border-slate-800">
               <img
                 src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?q=80&w=1000&auto=format&fit=crop"
                 alt="AVICINNA Medical Coordinator and Doctor"
@@ -106,14 +117,22 @@ export const WhyChooseAvicinna: React.FC = () => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#032654]/80 via-transparent to-transparent" />
 
-              <div className="absolute bottom-6 left-6 right-6 bg-white/95 backdrop-blur-md p-5 rounded-2xl shadow-lg border border-white/40">
-                <div className="flex items-center gap-2 text-[#0097FB] font-bold text-sm mb-1">
+              <div className="absolute bottom-6 left-6 right-6 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md p-5 rounded-2xl shadow-lg border border-white/40 dark:border-slate-700/60">
+                <div className="flex items-center gap-2 text-[#0097FB] dark:text-sky-400 font-bold text-sm mb-1">
                   <CheckCircle className="w-4 h-4 text-emerald-500" />
-                  <span>{language === 'ar' ? 'فريق طبي متعدد اللغات' : 'Multilingual Medical Board'}</span>
+                  <span>
+                    {language === 'ar'
+                      ? 'فريق طبي متعدد اللغات'
+                      : language === 'fr'
+                      ? 'Équipe Médicale Polyglotte'
+                      : 'Multilingual Medical Board'}
+                  </span>
                 </div>
-                <p className="text-xs text-[#64748B] leading-relaxed">
+                <p className="text-xs text-[#64748B] dark:text-slate-300 leading-relaxed">
                   {language === 'ar'
                     ? 'نرافقك باللغات العربية، الإنجليزية والفرنسية في كل خطوة.'
+                    : language === 'fr'
+                    ? 'Interprètes médicaux dédiés vous accompagnant en français, arabe et anglais à chaque étape.'
                     : 'Personal medical translators supporting you in Arabic, English, and French.'}
                 </p>
               </div>

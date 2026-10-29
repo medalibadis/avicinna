@@ -50,6 +50,11 @@ export interface WordPressArticle {
   };
   htmlContent: string;
   paragraphs: string[];
+  content?: {
+    ar: string[];
+    en: string[];
+    fr: string[];
+  };
   readingTimeMinutes: number;
   publishedDate: string;
   sourceHospital: {
@@ -122,24 +127,27 @@ export function normalizeWordPressPost(raw: WordPressRawPost): WordPressArticle 
     ? rawCanonical.replace(/https?:\/\/cms\.[^/]+/i, publicBaseUrl)
     : `${publicBaseUrl}/blog/${raw.slug}`;
 
+  const isTitleArabic = /[\u0600-\u06FF]/.test(cleanTitle);
+  const isExcerptArabic = /[\u0600-\u06FF]/.test(cleanExcerpt);
+
   return {
     id: `wp-${raw.id}`,
     slug: raw.slug,
     categorySlug,
     categoryName: {
       ar: categoryNameAr,
-      en: categoryNameAr,
-      fr: categoryNameAr,
+      en: isTitleArabic ? '' : categoryNameAr,
+      fr: isTitleArabic ? '' : categoryNameAr,
     },
     title: {
-      ar: cleanTitle,
-      en: cleanTitle,
-      fr: cleanTitle,
+      ar: isTitleArabic ? cleanTitle : '',
+      en: isTitleArabic ? '' : cleanTitle,
+      fr: isTitleArabic ? '' : cleanTitle,
     },
     excerpt: {
-      ar: cleanExcerpt,
-      en: cleanExcerpt,
-      fr: cleanExcerpt,
+      ar: isExcerptArabic ? cleanExcerpt : '',
+      en: isExcerptArabic ? '' : cleanExcerpt,
+      fr: isExcerptArabic ? '' : cleanExcerpt,
     },
     htmlContent: rawHtml,
     paragraphs: paragraphs.length > 0 ? paragraphs : [cleanExcerpt],
@@ -172,7 +180,8 @@ export function normalizeWordPressPost(raw: WordPressRawPost): WordPressArticle 
  */
 export function convertLocalArticleToWP(art: Article): WordPressArticle {
   const publicBaseUrl = getPublicSiteUrl();
-  const htmlContent = art.content.ar.map((p) => `<p>${p}</p>`).join('');
+  const arParagraphs = art.content?.ar || (art as any).paragraphs || [];
+  const htmlContent = arParagraphs.map((p: string) => `<p>${p}</p>`).join('');
 
   return {
     id: art.id,
@@ -182,16 +191,17 @@ export function convertLocalArticleToWP(art: Article): WordPressArticle {
     title: art.title,
     excerpt: art.excerpt,
     htmlContent,
-    paragraphs: art.content.ar,
+    paragraphs: arParagraphs,
+    content: art.content,
     readingTimeMinutes: art.readingTimeMinutes,
     publishedDate: art.publishedDate,
     sourceHospital: art.sourceHospital,
     image: art.image,
     author: art.author,
     seo: {
-      title: `${art.title.ar} | AVICINNA`,
-      description: art.excerpt.ar,
-      focusKeyword: art.title.ar,
+      title: `${art.title?.ar || art.title?.en} | AVICINNA`,
+      description: art.excerpt?.ar || art.excerpt?.en,
+      focusKeyword: art.title?.ar || art.title?.en,
       canonical: `${publicBaseUrl}/blog/${art.slug}`,
     },
     isFromWordPress: false,
@@ -348,11 +358,23 @@ export async function syncArticleToWordPress(payload: {
           hospital_name: payload.hospitalName,
           category_slug: payload.categorySlug,
           category_name: payload.categoryName,
+          // Official Rank Math WordPress Database Meta Keys
+          rank_math_title: payload.seoTitle || `${payload.title} - AVICINNA`,
+          rank_math_description: payload.seoDescription || payload.excerpt,
+          rank_math_focus_keyword: payload.focusKeyword || payload.title,
+          // Official Yoast SEO WordPress Database Meta Keys
+          _yoast_wpseo_title: payload.seoTitle || `${payload.title} - AVICINNA`,
+          _yoast_wpseo_metadesc: payload.seoDescription || payload.excerpt,
+          _yoast_wpseo_focuskw: payload.focusKeyword || payload.title,
         },
         rank_math_seo: {
           title: payload.seoTitle || `${payload.title} - AVICINNA`,
           description: payload.seoDescription || payload.excerpt,
           focus_keyword: payload.focusKeyword || payload.title,
+        },
+        yoast_head_json: {
+          title: payload.seoTitle || `${payload.title} - AVICINNA`,
+          description: payload.seoDescription || payload.excerpt,
         },
       }),
     });

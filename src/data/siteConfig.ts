@@ -46,15 +46,16 @@ export interface SiteConfig {
     footer: boolean;
     whatsappFloating: boolean;
   };
+  adminGuideEnabled: boolean;
 }
 
 export const initialSiteConfig: SiteConfig = {
   brandName: 'AVICINNA',
   brandArabic: 'أفيسينا للرعاية الطبية الدولية',
   contact: {
-    phone: '+90 538 492 18 90',
-    phoneFormatted: '+90 538 492 18 90',
-    whatsapp: '905384921890',
+    phone: '+90 544 282 27 69',
+    phoneFormatted: '+90 544 282 27 69',
+    whatsapp: '905442822769',
     whatsappMessage: {
       ar: 'مرحباً، أود الحصول على استشارة طبية مجانية عبر منصة AVICINNA بخصوص حالتي.',
       en: 'Hello, I would like to request a free medical consultation with the AVICINNA team regarding treatment in Turkey.',
@@ -108,4 +109,5 @@ export const initialSiteConfig: SiteConfig = {
     footer: true,
     whatsappFloating: true,
   },
+  adminGuideEnabled: true,
 };

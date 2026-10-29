@@ -1,7 +1,9 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import { motion } from 'framer-motion';
 import { useLanguage } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
 import {
@@ -18,13 +20,38 @@ import {
   Sparkles,
 } from 'lucide-react';
 
-export default function DoctorsPage() {
+function DoctorsPageContent() {
   const { language, direction, t } = useLanguage();
   const { doctors, treatments } = useData();
+  const searchParams = useSearchParams();
   const ArrowIcon = direction === 'rtl' ? ChevronLeft : ChevronRight;
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSpecialty, setSelectedSpecialty] = useState('all');
+
+  // Deep-linking from search bar
+  const paramSearch = searchParams.get('search') || searchParams.get('q');
+  const paramSpecialty = searchParams.get('specialty');
+  const paramId = searchParams.get('id') || searchParams.get('slug');
+
+  useEffect(() => {
+    if (paramSearch) {
+      setSearchQuery(paramSearch);
+    }
+    if (paramSpecialty) {
+      setSelectedSpecialty(paramSpecialty);
+    }
+    if (paramId && doctors?.length) {
+      const matched = doctors.find(
+        (d) =>
+          d.id.toLowerCase() === paramId.toLowerCase() ||
+          d.slug.toLowerCase() === paramId.toLowerCase()
+      );
+      if (matched) {
+        setSearchQuery(matched.name[language] || matched.name.en || '');
+      }
+    }
+  }, [paramSearch, paramSpecialty, paramId, doctors, language]);
 
   const content = {
     ar: {
@@ -93,7 +120,7 @@ export default function DoctorsPage() {
   }, [doctors, searchQuery, selectedSpecialty, language]);
 
   return (
-    <div className="pt-24 pb-16 bg-slate-50 min-h-screen">
+    <div className="pt-24 pb-16 bg-slate-50 dark:bg-[#080E1A] min-h-screen transition-colors">
       {/* Hero Header */}
       <div className="bg-gradient-to-b from-[#021838] to-[#032654] text-white py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:16px_16px]" />
@@ -113,7 +140,7 @@ export default function DoctorsPage() {
 
       {/* Filter and Search Bar Ribbon */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-20">
-        <div className="bg-white rounded-3xl shadow-xl border border-slate-100 p-4 sm:p-6 space-y-4">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-xl border border-slate-100 dark:border-slate-800 p-4 sm:p-6 space-y-4">
           {/* Search Input */}
           <div className="relative">
             <Search className="w-5 h-5 text-slate-400 absolute top-1/2 -translate-y-1/2 right-4 rtl:right-4 ltr:left-4 ltr:right-auto pointer-events-none" />
@@ -122,7 +149,7 @@ export default function DoctorsPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={content.searchPlaceholder}
-              className="w-full py-3.5 px-12 rounded-2xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white text-sm transition-all"
+              className="w-full py-3.5 px-12 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white dark:focus:bg-slate-800 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 transition-all"
             />
           </div>
 
@@ -134,7 +161,7 @@ export default function DoctorsPage() {
               className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all cursor-pointer ${
                 selectedSpecialty === 'all'
                   ? 'bg-sky-500 text-white shadow-sm'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
               }`}
             >
               {content.allSpecialties}
@@ -147,7 +174,7 @@ export default function DoctorsPage() {
                 className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all cursor-pointer ${
                   selectedSpecialty === item.slug
                     ? 'bg-sky-500 text-white shadow-sm'
-                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                 }`}
               >
                 {item.title[language]}
@@ -155,9 +182,9 @@ export default function DoctorsPage() {
             ))}
           </div>
 
-          <div className="text-xs text-slate-500 font-medium pt-1">
-            {content.showing} <span className="font-bold text-slate-800">{filteredDoctors.length}</span> {content.of}{' '}
-            <span className="font-bold text-slate-800">{doctors.length}</span> {content.doctorsCount}
+          <div className="text-xs text-slate-500 dark:text-slate-400 font-medium pt-1">
+            {content.showing} <span className="font-bold text-slate-800 dark:text-white">{filteredDoctors.length}</span> {content.of}{' '}
+            <span className="font-bold text-slate-800 dark:text-white">{doctors.length}</span> {content.doctorsCount}
           </div>
         </div>
       </div>
@@ -165,29 +192,39 @@ export default function DoctorsPage() {
       {/* Doctors Grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
         {filteredDoctors.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-3xl border border-slate-200">
-            <Stethoscope className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-            <p className="text-slate-600 text-base">{content.noResults}</p>
+          <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800">
+            <Stethoscope className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+            <p className="text-slate-600 dark:text-slate-400 text-base">{content.noResults}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredDoctors.map((doctor) => (
-              <div
+            {filteredDoctors.map((doctor, idx) => (
+              <motion.div
                 key={doctor.id}
-                className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-xl hover:border-sky-200 transition-all duration-300 flex flex-col group"
+                initial={{ opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{
+                  type: 'spring',
+                  stiffness: 350,
+                  damping: 26,
+                  delay: (idx % 3) * 0.08,
+                }}
+                whileHover={{ y: -5, transition: { duration: 0.2 } }}
+                className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden hover:shadow-xl hover:border-sky-200 dark:hover:border-sky-500/40 transition-colors duration-300 flex flex-col group cursor-pointer"
               >
                 {/* Image & Badges */}
-                <div className="relative h-64 overflow-hidden bg-slate-100">
+                <div className="relative h-64 overflow-hidden bg-slate-100 dark:bg-slate-800">
                   <img
                     src={doctor.image}
                     alt={doctor.name[language]}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
 
                   {/* Experience Badge */}
-                  <div className="absolute top-4 left-4 rtl:left-auto rtl:right-4 bg-white/95 backdrop-blur-sm text-slate-900 px-3 py-1 rounded-full text-xs font-bold shadow-sm flex items-center gap-1.5">
-                    <Award className="w-3.5 h-3.5 text-sky-600" />
+                  <div className="absolute top-4 left-4 rtl:left-auto rtl:right-4 bg-white/95 dark:bg-slate-900/90 backdrop-blur-sm text-slate-900 dark:text-white px-3 py-1 rounded-full text-xs font-bold shadow-sm flex items-center gap-1.5">
+                    <Award className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
                     <span>
                       {doctor.experienceYears} {content.experienceYears}
                     </span>
@@ -204,27 +241,27 @@ export default function DoctorsPage() {
                 {/* Body Content */}
                 <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
                   <div>
-                    <div className="text-xs font-bold text-sky-600 uppercase tracking-wider mb-1">
+                    <div className="text-xs font-bold text-sky-600 dark:text-sky-400 uppercase tracking-wider mb-1">
                       {doctor.specialtyName[language]}
                     </div>
-                    <h3 className="text-xl font-bold text-slate-900 group-hover:text-sky-600 transition-colors">
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
                       {doctor.name[language]}
                     </h3>
-                    <p className="text-xs text-slate-500 mt-1 line-clamp-2">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
                       {doctor.title[language]}
                     </p>
 
-                    <div className="mt-3 flex items-center gap-1.5 text-xs text-slate-600">
+                    <div className="mt-3 flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-300">
                       <Building2 className="w-4 h-4 text-sky-500 flex-shrink-0" />
                       <span className="truncate">{doctor.hospital[language]}</span>
                     </div>
 
                     {/* Expertise Tags */}
                     <div className="mt-3 flex flex-wrap gap-1.5">
-                      {doctor.areasOfExpertise[language].slice(0, 2).map((area, idx) => (
+                      {doctor.areasOfExpertise[language].slice(0, 2).map((area, areaIdx) => (
                         <span
-                          key={idx}
-                          className="bg-slate-50 border border-slate-100 text-slate-600 text-[11px] px-2 py-0.5 rounded-md"
+                          key={areaIdx}
+                          className="bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-[11px] px-2 py-0.5 rounded-md"
                         >
                           {area}
                         </span>
@@ -233,28 +270,42 @@ export default function DoctorsPage() {
                   </div>
 
                   {/* Actions */}
-                  <div className="pt-4 border-t border-slate-100 flex items-center gap-3">
+                  <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center gap-3">
                     <Link
                       href={`/doctors/${doctor.slug}`}
-                      className="flex-1 py-2.5 px-4 rounded-xl bg-sky-50 hover:bg-sky-500 text-sky-700 hover:text-white font-semibold text-xs transition-colors text-center flex items-center justify-center gap-1"
+                      className="flex-1 py-2.5 px-4 rounded-xl bg-sky-50 dark:bg-sky-950/40 hover:bg-sky-500 text-sky-700 dark:text-sky-300 hover:text-white font-semibold text-xs transition-colors text-center flex items-center justify-center gap-1 cursor-pointer"
                     >
                       <span>{content.viewProfile}</span>
                       <ArrowIcon className="w-3.5 h-3.5" />
                     </Link>
                     <Link
                       href={`/contact?doctor=${doctor.slug}`}
-                      className="py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition-colors flex items-center justify-center"
+                      className="py-2.5 px-3 rounded-xl bg-slate-900 dark:bg-sky-600 hover:bg-slate-800 dark:hover:bg-sky-500 text-white text-xs font-semibold transition-colors flex items-center justify-center cursor-pointer"
                       title={content.bookAppointment}
                     >
                       <Calendar className="w-4 h-4" />
                     </Link>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         )}
       </div>
     </div>
+  );
+}
+
+export default function DoctorsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-slate-50 dark:bg-[#080E1A] flex items-center justify-center">
+          <div className="w-8 h-8 rounded-full border-2 border-[#0097FB] border-t-transparent animate-spin" />
+        </div>
+      }
+    >
+      <DoctorsPageContent />
+    </Suspense>
   );
 }

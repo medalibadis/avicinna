@@ -13,13 +13,13 @@ export const Footer: React.FC = () => {
 
   const contactInfo = {
     address: { ar: 'إسطنبول، ليفنت / أتاشهير، الجمهورية التركية', en: 'Istanbul (Levent & Atasehir), Republic of Turkey', fr: 'Istanbul (Levent & Atasehir), République de Turquie' },
-    phone: sections.finalCta.phone || '+90 538 492 18 90',
+    phone: sections.finalCta.phone || '+90 544 282 27 69',
     email: 'contact@avicinna-health.com',
     workingHours: { ar: 'التنسيق والاستشارات الطبية متاح 24 ساعة / 7 أيام', en: '24/7 International Patient Coordination', fr: 'Coordination internationale disponible 24h/24 et 7j/7' },
   };
 
   return (
-    <footer className="bg-[#032654] text-slate-300 pt-16 pb-10 border-t border-white/10">
+    <footer className="bg-[#032654] dark:bg-[#060D1A] text-slate-300 pt-16 pb-10 border-t border-white/10 dark:border-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12 pb-14 border-b border-white/10">
           {/* Column 1: Brand & About */}
@@ -63,6 +63,11 @@ export const Footer: React.FC = () => {
               <li>
                 <Link href="/" className="text-slate-300/80 hover:text-[#00BFFF] transition-colors">
                   {t.nav.home}
+                </Link>
+              </li>
+              <li>
+                <Link href="/hospitals" className="text-slate-300/80 hover:text-[#00BFFF] transition-colors">
+                  {t.nav.hospitals}
                 </Link>
               </li>
               <li>

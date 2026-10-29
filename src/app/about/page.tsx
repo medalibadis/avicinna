@@ -25,7 +25,7 @@ export default function AboutPage() {
   const { sections } = useData();
   const ArrowIcon = direction === 'rtl' ? ChevronLeft : ChevronRight;
 
-  const cleanPhone = (sections?.finalCta?.phone || '+90 500 000 00 00').replace(/[\s\-\+\(\)]/g, '');
+  const cleanPhone = (sections?.finalCta?.phone || '+90 544 282 27 69').replace(/[\s\-\+\(\)]/g, '') || '905442822769';
   const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(
     language === 'ar'
       ? 'مرحباً، أود الحصول على استشارة طبية مجانية عبر منصة أفيسينا'
@@ -185,7 +185,7 @@ export default function AboutPage() {
   }[language];
 
   return (
-    <div className="pt-24 pb-16 bg-slate-50 min-h-screen">
+    <div className="pt-24 pb-16 bg-slate-50 dark:bg-[#080E1A] min-h-screen">
       {/* Breadcrumbs & Header */}
       <div className="bg-gradient-to-b from-[#021838] to-[#032654] text-white py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:16px_16px]" />
@@ -227,49 +227,55 @@ export default function AboutPage() {
 
       {/* Stats Quick Ribbon */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-20">
-        <div className="bg-white rounded-2xl shadow-xl border border-slate-100 p-6 sm:p-8 grid grid-cols-2 lg:grid-cols-4 gap-6 text-center">
-          <div className="border-r border-slate-100 last:border-0">
-            <div className="text-3xl sm:text-4xl font-black text-sky-600">{sections.stats.experienceCount}</div>
-            <div className="text-xs sm:text-sm font-semibold text-slate-600 mt-1">{sections.stats.experienceLabel[language]}</div>
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800 p-6 sm:p-8 grid grid-cols-2 lg:grid-cols-4 gap-6 text-center">
+          <div className="border-r border-slate-100 dark:border-slate-800 last:border-0">
+            <div className="text-3xl sm:text-4xl font-black text-sky-600 dark:text-sky-400">{sections.stats.experienceCount}</div>
+            <div className="text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400 mt-1">{sections.stats.experienceLabel[language]}</div>
           </div>
-          <div className="border-r border-slate-100 last:border-0">
-            <div className="text-3xl sm:text-4xl font-black text-slate-900">{sections.stats.patientsCount}</div>
-            <div className="text-xs sm:text-sm font-semibold text-slate-600 mt-1">{sections.stats.patientsLabel[language]}</div>
+          <div className="border-r border-slate-100 dark:border-slate-800 last:border-0">
+            <div className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white">{sections.stats.patientsCount}</div>
+            <div className="text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400 mt-1">{sections.stats.patientsLabel[language]}</div>
           </div>
-          <div className="border-r border-slate-100 last:border-0">
-            <div className="text-3xl sm:text-4xl font-black text-sky-600">{sections.stats.hospitalsCount}</div>
-            <div className="text-xs sm:text-sm font-semibold text-slate-600 mt-1">{sections.stats.hospitalsLabel[language]}</div>
+          <div className="border-r border-slate-100 dark:border-slate-800 last:border-0">
+            <div className="text-3xl sm:text-4xl font-black text-sky-600 dark:text-sky-400">{sections.stats.hospitalsCount}</div>
+            <div className="text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400 mt-1">{sections.stats.hospitalsLabel[language]}</div>
           </div>
           <div>
-            <div className="text-3xl sm:text-4xl font-black text-emerald-600">{sections.stats.satisfactionRate}</div>
-            <div className="text-xs sm:text-sm font-semibold text-slate-600 mt-1">{sections.stats.satisfactionLabel[language]}</div>
+            <div className="text-3xl sm:text-4xl font-black text-emerald-600 dark:text-emerald-400">{sections.stats.satisfactionRate}</div>
+            <div className="text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400 mt-1">{sections.stats.satisfactionLabel[language]}</div>
           </div>
         </div>
       </div>
 
       {/* Story & Philosophy Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16">
-        <div className="bg-white rounded-3xl p-8 sm:p-12 shadow-sm border border-slate-100 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 sm:p-12 shadow-sm border border-slate-100 dark:border-slate-800 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           <div className="lg:col-span-7 space-y-5">
-            <div className="inline-flex items-center gap-2 text-sky-600 text-sm font-bold tracking-wide uppercase">
+            <div className="inline-flex items-center gap-2 text-sky-600 dark:text-sky-400 text-sm font-bold tracking-wide uppercase">
               <Stethoscope className="w-4 h-4" />
-              <span>إرث ابن سينا الطبي الحديث</span>
+              <span>
+                {language === 'ar'
+                  ? 'إرث ابن سينا الطبي الحديث'
+                  : language === 'fr'
+                  ? 'L’Héritage Moderne d’Avicenne'
+                  : 'The Modern Legacy of Avicenna'}
+              </span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-snug">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white leading-snug">
               {content.storyHeading}
             </h2>
-            <p className="text-slate-600 leading-relaxed text-base sm:text-lg">
+            <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base sm:text-lg">
               {content.storyP1}
             </p>
-            <p className="text-slate-600 leading-relaxed text-base sm:text-lg">
+            <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base sm:text-lg">
               {content.storyP2}
             </p>
 
-            <div className="pt-4 border-t border-slate-100 space-y-3">
-              <h3 className="font-bold text-slate-900 text-sm">{content.accreditationTitle}</h3>
+            <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
+              <h3 className="font-bold text-slate-900 dark:text-white text-sm">{content.accreditationTitle}</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 {content.accreditations.map((item, idx) => (
-                  <div key={idx} className="flex items-start gap-2 text-xs sm:text-sm text-slate-700">
+                  <div key={idx} className="flex items-start gap-2 text-xs sm:text-sm text-slate-700 dark:text-slate-300">
                     <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
                     <span>{item}</span>
                   </div>
@@ -279,7 +285,7 @@ export default function AboutPage() {
           </div>
 
           <div className="lg:col-span-5 relative">
-            <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white aspect-[4/5]">
+            <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white dark:border-slate-800 aspect-[4/5]">
               <img
                 src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=800&auto=format&fit=crop"
                 alt="Istanbul Modern Hospital"
@@ -287,8 +293,20 @@ export default function AboutPage() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
               <div className="absolute bottom-6 left-6 right-6 text-white">
-                <div className="text-xs font-semibold text-sky-400">إسطنبول، تركيا</div>
-                <div className="text-lg font-bold">بنية تحتية طبية تضاهي كبرى مستشفيات أوروبا وأمريكا</div>
+                <div className="text-xs font-semibold text-sky-400">
+                  {language === 'ar'
+                    ? 'إسطنبول، تركيا'
+                    : language === 'fr'
+                    ? 'Istanbul, Turquie'
+                    : 'Istanbul, Turkey'}
+                </div>
+                <div className="text-lg font-bold">
+                  {language === 'ar'
+                    ? 'بنية تحتية طبية تضاهي كبرى مستشفيات أوروبا وأمريكا'
+                    : language === 'fr'
+                    ? 'Infrastructures médicales de pointe rivalisant avec les meilleurs hôpitaux'
+                    : 'World-Class Healthcare Infrastructure Matching Top Global Hospitals'}
+                </div>
               </div>
             </div>
           </div>
@@ -298,13 +316,17 @@ export default function AboutPage() {
       {/* 4 Pillars Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16">
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="text-xs font-bold text-sky-600 uppercase tracking-wider mb-2">
-            معاييرنا الطبية
+          <div className="text-xs font-bold text-sky-600 dark:text-sky-400 uppercase tracking-wider mb-2">
+            {language === 'ar'
+              ? 'معاييرنا الطبية'
+              : language === 'fr'
+              ? 'Nos Standards Médicaux'
+              : 'Our Clinical Standards'}
           </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
             {content.pillarsTitle}
           </h2>
-          <p className="mt-2 text-slate-600 text-sm sm:text-base">
+          <p className="mt-2 text-slate-600 dark:text-slate-400 text-sm sm:text-base">
             {content.pillarsSubtitle}
           </p>
         </div>
@@ -315,16 +337,16 @@ export default function AboutPage() {
             return (
               <div
                 key={idx}
-                className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:border-sky-200 hover:shadow-lg transition-all duration-300 flex flex-col justify-between group"
+                className="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 hover:border-sky-200 dark:hover:border-sky-500/40 hover:shadow-lg transition-all duration-300 flex flex-col justify-between group"
               >
                 <div>
-                  <div className="w-12 h-12 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center mb-4 group-hover:bg-sky-500 group-hover:text-white transition-colors">
+                  <div className="w-12 h-12 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center mb-4 group-hover:bg-sky-500 group-hover:text-white transition-colors">
                     <IconComponent className="w-6 h-6" />
                   </div>
-                  <h3 className="font-bold text-slate-900 text-base mb-2">
+                  <h3 className="font-bold text-slate-900 dark:text-white text-base mb-2">
                     {pillar.title}
                   </h3>
-                  <p className="text-slate-600 text-sm leading-relaxed">
+                  <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
                     {pillar.desc}
                   </p>
                 </div>

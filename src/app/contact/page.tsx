@@ -196,7 +196,7 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="pt-24 pb-16 bg-slate-50 min-h-screen">
+    <div className="pt-24 pb-16 bg-slate-50 dark:bg-[#080E1A] min-h-screen">
       {/* Header Banner */}
       <div className="bg-gradient-to-b from-[#021838] to-[#032654] text-white py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:16px_16px]" />
@@ -218,14 +218,14 @@ export default function ContactPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Main Form Column (7 cols) */}
           <div className="lg:col-span-7">
-            <div className="bg-white rounded-3xl p-6 sm:p-10 shadow-xl border border-slate-100">
+            <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-10 shadow-xl border border-slate-100 dark:border-slate-800">
               {submitted ? (
                 <div className="text-center py-10 space-y-4 animate-in fade-in zoom-in-95 duration-300">
-                  <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto">
+                  <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mx-auto">
                     <CheckCircle2 className="w-10 h-10" />
                   </div>
-                  <h3 className="text-2xl font-bold text-slate-900">{content.successTitle}</h3>
-                  <p className="text-slate-600 max-w-md mx-auto text-sm leading-relaxed">
+                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{content.successTitle}</h3>
+                  <p className="text-slate-600 dark:text-slate-300 max-w-md mx-auto text-sm leading-relaxed">
                     {content.successMsg}
                   </p>
                   <div className="pt-4">
@@ -242,7 +242,7 @@ export default function ContactPage() {
                           notes: '',
                         });
                       }}
-                      className="inline-flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold px-6 py-2.5 rounded-full text-sm transition-colors"
+                      className="inline-flex items-center gap-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-semibold px-6 py-2.5 rounded-full text-sm transition-colors cursor-pointer"
                     >
                       {content.resetBtn}
                     </button>
@@ -251,14 +251,14 @@ export default function ContactPage() {
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div>
-                    <h2 className="text-2xl font-bold text-slate-900">{content.formHeading}</h2>
-                    <p className="text-slate-500 text-xs sm:text-sm mt-1">{content.formLead}</p>
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{content.formHeading}</h2>
+                    <p className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm mt-1">{content.formLead}</p>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                     {/* Full Name */}
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                         {content.nameLabel}
                       </label>
                       <input
@@ -266,14 +266,20 @@ export default function ContactPage() {
                         required
                         value={formData.fullName}
                         onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                        placeholder="محمد الأحمد / John Smith"
-                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent text-sm"
+                        placeholder={
+                          language === 'ar'
+                            ? 'محمد الأحمد'
+                            : language === 'fr'
+                            ? 'Jean Dupont'
+                            : 'John Smith'
+                        }
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent text-sm"
                       />
                     </div>
 
                     {/* Phone / WhatsApp */}
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                         {content.phoneLabel}
                       </label>
                       <input
@@ -281,8 +287,14 @@ export default function ContactPage() {
                         required
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        placeholder="+966 5X XXX XXXX"
-                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent text-sm"
+                        placeholder={
+                          language === 'ar'
+                            ? '+966 5X XXX XXXX'
+                            : language === 'fr'
+                            ? '+33 6 XX XX XX XX'
+                            : '+1 (555) 000-0000'
+                        }
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent text-sm"
                       />
                     </div>
                   </div>
@@ -290,7 +302,7 @@ export default function ContactPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* Email */}
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                         {content.emailLabel}
                       </label>
                       <input
@@ -298,13 +310,13 @@ export default function ContactPage() {
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         placeholder="patient@example.com"
-                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent text-sm"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent text-sm"
                       />
                     </div>
 
                     {/* Country */}
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                         {content.countryLabel}
                       </label>
                       <input
@@ -312,24 +324,30 @@ export default function ContactPage() {
                         required
                         value={formData.country}
                         onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                        placeholder="السعودية / France / Kuwait"
-                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent text-sm"
+                        placeholder={
+                          language === 'ar'
+                            ? 'السعودية، الكويت، الجزائر...'
+                            : language === 'fr'
+                            ? 'France, Belgique, Suisse, Algérie...'
+                            : 'United States, UK, Canada...'
+                        }
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent text-sm"
                       />
                     </div>
                   </div>
 
                   {/* Specialty */}
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                       {content.specialtyLabel}
                     </label>
                     <select
                       value={formData.specialty}
                       onChange={(e) => setFormData({ ...formData, specialty: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent text-sm bg-white"
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent text-sm"
                     >
                       {treatmentsData.map((tItem) => (
-                        <option key={tItem.slug} value={tItem.slug}>
+                        <option key={tItem.slug} value={tItem.slug} className="dark:bg-slate-900">
                           {tItem.title[language]}
                         </option>
                       ))}
@@ -338,7 +356,7 @@ export default function ContactPage() {
 
                   {/* Medical Notes */}
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                       {content.notesLabel}
                     </label>
                     <textarea
@@ -346,7 +364,7 @@ export default function ContactPage() {
                       value={formData.notes}
                       onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                       placeholder={content.notesPlaceholder}
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent text-sm"
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent text-sm"
                     />
                   </div>
 
@@ -382,52 +400,83 @@ export default function ContactPage() {
                   {content.whatsappCardDesc}
                 </p>
                 <a
-                  href="https://wa.me/905000000000?text=Hello%20AVICINNA%20Medical%20Desk"
+                  href="https://wa.me/905442822769?text=Hello%20AVICINNA%20Medical%20Desk"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center w-full gap-2 bg-white text-emerald-700 font-bold py-3 rounded-xl hover:bg-slate-100 shadow transition-colors text-sm"
+                  dir="ltr"
                 >
-                  <Phone className="w-4 h-4" />
-                  <span>+90 500 000 00 00</span>
+                  <Phone className="w-4 h-4 flex-shrink-0" />
+                  <span dir="ltr" className="font-mono font-bold tracking-wider select-all">+90 544 282 27 69</span>
                 </a>
               </div>
             </div>
 
             {/* Direct Headquarters Info */}
-            <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-100 space-y-4">
-              <h3 className="font-bold text-slate-900 text-base border-b border-slate-100 pb-3">
+            <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-100 dark:border-slate-800 space-y-4">
+              <h3 className="font-bold text-slate-900 dark:text-white text-base border-b border-slate-100 dark:border-slate-800 pb-3">
                 {content.contactInfoHeading}
               </h3>
 
-              <div className="flex items-start gap-3 text-sm text-slate-600">
+              <div className="flex items-start gap-3 text-sm text-slate-600 dark:text-slate-300">
                 <MapPin className="w-5 h-5 text-sky-500 flex-shrink-0 mt-0.5" />
                 <div>
-                  <div className="font-semibold text-slate-800">المقر الرئيسي / Headquarters</div>
+                  <div className="font-semibold text-slate-800 dark:text-slate-100">
+                    {language === 'ar'
+                      ? 'المقر الرئيسي'
+                      : language === 'fr'
+                      ? 'Siège Principal'
+                      : 'Headquarters'}
+                  </div>
                   <div>{content.officeAddress}</div>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 text-sm text-slate-600">
+              <div className="flex items-start gap-3 text-sm text-slate-600 dark:text-slate-300">
                 <Clock className="w-5 h-5 text-sky-500 flex-shrink-0 mt-0.5" />
                 <div>
-                  <div className="font-semibold text-slate-800">ساعات العمل / Service Hours</div>
+                  <div className="font-semibold text-slate-800 dark:text-slate-100">
+                    {language === 'ar'
+                      ? 'ساعات العمل'
+                      : language === 'fr'
+                      ? 'Horaires de Service'
+                      : 'Service Hours'}
+                  </div>
                   <div>{content.hours}</div>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 text-sm text-slate-600">
+              <div className="flex items-start gap-3 text-sm text-slate-600 dark:text-slate-300">
                 <Mail className="w-5 h-5 text-sky-500 flex-shrink-0 mt-0.5" />
                 <div>
-                  <div className="font-semibold text-slate-800">البريد الإلكتروني / Email</div>
+                  <div className="font-semibold text-slate-800 dark:text-slate-100">
+                    {language === 'ar'
+                      ? 'البريد الإلكتروني'
+                      : language === 'fr'
+                      ? 'Courrier Électronique'
+                      : 'Email Address'}
+                  </div>
                   <div>care@avicinna.com</div>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 text-sm text-slate-600">
+              <div className="flex items-start gap-3 text-sm text-slate-600 dark:text-slate-300">
                 <ShieldCheck className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
                 <div>
-                  <div className="font-semibold text-slate-800">سرية وأمان البيانات الطبية</div>
-                  <div className="text-xs text-slate-500">مشفرة بالكامل طبقاً لمعايير HIPAA وGDPR الدولية.</div>
+                  <div className="font-semibold text-slate-800 dark:text-slate-100">
+                    {language === 'ar'
+                      ? 'سرية وأمان البيانات الطبية'
+                      : language === 'fr'
+                      ? 'Protection des Données Médicales'
+                      : 'Medical Data Privacy & Security'}
+                  </div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400">
+                    {language === 'ar'
+                      ? 'مشفرة بالكامل طبقاً لمعايير HIPAA وGDPR الدولية.'
+                      : language === 'fr'
+                      ? 'Entièrement chiffré selon les normes internationales HIPAA et RGPD.'
+                      : 'Fully encrypted in accordance with HIPAA & GDPR international standards.'}
+                  </div>
                 </div>
               </div>
             </div>
@@ -438,11 +487,17 @@ export default function ContactPage() {
       {/* FAQ Accordion */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-16">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-1 text-xs font-bold text-sky-600 uppercase tracking-wider mb-2">
+          <div className="inline-flex items-center gap-1 text-xs font-bold text-sky-600 dark:text-sky-400 uppercase tracking-wider mb-2">
             <HelpCircle className="w-4 h-4" />
-            <span>إجابات فورية</span>
+            <span>
+              {language === 'ar'
+                ? 'إجابات فورية'
+                : language === 'fr'
+                ? 'Réponses Claires'
+                : 'Instant Answers'}
+            </span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
             {content.faqHeading}
           </h2>
         </div>
@@ -453,12 +508,12 @@ export default function ContactPage() {
             return (
               <div
                 key={idx}
-                className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden transition-colors"
+                className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden transition-colors"
               >
                 <button
                   type="button"
                   onClick={() => setActiveFaq(isOpen ? null : idx)}
-                  className="w-full px-6 py-4 text-left flex items-center justify-between gap-4 font-bold text-slate-800 hover:text-sky-600 transition-colors cursor-pointer"
+                  className="w-full px-6 py-4 text-start flex items-center justify-between gap-4 font-bold text-slate-800 dark:text-slate-100 hover:text-sky-600 dark:hover:text-sky-400 transition-colors cursor-pointer"
                 >
                   <span className="text-sm sm:text-base">{faq.q}</span>
                   <ChevronDown
@@ -468,7 +523,7 @@ export default function ContactPage() {
                   />
                 </button>
                 {isOpen && (
-                  <div className="px-6 pb-5 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-slate-50 pt-3 animate-in fade-in duration-150">
+                  <div className="px-6 pb-5 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-50 dark:border-slate-800 pt-3 animate-in fade-in duration-150">
                     {faq.a}
                   </div>
                 )}

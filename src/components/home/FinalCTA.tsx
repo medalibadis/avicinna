@@ -10,7 +10,7 @@ export const FinalCTA: React.FC = () => {
   const { sections } = useData();
 
   const ctaData = sections.finalCta;
-  const phone = ctaData.phone || '+90 500 000 00 00';
+  const phone = ctaData.phone || '+90 544 282 27 69';
   const defaultMsg: Record<string, string> = {
     ar: 'مرحباً، أود الحصول على استشارة طبية مجانية عبر منصة AVICINNA بخصوص حالتي.',
     en: 'Hello, I would like to request a free medical consultation with the AVICINNA team regarding treatment in Turkey.',
@@ -39,7 +39,13 @@ export const FinalCTA: React.FC = () => {
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <div className="inline-flex items-center gap-2 bg-[#0097FB]/20 border border-[#00BFFF]/40 px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold text-[#00BFFF] mb-6">
           <Heart className="w-4 h-4 text-[#00BFFF] fill-current animate-pulse" />
-          <span>{language === 'ar' ? 'صحتك في أيدٍ أمينة مع AVICINNA' : 'Your Health in Safe Hands with AVICINNA'}</span>
+          <span>
+            {language === 'ar'
+              ? 'صحتك في أيدٍ أمينة مع AVICINNA'
+              : language === 'fr'
+              ? 'Votre santé entre de bonnes mains avec AVICINNA'
+              : 'Your Health in Safe Hands with AVICINNA'}
+          </span>
         </div>
 
         <h2 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight mb-6 max-w-3xl mx-auto">

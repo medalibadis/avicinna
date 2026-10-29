@@ -3,6 +3,7 @@ export type Language = 'ar' | 'en' | 'fr';
 export interface TranslationDictionary {
   nav: {
     home: string;
+    hospitals: string;
     doctors: string;
     patientStories: string;
     blog: string;
@@ -160,16 +161,70 @@ export interface TranslationDictionary {
     learnMore: string;
     adminDashboard: string;
   };
+  hospitalsPage: {
+    badge: string;
+    title: string;
+    subtitle: string;
+    searchPlaceholder: string;
+    allCities: string;
+    allSpecialties: string;
+    allAccreditations: string;
+    cityAsia: string;
+    cityEurope: string;
+    cityAnkara: string;
+    cityKocaeli: string;
+    filterByCity: string;
+    filterBySpecialty: string;
+    filterByAccreditation: string;
+    showing: string;
+    of: string;
+    hospitalsCountLabel: string;
+    doctorsCountLabel: string;
+    bedsCount: string;
+    icuCount: string;
+    operatingRooms: string;
+    establishedYear: string;
+    keyTechnologies: string;
+    specialtiesOffered: string;
+    viewHospitalDoctors: string;
+    bookConsultation: string;
+    whatsappInquiry: string;
+    noResults: string;
+    resetFilters: string;
+    doctorsInHospital: string;
+    filterHospitalDoctorsBySpecialty: string;
+    allHospitalSpecialties: string;
+    experienceYears: string;
+    procedures: string;
+    education: string;
+    languages: string;
+    consultDoctorWhatsapp: string;
+    viewDoctorProfile: string;
+    closeModal: string;
+    finderTabHospitals: string;
+    finderTabMatcher: string;
+    matcherTitle: string;
+    matcherSubtitle: string;
+    selectHospitalLabel: string;
+    selectSpecialtyLabel: string;
+    matchedDoctorsFound: string;
+    quickFiltersLabel: string;
+    accreditationJci: string;
+    accreditationLeed: string;
+    accreditationAcademic: string;
+    clearAllFilters: string;
+  };
 }
 
 export const translations: Record<Language, TranslationDictionary> = {
   ar: {
     nav: {
       home: 'الرئيسية',
+      hospitals: 'المستشفيات',
       doctors: 'الأطباء',
       patientStories: 'قصص المرضى',
       blog: 'المدونة',
-      services: 'الخدمات',
+      services: 'التخصصات',
       about: 'عن أفيسينا',
       contact: 'اتصل بنا',
       freeConsultation: 'استشارة مجانية',
@@ -182,7 +237,7 @@ export const translations: Record<Language, TranslationDictionary> = {
       subtitle: 'ترافقكم AVICINNA في كافة مراحل رحلتكم العلاجية، من الاستشارة الطبية الأولية المجانية حتى الشفاء التام والمتابعة المستمرة في إسطنبول.',
       searchPlaceholder: 'ابحث عن تخصص، طبيب أو علاج...',
       primaryCta: 'احصل على استشارة مجانية',
-      secondaryCta: 'اكتشف خدماتنا',
+      secondaryCta: 'اكتشف تخصصاتنا',
       trustBadge: 'معتمد من وزارة الصحة التركية ومستشفيات JCI',
     },
     stats: {
@@ -323,16 +378,70 @@ export const translations: Record<Language, TranslationDictionary> = {
       learnMore: 'اعرف المزيد',
       adminDashboard: 'لوحة التحكم',
     },
+    hospitalsPage: {
+      badge: 'شبكة المستشفيات والمراكز التخصصية المعتمدة',
+      title: 'المستشفيات',
+      subtitle: 'اختر المستشفى المناسب لحالتك من بين 11 صرحاً طبياً عالمياً معتمداً من JCI، واستكشف كبار البروفيسورات والتخصصات الدقيقة المزودة بأحدث تقنيات الجراحة الروبوتية.',
+      searchPlaceholder: 'ابحث باسم المستشفى، المدينة، التخصص، أو التقنية الجراحية...',
+      allCities: 'جميع المدن والمناطق',
+      allSpecialties: 'جميع التخصصات الجراحية',
+      allAccreditations: 'جميع الاعتمادات',
+      cityAsia: 'إسطنبول - الجانب الآسيوي',
+      cityEurope: 'إسطنبول - الجانب الأوروبي',
+      cityAnkara: 'أنقرة (العاصمة)',
+      cityKocaeli: 'كوجالي / جبزي',
+      filterByCity: 'تصفية حسب المنطقة والمدينة',
+      filterBySpecialty: 'تصفية حسب التخصص الطبي',
+      filterByAccreditation: 'تصفية حسب الاعتماد الدولي',
+      showing: 'عرض',
+      of: 'من أصل',
+      hospitalsCountLabel: 'مستشفى شريك معتمد',
+      doctorsCountLabel: 'طبيباً وبروفيسوراً',
+      bedsCount: 'سرير استشفاء',
+      icuCount: 'سرير عناية مركزة',
+      operatingRooms: 'غرفة عمليات متطورة',
+      establishedYear: 'سنة التأسيس',
+      keyTechnologies: 'أبرز التقنيات والمعدات الطبية المتاحة',
+      specialtiesOffered: 'التخصصات الطبية والأقسام الدقيقة',
+      viewHospitalDoctors: 'عرض كادر الأطباء والتخصصات',
+      bookConsultation: 'طلب استشارة بهذا المستشفى',
+      whatsappInquiry: 'استفسار فوري عبر واتساب',
+      noResults: 'لم يتم العثور على مستشفيات أو أطباء تطابق معايير بحثك. يرجى إعادة ضبط الفلاتر.',
+      resetFilters: 'إعادة ضبط خيارات البحث',
+      doctorsInHospital: 'الأطباء والبروفيسورات في هذا المستشفى',
+      filterHospitalDoctorsBySpecialty: 'تصفية أطباء هذا المستشفى حسب التخصص:',
+      allHospitalSpecialties: 'جميع التخصصات في المستشفى',
+      experienceYears: 'سنة خبرة سريرية',
+      procedures: 'أبرز العمليات والإجراءات',
+      education: 'التعليم والزمالات الدولية',
+      languages: 'اللغات المتاحة مع المريض',
+      consultDoctorWhatsapp: 'حجز استشارة مع الطبيب عبر واتساب',
+      viewDoctorProfile: 'الملف الطبي الكامل',
+      closeModal: 'إغلاق النافذة',
+      finderTabHospitals: 'استكشاف المستشفيات (11 صرح طبي)',
+      finderTabMatcher: 'البحث المباشر: مستشفى + تخصص',
+      matcherTitle: 'المطابقة الطبية المباشرة بين المستشفى والتخصص',
+      matcherSubtitle: 'حدد المستشفى والتخصص المطلوب ليظهر لك فوراً الاستشاريون والبروفيسورات المعتمدون مع سيرهم الطبية الكاملة.',
+      selectHospitalLabel: 'اختر المستشفى:',
+      selectSpecialtyLabel: 'اختر التخصص المطلوب:',
+      matchedDoctorsFound: 'طبيباً استشارياً متاحاً في هذا المستشفى',
+      quickFiltersLabel: 'فلاتر سريعة:',
+      accreditationJci: 'معتمد دولياً (JCI)',
+      accreditationLeed: 'شهادة LEED الذهبية والبلاتينية',
+      accreditationAcademic: 'مستشفى ومجمع جامعي معتمد',
+      clearAllFilters: 'إعادة ضبط الفلاتر',
+    },
   },
   en: {
     nav: {
       home: 'Home',
+      hospitals: 'Hospitals',
       doctors: 'Doctors',
-      patientStories: 'Patient Stories',
-      blog: 'Medical Blog',
+      patientStories: 'Stories',
+      blog: 'Blog',
       services: 'Specialties',
-      about: 'About AVICINNA',
-      contact: 'Contact Us',
+      about: 'About',
+      contact: 'Contact',
       freeConsultation: 'Free Consultation',
     },
     hero: {
@@ -484,17 +593,71 @@ export const translations: Record<Language, TranslationDictionary> = {
       learnMore: 'Learn More',
       adminDashboard: 'Admin Dashboard',
     },
+    hospitalsPage: {
+      badge: 'Accredited Partner Hospitals & Academic Centers',
+      title: 'Hospitals',
+      subtitle: 'Explore 11 world-renowned JCI-accredited medical destinations across Istanbul and Ankara. Filter by hospital and specialty to find distinguished professors equipped with robotic surgery.',
+      searchPlaceholder: 'Search by hospital name, city, specialty, or surgical technology...',
+      allCities: 'All Locations & Cities',
+      allSpecialties: 'All Surgical Specialties',
+      allAccreditations: 'All Accreditations',
+      cityAsia: 'Istanbul - Asian Side',
+      cityEurope: 'Istanbul - European Side',
+      cityAnkara: 'Ankara (Capital City)',
+      cityKocaeli: 'Kocaeli / Gebze',
+      filterByCity: 'Filter by Location',
+      filterBySpecialty: 'Filter by Specialty',
+      filterByAccreditation: 'Filter by Accreditation',
+      showing: 'Showing',
+      of: 'of',
+      hospitalsCountLabel: 'accredited hospitals',
+      doctorsCountLabel: 'professors & surgeons',
+      bedsCount: 'Inpatient Beds',
+      icuCount: 'ICU Beds',
+      operatingRooms: 'Operating Theaters',
+      establishedYear: 'Established',
+      keyTechnologies: 'Advanced Technologies & Systems',
+      specialtiesOffered: 'Core Specialties & Departments',
+      viewHospitalDoctors: 'View Hospital Doctors & Specialties',
+      bookConsultation: 'Request Consultation at this Hospital',
+      whatsappInquiry: 'Instant WhatsApp Inquiry',
+      noResults: 'No hospitals or physicians matched your search criteria. Please reset your filters.',
+      resetFilters: 'Reset All Filters',
+      doctorsInHospital: 'Consultant Physicians at this Hospital',
+      filterHospitalDoctorsBySpecialty: 'Filter hospital physicians by specialty:',
+      allHospitalSpecialties: 'All Specialties in this Hospital',
+      experienceYears: 'Years Clinical Experience',
+      procedures: 'Core Surgical Procedures',
+      education: 'Education & International Fellowships',
+      languages: 'Languages Spoken',
+      consultDoctorWhatsapp: 'Book Doctor Consultation via WhatsApp',
+      viewDoctorProfile: 'Full Medical Profile',
+      closeModal: 'Close',
+      finderTabHospitals: 'Explore All Hospitals (11 Campuses)',
+      finderTabMatcher: 'Doctor Finder: Hospital + Specialty',
+      matcherTitle: 'Direct Doctor & Specialty Matcher',
+      matcherSubtitle: 'Select any hospital and specialty to instantly uncover board-certified faculty members along with their comprehensive medical CVs.',
+      selectHospitalLabel: 'Select Hospital:',
+      selectSpecialtyLabel: 'Select Specialty:',
+      matchedDoctorsFound: 'consultant doctors available at this hospital',
+      quickFiltersLabel: 'Quick Filters:',
+      accreditationJci: 'JCI Accredited',
+      accreditationLeed: 'LEED Platinum / Gold',
+      accreditationAcademic: 'Academic University Center',
+      clearAllFilters: 'Clear All Filters',
+    },
   },
   fr: {
     nav: {
       home: 'Accueil',
+      hospitals: 'Hôpitaux',
       doctors: 'Médecins',
       patientStories: 'Témoignages',
-      blog: 'Blog Médical',
+      blog: 'Blog',
       services: 'Spécialités',
       about: 'À propos',
       contact: 'Contact',
-      freeConsultation: 'Consultation Gratuite',
+      freeConsultation: 'Consultation',
     },
     hero: {
       eyebrow: 'Votre plateforme de référence pour les soins médicaux de pointe en Turquie',
@@ -644,6 +807,59 @@ export const translations: Record<Language, TranslationDictionary> = {
       freeQuote: 'Devis gratuit',
       learnMore: 'En savoir plus',
       adminDashboard: 'Tableau de bord',
+    },
+    hospitalsPage: {
+      badge: 'Réseau d’Hôpitaux et Centres Universitaires Agréés',
+      title: 'Hôpitaux',
+      subtitle: 'Découvrez 11 institutions hospitalières de prestige certifiées JCI à Istanbul et Ankara. Filtrez par hôpital et par spécialité pour trouver les meilleurs chirurgiens et professeurs.',
+      searchPlaceholder: 'Rechercher par nom d’hôpital, ville, spécialité ou équipement...',
+      allCities: 'Toutes les Villes & Régions',
+      allSpecialties: 'Toutes les Spécialités',
+      allAccreditations: 'Toutes les Accréditations',
+      cityAsia: 'Istanbul - Rive Asiatique',
+      cityEurope: 'Istanbul - Rive Européenne',
+      cityAnkara: 'Ankara (Capitale)',
+      cityKocaeli: 'Kocaeli / Gebze',
+      filterByCity: 'Filtrer par Région',
+      filterBySpecialty: 'Filtrer par Spécialité',
+      filterByAccreditation: 'Filtrer par Accréditation',
+      showing: 'Affichage de',
+      of: 'sur',
+      hospitalsCountLabel: 'hôpitaux partenaires agréés',
+      doctorsCountLabel: 'professeurs et chirurgiens',
+      bedsCount: 'Lits d’hospitalisation',
+      icuCount: 'Lits de soins intensifs',
+      operatingRooms: 'Salles d’opération de pointe',
+      establishedYear: 'Année de fondation',
+      keyTechnologies: 'Plateaux Techniques & Technologies',
+      specialtiesOffered: 'Spécialités Médicales & Chirurgicales',
+      viewHospitalDoctors: 'Voir les Spécialistes de cet Hôpital',
+      bookConsultation: 'Consulter dans cet Hôpital',
+      whatsappInquiry: 'Échanger par WhatsApp',
+      noResults: 'Aucun hôpital ni médecin ne correspond à votre recherche. Veuillez réinitialiser les filtres.',
+      resetFilters: 'Réinitialiser les filtres',
+      doctorsInHospital: 'Médecins & Chirurgiens Référents dans cet Hôpital',
+      filterHospitalDoctorsBySpecialty: 'Filtrer les spécialistes de cet hôpital par spécialité :',
+      allHospitalSpecialties: 'Toutes les spécialités de l’hôpital',
+      experienceYears: 'ans d’expérience clinique',
+      procedures: 'Interventions & Actes Clés',
+      education: 'Diplômes & Fellowships Internationaux',
+      languages: 'Langues parlées',
+      consultDoctorWhatsapp: 'Prendre RDV avec le Médecin sur WhatsApp',
+      viewDoctorProfile: 'Voir le Profil Médical',
+      closeModal: 'Fermer',
+      finderTabHospitals: 'Explorer les Hôpitaux (11 Campus)',
+      finderTabMatcher: 'Recherche Ciblée : Hôpital + Spécialité',
+      matcherTitle: 'Trouver un Spécialiste par Hôpital et Spécialité',
+      matcherSubtitle: 'Sélectionnez un hôpital et une discipline pour découvrir immédiatement les praticiens d’élite et leurs CV médicaux complets.',
+      selectHospitalLabel: 'Sélectionnez l’Hôpital :',
+      selectSpecialtyLabel: 'Sélectionnez la Spécialité :',
+      matchedDoctorsFound: 'médecins spécialistes disponibles dans cet établissement',
+      quickFiltersLabel: 'Filtres rapides :',
+      accreditationJci: 'Accréditation JCI',
+      accreditationLeed: 'Certifié LEED Or / Platine',
+      accreditationAcademic: 'Centre Hospitalier Universitaire',
+      clearAllFilters: 'Réinitialiser les filtres',
     },
   },
 };

@@ -1,92 +1,128 @@
 'use client';
 
 import React, { useState } from 'react';
-import { MessageCircle, X } from 'lucide-react';
+import { MessageCircle, X, Send, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
 
 export const FloatingWhatsApp: React.FC = () => {
-  const { language, direction, t } = useLanguage();
+  const { language, t } = useLanguage();
   const { sections } = useData();
   const [isOpen, setIsOpen] = useState(false);
 
-  const phoneRaw = (sections.finalCta.phone || '+90 538 492 18 90').replace(/[^0-9]/g, '');
+  // Official WhatsApp number from client
+  const phoneRaw = (sections.finalCta.phone || '+90 544 282 27 69').replace(/[^0-9]/g, '') || '905442822769';
+
   const defaultMsg: Record<string, string> = {
     ar: 'مرحباً، أود الحصول على استشارة طبية مجانية عبر منصة AVICINNA بخصوص حالتي.',
     en: 'Hello, I would like to request a free medical consultation with the AVICINNA team regarding treatment in Turkey.',
-    fr: 'Bonjour, je souhaite obtenir une consultation médicale gratuite avec l\'équipe AVICINNA concernant des soins en Turquie.',
+    fr: "Bonjour, je souhaite obtenir une consultation médicale gratuite avec l'équipe AVICINNA concernant des soins en Turquie.",
   };
   const message = encodeURIComponent(defaultMsg[language] || defaultMsg.en);
   const whatsappUrl = `https://wa.me/${phoneRaw}?text=${message}`;
 
-  const isRtl = direction === 'rtl';
-
   return (
     <div
-      className={`fixed bottom-6 z-40 flex flex-col items-end ${
-        isRtl ? 'left-6' : 'right-6'
-      }`}
+      id="whatsapp-floating-container"
+      className="fixed bottom-5 sm:bottom-6 right-4 sm:right-6 z-50 flex flex-col items-end select-none"
+      dir="ltr"
     >
       {/* Quick Chat Popup Card */}
       {isOpen && (
         <div
-          className={`mb-3 w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-bottom-3 duration-200 ${
-            isRtl ? 'text-right' : 'text-left'
-          }`}
+          className="mb-3 w-[calc(100vw-2rem)] max-w-sm sm:w-84 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-bottom-3 duration-200"
+          dir={language === 'ar' ? 'rtl' : 'ltr'}
         >
           {/* Header */}
-          <div className="bg-[#032654] text-white p-4 flex items-center justify-between">
+          <div className="bg-gradient-to-r from-[#021b3b] to-[#032654] text-white p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center text-white">
-                <MessageCircle className="w-5 h-5" />
+              <div className="relative">
+                <div className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center text-white shadow-md shadow-emerald-500/30">
+                  <MessageCircle className="w-5 h-5 fill-current" />
+                </div>
+                <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-400 border-2 border-[#032654] rounded-full animate-pulse" />
               </div>
               <div>
-                <h4 className="font-bold text-sm">AVICINNA</h4>
-                <p className="text-[11px] text-emerald-400 font-medium">
-                  {language === 'ar' ? 'متصل الآن للمساعدة الطبية' : 'Online for Medical Assistance'}
+                <div className="flex items-center gap-1.5">
+                  <h4 className="font-bold text-sm tracking-wide">AVICINNA</h4>
+                  <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded-full font-semibold">
+                    24/7
+                  </span>
+                </div>
+                <p className="text-[11px] text-emerald-400 font-medium flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-ping" />
+                  {language === 'ar'
+                    ? 'متصل الآن للمساعدة الطبية الفورية'
+                    : language === 'fr'
+                    ? 'En ligne pour assistance médicale'
+                    : 'Online for Immediate Assistance'}
                 </p>
               </div>
             </div>
             <button
               onClick={() => setIsOpen(false)}
-              className="text-white/70 hover:text-white p-1 rounded-lg hover:bg-white/10"
-              aria-label="Close"
+              className="text-white/70 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition-colors"
+              aria-label="Close WhatsApp chat card"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
 
           {/* Body */}
-          <div className="p-4 bg-slate-50 space-y-3">
-            <div className="bg-white p-3 rounded-xl rounded-tl-none shadow-sm text-xs text-slate-700 leading-relaxed border border-slate-100">
+          <div className="p-4 bg-slate-50 space-y-3.5">
+            <div className="bg-white p-3.5 rounded-2xl rounded-tr-none shadow-sm text-xs text-slate-700 leading-relaxed border border-slate-100/80">
+              <p className="font-semibold text-slate-900 mb-1 flex items-center gap-1">
+                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                {language === 'ar'
+                  ? 'مرحباً بك في أفيسينا الدولية'
+                  : language === 'fr'
+                  ? 'Bienvenue chez AVICINNA'
+                  : 'Welcome to AVICINNA Health'}
+              </p>
               {language === 'ar'
-                ? 'مرحباً بك في أفيسينا! فريقنا الطبي والاستشاري جاهز للرد على استفسارك ومراجعة تقاريرك مجاناً عبر واتساب.'
+                ? 'فريقنا الطبي جاهز للرد على استفسارك ومراجعة تقاريرك الطبية مجاناً واقتراح أفضل المستشفيات والبروفيسورات المناسبة لحالتك.'
                 : language === 'fr'
-                ? 'Bienvenue chez AVICINNA ! Notre équipe médicale est disponible 24/7 sur WhatsApp pour répondre à vos questions.'
-                : 'Welcome to AVICINNA! Our medical coordinators are available 24/7 on WhatsApp for your free case review.'}
+                ? 'Notre équipe médicale est disponible 24/7 sur WhatsApp pour étudier vos rapports médicaux et vous orienter vers les meilleurs spécialistes en Turquie.'
+                : 'Our medical coordinators are available 24/7 on WhatsApp for your free case review and direct guidance to top-tier Turkish hospital faculties.'}
+            </div>
+
+            <div className="text-[11px] text-slate-500 flex items-center justify-between px-1">
+              <span>{language === 'ar' ? 'الرقم الرسمي:' : language === 'fr' ? 'Ligne officielle :' : 'Official Line:'}</span>
+              <span className="font-mono font-bold text-slate-800" dir="ltr">+90 544 282 27 69</span>
             </div>
 
             <a
               href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2.5 px-4 rounded-xl shadow-md transition-colors text-sm"
+              className="w-full flex items-center justify-center gap-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-emerald-500/25 transition-all duration-200 text-xs sm:text-sm active:scale-[0.98]"
             >
-              <MessageCircle className="w-4 h-4" />
+              <MessageCircle className="w-4 h-4 fill-current" />
               <span>{t.common.whatsapp}</span>
+              <Send className="w-3.5 h-3.5 rtl:rotate-180 opacity-80" />
             </a>
           </div>
         </div>
       )}
 
-      {/* Floating Action Button */}
+      {/* Floating Action Button (Always on the right, perfectly sized for mobile) */}
       <button
+        id="btn-floating-whatsapp"
         onClick={() => setIsOpen(!isOpen)}
-        className="group flex items-center gap-3 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-3.5 rounded-full shadow-lg shadow-emerald-500/30 transition-all duration-300 transform hover:scale-105 active:scale-95 cursor-pointer"
-        aria-label="WhatsApp Medical Coordinator"
+        className="group relative flex items-center justify-center gap-2.5 bg-gradient-to-tr from-emerald-600 via-emerald-500 to-teal-400 text-white rounded-full shadow-2xl shadow-emerald-500/40 hover:shadow-emerald-500/60 p-3.5 sm:px-5 sm:py-3.5 transition-all duration-300 transform hover:scale-105 active:scale-95 cursor-pointer border border-white/20"
+        aria-label="WhatsApp Medical Coordinator +90 544 282 27 69"
       >
-        <MessageCircle className="w-6 h-6 fill-current animate-pulse" />
-        <span className="hidden sm:inline font-bold text-sm tracking-wide">
+        {/* Pulsing ring indicator */}
+        <span className="absolute -inset-1 rounded-full bg-emerald-400/30 animate-ping pointer-events-none" />
+
+        {/* WhatsApp Icon */}
+        <div className="relative flex items-center justify-center">
+          <MessageCircle className="w-6 h-6 sm:w-6 sm:h-6 fill-current animate-[pulse_2s_ease-in-out_infinite]" />
+          <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-white border-2 border-emerald-500 rounded-full" />
+        </div>
+
+        {/* Desktop Label (Hidden on mobile for clean touch target, visible on sm+) */}
+        <span className="hidden sm:inline-block font-extrabold text-sm tracking-wide text-white drop-shadow-sm">
           {t.common.whatsapp}
         </span>
       </button>

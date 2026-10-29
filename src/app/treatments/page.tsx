@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import { useLanguage } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
 import {
@@ -108,7 +109,7 @@ export default function TreatmentsPage() {
   });
 
   return (
-    <div className="pt-24 pb-16 bg-slate-50 min-h-screen">
+    <div className="pt-24 pb-16 bg-slate-50 dark:bg-[#080E1A] min-h-screen transition-colors">
       {/* Hero Header */}
       <div className="bg-gradient-to-b from-[#021838] to-[#032654] text-white py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:16px_16px]" />
@@ -128,7 +129,7 @@ export default function TreatmentsPage() {
 
       {/* Search Ribbon */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-20">
-        <div className="bg-white rounded-3xl shadow-xl border border-slate-100 p-4">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-xl border border-slate-100 dark:border-slate-800 p-4">
           <div className="relative">
             <Search className="w-5 h-5 text-slate-400 absolute top-1/2 -translate-y-1/2 right-4 rtl:right-4 ltr:left-4 ltr:right-auto pointer-events-none" />
             <input
@@ -136,7 +137,7 @@ export default function TreatmentsPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={content.searchPlaceholder}
-              className="w-full py-3.5 px-12 rounded-2xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white text-sm transition-all"
+              className="w-full py-3.5 px-12 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white dark:focus:bg-slate-800 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 transition-all"
             />
           </div>
         </div>
@@ -145,21 +146,31 @@ export default function TreatmentsPage() {
       {/* Treatments Grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
         {filteredTreatments.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-3xl border border-slate-200">
-            <Stethoscope className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-            <p className="text-slate-600 text-base">{content.noResults}</p>
+          <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800">
+            <Stethoscope className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+            <p className="text-slate-600 dark:text-slate-400 text-base">{content.noResults}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredTreatments.map((item) => {
+            {filteredTreatments.map((item, idx) => {
               const IconComponent = iconMap[item.iconName] || Stethoscope;
               return (
-                <div
+                <motion.div
                   key={item.id}
-                  className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-xl hover:border-sky-200 transition-all duration-300 flex flex-col group"
+                  initial={{ opacity: 0, y: 18 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-40px' }}
+                  transition={{
+                    type: 'spring',
+                    stiffness: 350,
+                    damping: 26,
+                    delay: (idx % 3) * 0.08,
+                  }}
+                  whileHover={{ y: -5, transition: { duration: 0.2 } }}
+                  className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden hover:shadow-xl hover:border-sky-200 dark:hover:border-sky-500/40 transition-colors duration-300 flex flex-col group cursor-pointer"
                 >
                   {/* Visual Header */}
-                  <div className="relative h-56 overflow-hidden bg-slate-100">
+                  <div className="relative h-56 overflow-hidden bg-slate-100 dark:bg-slate-800">
                     <img
                       src={item.image}
                       alt={item.title[language]}
@@ -167,7 +178,7 @@ export default function TreatmentsPage() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent" />
 
-                    <div className="absolute top-4 right-4 rtl:right-4 rtl:left-auto ltr:left-4 ltr:right-auto w-10 h-10 rounded-xl bg-white/90 backdrop-blur-sm text-sky-600 flex items-center justify-center shadow-md">
+                    <div className="absolute top-4 right-4 rtl:right-4 rtl:left-auto ltr:left-4 ltr:right-auto w-10 h-10 rounded-xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm text-sky-600 dark:text-sky-400 flex items-center justify-center shadow-md">
                       <IconComponent className="w-5 h-5" />
                     </div>
 
@@ -181,20 +192,20 @@ export default function TreatmentsPage() {
                   {/* Card Body */}
                   <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
                     <div>
-                      <p className="text-xs sm:text-sm text-slate-600 leading-relaxed line-clamp-3">
+                      <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed line-clamp-3">
                         {item.shortDescription[language]}
                       </p>
 
                       {/* Featured Procedures Pills */}
-                      <div className="mt-4 pt-3 border-t border-slate-100">
-                        <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">
+                      <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
+                        <div className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">
                           {content.keyProcedures}
                         </div>
                         <div className="space-y-1.5">
-                          {item.procedures[language].slice(0, 2).map((proc, idx) => (
+                          {item.procedures[language].slice(0, 2).map((proc, pIdx) => (
                             <div
-                              key={idx}
-                              className="text-xs text-slate-700 flex items-center gap-1.5"
+                              key={pIdx}
+                              className="text-xs text-slate-700 dark:text-slate-300 flex items-center gap-1.5"
                             >
                               <CheckCircle2 className="w-3.5 h-3.5 text-sky-500 flex-shrink-0" />
                               <span className="truncate">{proc.name}</span>
@@ -205,24 +216,24 @@ export default function TreatmentsPage() {
                     </div>
 
                     {/* Actions */}
-                    <div className="pt-4 border-t border-slate-100 flex items-center gap-3">
+                    <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center gap-3">
                       <Link
                         href={`/treatments/${item.slug}`}
-                        className="flex-1 py-2.5 px-4 rounded-xl bg-sky-50 hover:bg-sky-500 text-sky-700 hover:text-white font-semibold text-xs transition-colors text-center flex items-center justify-center gap-1"
+                        className="flex-1 py-2.5 px-4 rounded-xl bg-sky-50 dark:bg-sky-950/40 hover:bg-sky-500 text-sky-700 dark:text-sky-300 hover:text-white font-semibold text-xs transition-colors text-center flex items-center justify-center gap-1 cursor-pointer"
                       >
                         <span>{content.viewDetails}</span>
                         <ArrowIcon className="w-3.5 h-3.5" />
                       </Link>
                       <Link
                         href={`/contact?specialty=${item.slug}`}
-                        className="py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition-colors flex items-center justify-center"
+                        className="py-2.5 px-3 rounded-xl bg-slate-900 dark:bg-sky-600 hover:bg-slate-800 dark:hover:bg-sky-500 text-white text-xs font-semibold transition-colors flex items-center justify-center cursor-pointer"
                         title={content.bookConsultation}
                       >
                         <Calendar className="w-4 h-4" />
                       </Link>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               );
             })}
           </div>
@@ -231,17 +242,17 @@ export default function TreatmentsPage() {
 
       {/* Why Turkey Feature Strip */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16">
-        <div className="bg-white rounded-3xl p-8 sm:p-12 shadow-sm border border-slate-100">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-6 text-center">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 sm:p-12 shadow-sm border border-slate-100 dark:border-slate-800">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-6 text-center">
             {content.whyTurkeyTitle}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {content.whyTurkeyItems.map((item, idx) => (
               <div key={idx} className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <div className="w-8 h-8 rounded-lg bg-sky-50 dark:bg-slate-800 text-sky-600 dark:text-sky-400 flex items-center justify-center flex-shrink-0 mt-0.5">
                   <ShieldCheck className="w-4 h-4" />
                 </div>
-                <p className="text-xs sm:text-sm text-slate-700 font-medium leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 font-medium leading-relaxed">
                   {item}
                 </p>
               </div>

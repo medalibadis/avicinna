@@ -44,14 +44,14 @@ export function CustomSelect({
 
   return (
     <div className={`space-y-1.5 ${className}`} ref={containerRef}>
-      {label && <label className="block text-xs font-bold text-slate-700">{label}</label>}
+      {label && <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">{label}</label>}
 
       <div className="relative">
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className={`w-full bg-white border border-slate-200/90 rounded-xl px-4 py-2.5 text-xs text-slate-800 flex items-center justify-between shadow-xs transition-all cursor-pointer ${
-            isOpen ? 'ring-2 ring-sky-500/20 border-sky-500 shadow-sm' : 'hover:border-slate-300'
+          className={`w-full bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-700 rounded-xl px-4 py-2.5 text-xs text-slate-800 dark:text-slate-100 flex items-center justify-between shadow-xs transition-all cursor-pointer ${
+            isOpen ? 'ring-2 ring-sky-500/20 border-sky-500 shadow-sm' : 'hover:border-slate-300 dark:hover:border-slate-600'
           }`}
         >
           <div className="flex items-center gap-2.5 truncate">
@@ -60,7 +60,7 @@ export function CustomSelect({
               {selectedOption ? selectedOption.label : placeholder}
             </span>
             {selectedOption?.subLabel && (
-              <span className="text-[10px] text-slate-400 font-normal truncate">
+              <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal truncate">
                 ({selectedOption.subLabel})
               </span>
             )}
@@ -73,7 +73,7 @@ export function CustomSelect({
         </button>
 
         {isOpen && (
-          <div className="absolute right-0 rtl:right-0 rtl:left-auto ltr:left-0 ltr:right-auto mt-1.5 w-full bg-white/95 backdrop-blur-xl border border-slate-200/90 rounded-2xl shadow-xl shadow-slate-900/10 py-1.5 z-50 animate-in fade-in zoom-in-95 duration-150 max-h-60 overflow-y-auto ring-1 ring-black/5">
+          <div className="absolute right-0 rtl:right-0 rtl:left-auto ltr:left-0 ltr:right-auto mt-1.5 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200/90 dark:border-slate-700 rounded-2xl shadow-xl shadow-slate-900/10 dark:shadow-black/50 py-1.5 z-50 animate-in fade-in zoom-in-95 duration-150 max-h-60 overflow-y-auto ring-1 ring-black/5">
             <div className="space-y-0.5 px-1.5">
               {options.map((option) => {
                 const isSelected = option.value === value;
@@ -89,20 +89,20 @@ export function CustomSelect({
                     }}
                     className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                       isSelected
-                        ? 'bg-sky-50 text-sky-700 font-bold border border-sky-200/60 shadow-xs'
-                        : 'text-slate-700 hover:bg-slate-50'
+                        ? 'bg-sky-50 dark:bg-sky-950/50 text-sky-700 dark:text-sky-300 font-bold border border-sky-200/60 dark:border-sky-800/60 shadow-xs'
+                        : 'text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800'
                     }`}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
                       {Icon && (
                         <Icon
-                          className={`w-3.5 h-3.5 shrink-0 ${isSelected ? 'text-sky-600' : 'text-slate-400'}`}
+                          className={`w-3.5 h-3.5 shrink-0 ${isSelected ? 'text-sky-600' : 'text-slate-400 dark:text-slate-500'}`}
                         />
                       )}
                       <div className="text-right rtl:text-right ltr:text-left truncate">
                         <span className="truncate">{option.label}</span>
                         {option.subLabel && (
-                          <span className="text-[10px] text-slate-400 block font-normal truncate">
+                          <span className="text-[10px] text-slate-400 dark:text-slate-500 block font-normal truncate">
                             {option.subLabel}
                           </span>
                         )}

@@ -1,9 +1,11 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
+import { motion } from 'framer-motion';
 import { useLanguage } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
-import { Hotel, Car, Languages, Check, Building2, MapPin } from 'lucide-react';
+import { Hotel, Car, Languages, Check, Building2, MapPin, ArrowRight, ArrowLeft } from 'lucide-react';
 
 export const HospitalsPartners: React.FC = () => {
   const { t, language } = useLanguage();
@@ -50,7 +52,14 @@ export const HospitalsPartners: React.FC = () => {
         {/* 2 Large Featured Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {/* Featured Card 1: Luxury Patient Suites */}
-          <div className="group relative rounded-3xl overflow-hidden bg-white/5 border border-white/10 shadow-2xl hover:border-[#00BFFF]/40 transition-all duration-300">
+          <motion.div
+            initial={{ opacity: 0, y: 22 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+            whileHover={{ y: -6, transition: { duration: 0.2 } }}
+            className="group relative rounded-3xl overflow-hidden bg-white/5 border border-white/10 shadow-2xl hover:border-[#00BFFF]/40 transition-colors duration-300"
+          >
             <div className="h-72 overflow-hidden relative">
               <img
                 src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1200&auto=format&fit=crop"
@@ -74,15 +83,28 @@ export const HospitalsPartners: React.FC = () => {
                 {t.hospitals.card1Desc}
               </p>
               <div className="flex flex-wrap gap-2 text-xs text-slate-300">
-                <span className="bg-white/10 px-3 py-1 rounded-lg">إقامة 5 نجوم</span>
-                <span className="bg-white/10 px-3 py-1 rounded-lg">خدمة تمريض فندقي</span>
-                <span className="bg-white/10 px-3 py-1 rounded-lg">وجبات صحية مخصصة</span>
+                <span className="bg-white/10 px-3 py-1 rounded-lg">
+                  {language === 'ar' ? 'إقامة 5 نجوم' : language === 'fr' ? 'Hébergement 5 étoiles' : '5-Star Accommodation'}
+                </span>
+                <span className="bg-white/10 px-3 py-1 rounded-lg">
+                  {language === 'ar' ? 'خدمة تمريض فندقي' : language === 'fr' ? 'Soins infirmiers VIP' : 'Hotel-Grade Nursing'}
+                </span>
+                <span className="bg-white/10 px-3 py-1 rounded-lg">
+                  {language === 'ar' ? 'وجبات صحية مخصصة' : language === 'fr' ? 'Restauration adaptée' : 'Personalized Nutrition'}
+                </span>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Featured Card 2: Acibadem Hospital Istanbul */}
-          <div className="group relative rounded-3xl overflow-hidden bg-white/5 border border-white/10 shadow-2xl hover:border-[#00BFFF]/40 transition-all duration-300">
+          <motion.div
+            initial={{ opacity: 0, y: 22 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ type: 'spring', stiffness: 350, damping: 28, delay: 0.1 }}
+            whileHover={{ y: -6, transition: { duration: 0.2 } }}
+            className="group relative rounded-3xl overflow-hidden bg-white/5 border border-white/10 shadow-2xl hover:border-[#00BFFF]/40 transition-colors duration-300"
+          >
             <div className="h-72 overflow-hidden relative">
               <img
                 src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=1200&auto=format&fit=crop"
@@ -90,7 +112,7 @@ export const HospitalsPartners: React.FC = () => {
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#032654] via-[#032654]/40 to-transparent" />
-              <div className="absolute top-4 right-4 bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">
+              <div className="absolute top-4 rtl:right-4 rtl:left-auto ltr:right-4 ltr:left-auto bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">
                 JCI Accredited
               </div>
             </div>
@@ -106,12 +128,18 @@ export const HospitalsPartners: React.FC = () => {
                 {t.hospitals.card2Desc}
               </p>
               <div className="flex flex-wrap gap-2 text-xs text-slate-300">
-                <span className="bg-white/10 px-3 py-1 rounded-lg">مستشفيات معتمدة</span>
-                <span className="bg-white/10 px-3 py-1 rounded-lg">جراحة روبوتية</span>
-                <span className="bg-white/10 px-3 py-1 rounded-lg">مختبرات توافق وراثي</span>
+                <span className="bg-white/10 px-3 py-1 rounded-lg">
+                  {language === 'ar' ? 'مستشفيات معتمدة' : language === 'fr' ? 'Hôpitaux certifiés JCI' : 'JCI Accredited'}
+                </span>
+                <span className="bg-white/10 px-3 py-1 rounded-lg">
+                  {language === 'ar' ? 'جراحة روبوتية' : language === 'fr' ? 'Chirurgie robotique' : 'Robotic Surgery'}
+                </span>
+                <span className="bg-white/10 px-3 py-1 rounded-lg">
+                  {language === 'ar' ? 'مختبرات توافق وراثي' : language === 'fr' ? 'Génétique avancée' : 'Genetic Diagnostics'}
+                </span>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
 
         {/* 3 Supporting Value Items */}
@@ -142,7 +170,11 @@ export const HospitalsPartners: React.FC = () => {
         {/* Partner Hospitals Logo / Badges Strip */}
         <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
           <div className="text-center text-xs font-bold uppercase tracking-wider text-slate-400 mb-5">
-            {language === 'ar' ? 'شبكتنا الاستراتيجية من المستشفيات والمراكز المعتمدة' : 'Accredited Healthcare & Surgical Partners'}
+            {language === 'ar'
+              ? 'شبكتنا الاستراتيجية من المستشفيات والمراكز المعتمدة'
+              : language === 'fr'
+              ? 'Notre Réseau Stratégique d’Hôpitaux et Centres Agréés'
+              : 'Accredited Healthcare & Surgical Partners'}
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
             {hospitals.map((hosp) => (
@@ -158,6 +190,28 @@ export const HospitalsPartners: React.FC = () => {
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* CTA to Full Hospitals Page */}
+          <div className="mt-8 text-center">
+            <Link
+              href="/hospitals"
+              className="inline-flex items-center gap-2.5 bg-gradient-to-r from-[#0097FB] to-[#00BFFF] hover:from-[#0080d8] hover:to-[#00a8e0] text-white font-extrabold text-sm sm:text-base py-3.5 px-8 rounded-full shadow-lg shadow-[#0097FB]/30 hover:shadow-[#0097FB]/50 transition-all duration-300 transform hover:scale-105 active:scale-95"
+            >
+              <Building2 className="w-5 h-5" />
+              <span>
+                {language === 'ar'
+                  ? 'استكشف كافة المستشفيات والاعتمادات'
+                  : language === 'fr'
+                  ? 'Explorer tous les hôpitaux partenaires'
+                  : 'Explore All Partner Hospitals'}
+              </span>
+              {language === 'ar' ? (
+                <ArrowLeft className="w-4 h-4" />
+              ) : (
+                <ArrowRight className="w-4 h-4" />
+              )}
+            </Link>
           </div>
         </div>
       </div>

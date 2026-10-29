@@ -123,7 +123,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-full flex flex-col bg-white text-slate-900">
+      <body className="min-h-full flex flex-col bg-white text-slate-900 dark:bg-[#0B1120] dark:text-slate-100">
         <AppShell>{children}</AppShell>
       </body>
     </html>
