@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/context/LanguageContext';
 import { ShieldCheck, HeartHandshake, ArrowRight, ArrowLeft } from 'lucide-react';
+import { AboutVideoMedallion } from '@/components/public/BrandLogoMotion';
 
 export const AboutSection: React.FC = () => {
   const { t, direction, language } = useLanguage();
@@ -31,39 +32,10 @@ export const AboutSection: React.FC = () => {
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
             </div>
 
-            {/* Experience Badge Overlay */}
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-              className={`absolute -bottom-6 bg-[#032654] dark:bg-[#021838] text-white p-5 sm:p-6 rounded-2xl shadow-xl border border-[#00BFFF]/30 flex items-center gap-4 ${
-                isRtl ? '-right-4 sm:right-6' : '-left-4 sm:left-6'
-              }`}
-            >
-              <div className="text-3xl sm:text-4xl font-black text-[#00BFFF] font-sans">
-                +10
-              </div>
-              <div className="text-xs sm:text-sm font-bold leading-tight">
-                {language === 'ar' ? (
-                  <>
-                    سنوات من الخبرة
-                    <br />
-                    <span className="text-slate-300 font-normal">والرعاية الدولية</span>
-                  </>
-                ) : language === 'fr' ? (
-                  <>
-                    Années d'Excellence
-                    <br />
-                    <span className="text-slate-300 font-normal">en Soins Internationaux</span>
-                  </>
-                ) : (
-                  <>
-                    Years Experience
-                    <br />
-                    <span className="text-slate-300 font-normal">in Global Care</span>
-                  </>
-                )}
-              </div>
-            </motion.div>
+            {/* 10+ Years Excellence Floating Video Medallion (Placement C) */}
+            <div className={`absolute -bottom-6 z-20 ${isRtl ? '-right-4 sm:right-6' : '-left-4 sm:left-6'}`}>
+              <AboutVideoMedallion locale={language as any} />
+            </div>
           </motion.div>
 
           {/* Text Content Column */}

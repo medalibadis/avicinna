@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
-import { Hotel, Car, Languages, Check, Building2, MapPin, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Hotel, Car, Languages, Check, Building2, MapPin, ArrowRight, ArrowLeft, ShieldCheck, Bed, Star } from 'lucide-react';
 
 export const HospitalsPartners: React.FC = () => {
   const { t, language } = useLanguage();
@@ -167,33 +167,118 @@ export const HospitalsPartners: React.FC = () => {
           })}
         </div>
 
-        {/* Partner Hospitals Logo / Badges Strip */}
-        <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
-          <div className="text-center text-xs font-bold uppercase tracking-wider text-slate-400 mb-5">
+        {/* Infinite Kinetic Marquee + 3D Tilt Cards */}
+        <div className="relative -mx-4 sm:-mx-6 lg:-mx-8 overflow-hidden py-4">
+          <div className="text-center text-xs font-bold uppercase tracking-widest text-[#00BFFF] mb-6 px-4">
             {language === 'ar'
-              ? 'شبكتنا الاستراتيجية من المستشفيات والمراكز المعتمدة'
+              ? 'شبكتنا الاستراتيجية من المستشفيات والمراكز المعتمدة دولياً JCI'
               : language === 'fr'
-              ? 'Notre Réseau Stratégique d’Hôpitaux et Centres Agréés'
-              : 'Accredited Healthcare & Surgical Partners'}
+              ? 'Notre Réseau Stratégique d’Hôpitaux et Centres Certifiés JCI'
+              : 'Our Strategic Network of JCI-Accredited Hospitals & Centers'}
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-            {hospitals.map((hosp) => (
-              <div
-                key={hosp.id}
-                className="bg-white/5 rounded-xl p-4 border border-white/5 flex flex-col items-center justify-center hover:bg-white/10 transition-colors"
-              >
-                <div className="text-sm font-bold text-white mb-1">
-                  {hosp.name[language]}
-                </div>
-                <div className="text-[11px] text-[#00BFFF] font-medium">
-                  {hosp.accreditation}
-                </div>
-              </div>
-            ))}
+
+          {/* Row 1: Kinetic Marquee Moving Left */}
+          <div className="relative mb-4 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+            <div className="animate-marquee-left gap-4 flex items-center">
+              {[...hospitals.slice(0, Math.ceil(hospitals.length / 2)), ...hospitals.slice(0, Math.ceil(hospitals.length / 2))].map((hosp, idx) => (
+                <Link
+                  key={`r1-${hosp.id}-${idx}`}
+                  href={`/hospitals?id=${hosp.id}`}
+                  className="group relative w-72 sm:w-80 shrink-0 rounded-2xl overflow-hidden border border-white/10 bg-white/5 backdrop-blur-md p-3.5 shadow-xl transition-all duration-300 hover:scale-105 hover:border-sky-400/60 hover:bg-white/10 hover:shadow-sky-500/20"
+                >
+                  <div className="relative h-32 w-full overflow-hidden rounded-xl bg-slate-900">
+                    <img
+                      src={hosp.image}
+                      alt={hosp.name[language]}
+                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
+                    <span className="absolute top-2.5 right-2.5 rtl:right-auto rtl:left-2.5 flex items-center gap-1 rounded-full bg-emerald-500/90 backdrop-blur-xs px-2.5 py-0.5 text-[10px] font-black text-white shadow-md">
+                      <ShieldCheck className="h-3 w-3" />
+                      <span>{hosp.accreditationBadge || 'JCI Gold'}</span>
+                    </span>
+                    <span className="absolute bottom-2 left-2.5 right-2.5 flex items-center justify-between text-[11px] text-slate-200">
+                      <span className="flex items-center gap-1 font-semibold">
+                        <MapPin className="h-3 w-3 text-[#00BFFF]" />
+                        {hosp.city[language]}
+                      </span>
+                      <span className="flex items-center gap-1 text-amber-300 font-bold">
+                        <Star className="h-3 w-3 fill-current" />
+                        {hosp.rating || '4.9'}
+                      </span>
+                    </span>
+                  </div>
+                  <div className="pt-3">
+                    <h4 className="text-sm font-bold text-white group-hover:text-sky-300 transition-colors line-clamp-1 leading-snug">
+                      {hosp.name[language]}
+                    </h4>
+                    <div className="mt-2 flex items-center justify-between text-[11px] text-slate-300">
+                      <span className="flex items-center gap-1 text-slate-300/90 font-medium">
+                        <Bed className="h-3 w-3 text-sky-400" />
+                        {hosp.bedsCount} {language === 'ar' ? 'سريراً' : language === 'fr' ? 'lits' : 'beds'}
+                      </span>
+                      <span className="font-semibold text-sky-400 group-hover:underline">
+                        {language === 'ar' ? 'التفاصيل ←' : 'Details →'}
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Row 2: Kinetic Marquee Moving Right */}
+          <div className="relative mb-6 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+            <div className="animate-marquee-right gap-4 flex items-center">
+              {[...hospitals.slice(Math.ceil(hospitals.length / 2)), ...hospitals.slice(Math.ceil(hospitals.length / 2))].map((hosp, idx) => (
+                <Link
+                  key={`r2-${hosp.id}-${idx}`}
+                  href={`/hospitals?id=${hosp.id}`}
+                  className="group relative w-72 sm:w-80 shrink-0 rounded-2xl overflow-hidden border border-white/10 bg-white/5 backdrop-blur-md p-3.5 shadow-xl transition-all duration-300 hover:scale-105 hover:border-teal-400/60 hover:bg-white/10 hover:shadow-teal-500/20"
+                >
+                  <div className="relative h-32 w-full overflow-hidden rounded-xl bg-slate-900">
+                    <img
+                      src={hosp.image}
+                      alt={hosp.name[language]}
+                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
+                    <span className="absolute top-2.5 right-2.5 rtl:right-auto rtl:left-2.5 flex items-center gap-1 rounded-full bg-sky-500/90 backdrop-blur-xs px-2.5 py-0.5 text-[10px] font-black text-white shadow-md">
+                      <ShieldCheck className="h-3 w-3" />
+                      <span>{hosp.accreditationBadge || 'JCI Gold'}</span>
+                    </span>
+                    <span className="absolute bottom-2 left-2.5 right-2.5 flex items-center justify-between text-[11px] text-slate-200">
+                      <span className="flex items-center gap-1 font-semibold">
+                        <MapPin className="h-3 w-3 text-[#00BFFF]" />
+                        {hosp.city[language]}
+                      </span>
+                      <span className="flex items-center gap-1 text-amber-300 font-bold">
+                        <Star className="h-3 w-3 fill-current" />
+                        {hosp.rating || '4.9'}
+                      </span>
+                    </span>
+                  </div>
+                  <div className="pt-3">
+                    <h4 className="text-sm font-bold text-white group-hover:text-teal-300 transition-colors line-clamp-1 leading-snug">
+                      {hosp.name[language]}
+                    </h4>
+                    <div className="mt-2 flex items-center justify-between text-[11px] text-slate-300">
+                      <span className="flex items-center gap-1 text-slate-300/90 font-medium">
+                        <Bed className="h-3 w-3 text-teal-400" />
+                        {hosp.bedsCount} {language === 'ar' ? 'سريراً' : language === 'fr' ? 'lits' : 'beds'}
+                      </span>
+                      <span className="font-semibold text-teal-400 group-hover:underline">
+                        {language === 'ar' ? 'التفاصيل ←' : 'Details →'}
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
 
           {/* CTA to Full Hospitals Page */}
-          <div className="mt-8 text-center">
+          <div className="mt-6 text-center">
             <Link
               href="/hospitals"
               className="inline-flex items-center gap-2.5 bg-gradient-to-r from-[#0097FB] to-[#00BFFF] hover:from-[#0080d8] hover:to-[#00a8e0] text-white font-extrabold text-sm sm:text-base py-3.5 px-8 rounded-full shadow-lg shadow-[#0097FB]/30 hover:shadow-[#0097FB]/50 transition-all duration-300 transform hover:scale-105 active:scale-95"

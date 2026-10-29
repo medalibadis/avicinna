@@ -209,17 +209,26 @@ export const HeroSection: React.FC = () => {
 
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center pt-28 pb-16 overflow-hidden bg-[#032654]">
-      {/* Background Image with Deep Navy Gradient Overlay */}
-      <div className="absolute inset-0 z-0">
-        <div
-          className="absolute inset-0 bg-cover bg-center scale-105 transform animate-pulse duration-10000"
-          style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?q=80&w=2000&auto=format&fit=crop')`,
-          }}
-        />
-        {/* Navy Gradient Overlay for high text legibility */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#021838]/95 via-[#032654]/90 to-[#032654]/85" />
-        <div className="absolute inset-0 bg-radial-at-c from-[#0097FB]/15 via-transparent to-transparent pointer-events-none" />
+      {/* 1. AUTO-PLAYING AMBIENT MEDICAL VIDEO BACKGROUND */}
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          poster="https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?q=80&w=2000&auto=format&fit=crop"
+          className="h-full w-full scale-105 object-cover opacity-40 filter saturate-125 transition-opacity duration-1000"
+        >
+          <source
+            src="https://assets.mixkit.co/videos/preview/mixkit-doctors-walking-in-a-modern-hospital-corridor-41446-large.mp4"
+            type="video/mp4"
+          />
+        </video>
+
+        {/* Dynamic Multi-Layer Vignette Scrim for 100% Typographic Legibility */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/85 via-[#021838]/80 to-[#021838]/95 dark:from-[#050B14]/90 dark:via-[#09172B]/85 dark:to-[#050B14]" />
+        <div className="absolute -top-32 left-1/2 h-[500px] w-[900px] -translate-x-1/2 rounded-full bg-sky-500/20 blur-[140px] pointer-events-none" />
+        <div className="absolute -bottom-24 right-1/4 h-72 w-72 rounded-full bg-teal-500/15 blur-[120px] pointer-events-none" />
       </div>
 
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
@@ -289,6 +298,29 @@ export const HeroSection: React.FC = () => {
               {dict.quickSearchBtn}
             </button>
           </form>
+
+          {/* Quick-Filter Popular Specialty Chips */}
+          <div className="mt-3.5 flex flex-wrap items-center justify-center gap-2">
+            {[
+              language === 'ar' ? 'جراحة الأورام' : language === 'fr' ? 'Oncologie' : 'Oncology',
+              language === 'ar' ? 'جراحة القلب' : language === 'fr' ? 'Chirurgie Cardiaque' : 'Heart Surgery',
+              language === 'ar' ? 'جراحة المخ والأعصاب' : language === 'fr' ? 'Neurochirurgie' : 'Neurosurgery',
+              language === 'ar' ? 'زراعة الأعضاء' : language === 'fr' ? 'Greffe d’Organes' : 'Organ Transplant',
+              language === 'ar' ? 'الروبوت الجراحي Da Vinci' : language === 'fr' ? 'Chirurgie Robotique' : 'Robotic Surgery',
+            ].map((chip) => (
+              <button
+                key={chip}
+                type="button"
+                onClick={() => {
+                  setSearchQuery(chip);
+                  setIsDropdownOpen(true);
+                }}
+                className="rounded-full border border-white/20 bg-white/10 hover:bg-white/20 px-3.5 py-1 text-xs font-semibold text-slate-200 backdrop-blur-md transition-all hover:border-[#00BFFF]/60 hover:text-white cursor-pointer"
+              >
+                {chip}
+              </button>
+            ))}
+          </div>
 
           {/* ─── Live Autocomplete Dropdown (Direct deep links to Doctor, Hospital, Treatment) ─── */}
           {isDropdownOpen && searchQuery.trim().length >= 1 && (

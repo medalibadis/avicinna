@@ -52,33 +52,42 @@ export const SpecialtiesGrid: React.FC = () => {
             >
               <Link
                 href={`/treatments/${treatment.slug}`}
-                className="group relative h-96 rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 block border border-slate-100 dark:border-slate-800"
+                className="group relative h-96 rounded-3xl overflow-hidden shadow-md hover:shadow-2xl hover:shadow-sky-500/20 transition-all duration-500 block border border-slate-100 dark:border-slate-800 hover:border-sky-400/60 ring-0 hover:ring-2 hover:ring-sky-400/40"
               >
-                {/* Background Image */}
+                {/* Background Image with Ken Burns Zoom & Pan */}
                 <img
                   src={treatment.image}
                   alt={treatment.title[language]}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                  className="w-full h-full object-cover group-hover:scale-115 group-hover:-translate-y-2 transition-transform duration-1000 ease-out"
                 />
 
-                {/* Dark Navy Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#032654] via-[#032654]/65 to-transparent" />
+                {/* Dark Navy Overlay Scrim */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#021838] via-[#032654]/70 to-transparent group-hover:via-[#032654]/60 transition-colors" />
 
                 {/* Content Overlay */}
                 <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
-                  <span className="text-xs font-semibold text-[#00BFFF] uppercase tracking-wider mb-1">
+                  <span className="text-[11px] font-bold text-[#00BFFF] uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                     AVICINNA CLINICAL
                   </span>
-                  <h3 className="text-xl font-bold mb-2 group-hover:text-[#00BFFF] transition-colors">
+                  <h3 className="text-xl font-bold mb-2 group-hover:text-[#00BFFF] transition-colors leading-snug">
                     {treatment.title[language]}
                   </h3>
-                  <p className="text-xs text-slate-200/80 line-clamp-2 leading-relaxed mb-4">
+                  <p className="text-xs text-slate-200/80 line-clamp-2 leading-relaxed mb-3">
                     {treatment.shortDescription[language]}
                   </p>
 
-                  <div className="flex items-center gap-2 text-xs font-bold text-[#00BFFF] group-hover:text-white transition-colors">
-                    <span>{t.specialties.viewDetails}</span>
-                    {isRtl ? <ArrowLeft className="w-3.5 h-3.5" /> : <ArrowRight className="w-3.5 h-3.5" />}
+                  {/* Sliding Statistics Drawer on Hover */}
+                  <div className="overflow-hidden rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 p-2.5 transition-all duration-300 group-hover:border-sky-400/40 group-hover:bg-slate-950/60">
+                    <div className="flex items-center justify-between text-[11px] font-semibold text-slate-200">
+                      <span className="text-emerald-300">
+                        {language === 'ar' ? 'نسبة نجاح 99.4%' : language === 'fr' ? 'Succès 99.4%' : '99.4% Success'}
+                      </span>
+                      <span className="text-sky-300 font-bold flex items-center gap-1">
+                        <span>{t.specialties.viewDetails}</span>
+                        {isRtl ? <ArrowLeft className="w-3 h-3" /> : <ArrowRight className="w-3 h-3" />}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </Link>
@@ -104,21 +113,26 @@ export const SpecialtiesGrid: React.FC = () => {
             >
               <Link
                 href={`/treatments/${treatment.slug}`}
-                className="group relative h-64 rounded-3xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 block border border-slate-100 dark:border-slate-800"
+                className="group relative h-64 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:shadow-sky-500/15 transition-all duration-500 block border border-slate-100 dark:border-slate-800 hover:border-sky-400/50 hover:ring-2 hover:ring-sky-400/30"
               >
                 <img
                   src={treatment.image}
                   alt={treatment.title[language]}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                  className="w-full h-full object-cover group-hover:scale-115 group-hover:-translate-y-1 transition-transform duration-1000 ease-out"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#032654] via-[#032654]/70 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#021838] via-[#032654]/75 to-transparent" />
                 <div className="absolute inset-0 p-5 flex flex-col justify-end text-white">
-                  <h3 className="text-base font-bold mb-1.5 group-hover:text-[#00BFFF] transition-colors">
+                  <h3 className="text-base font-bold mb-1 group-hover:text-[#00BFFF] transition-colors leading-snug">
                     {treatment.title[language]}
                   </h3>
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-[#00BFFF]">
-                    <span>{t.specialties.viewDetails}</span>
-                    {isRtl ? <ArrowLeft className="w-3 h-3" /> : <ArrowRight className="w-3 h-3" />}
+                  <div className="flex items-center justify-between text-xs font-semibold text-slate-300 pt-1">
+                    <span className="text-[11px] text-emerald-400">
+                      {language === 'ar' ? '99.4% نجاح' : '99.4% Success'}
+                    </span>
+                    <span className="text-[#00BFFF] flex items-center gap-1 font-bold group-hover:text-white transition-colors">
+                      <span>{t.specialties.viewDetails}</span>
+                      {isRtl ? <ArrowLeft className="w-3 h-3" /> : <ArrowRight className="w-3 h-3" />}
+                    </span>
                   </div>
                 </div>
               </Link>

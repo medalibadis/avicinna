@@ -4,6 +4,7 @@ import React from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
 import { MessageCircle, Calendar, ShieldCheck, Heart } from 'lucide-react';
+import { FooterVideoTrustSeal } from '@/components/public/BrandLogoMotion';
 
 export const FinalCTA: React.FC = () => {
   const { t, language } = useLanguage();
@@ -37,6 +38,9 @@ export const FinalCTA: React.FC = () => {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-[#0097FB]/15 rounded-full blur-3xl pointer-events-none" />
 
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        {/* Placement D: Signature Watermark Trust Seal */}
+        <FooterVideoTrustSeal locale={language as any} />
+
         <div className="inline-flex items-center gap-2 bg-[#0097FB]/20 border border-[#00BFFF]/40 px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold text-[#00BFFF] mb-6">
           <Heart className="w-4 h-4 text-[#00BFFF] fill-current animate-pulse" />
           <span>

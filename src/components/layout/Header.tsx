@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { useTheme } from '@/context/ThemeContext';
 import { Logo } from '@/components/common/Logo';
+import { AnimatedNavbarLogo } from '@/components/public/BrandLogoMotion';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { Phone, Menu, X, Calendar, ChevronDown, Sun, Moon } from 'lucide-react';
 import { useData } from '@/context/DataContext';
@@ -67,7 +68,7 @@ export const Header: React.FC = () => {
           <div className="flex items-center justify-between gap-4">
             {/* Logo */}
             <div className="flex-shrink-0">
-              <Logo variant={isDarkLogo ? 'dark' : 'header'} size="md" />
+              <AnimatedNavbarLogo locale={language as any} />
             </div>
 
             {/* Desktop Navigation (Visible at xl+ / 1280px+) */}

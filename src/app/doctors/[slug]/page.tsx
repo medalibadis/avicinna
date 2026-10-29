@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
 import {
@@ -60,6 +61,7 @@ export default function DoctorDetailPage() {
 
   // Active Video state
   const [activeVideoIndex, setActiveVideoIndex] = useState(0);
+  const [activeTab, setActiveTab] = useState('bio');
 
   if (!doctor) {
     return (
@@ -349,44 +351,72 @@ export default function DoctorDetailPage() {
               </Link>
             </div>
 
-            {/* Key Clinical Metric Badges */}
+            {/* Animated Clinical Credential Counters on Scroll into View */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2">
-              <div className="bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-750 rounded-2xl p-3 text-center">
-                <div className="text-xl sm:text-2xl font-black text-[#0097FB] dark:text-sky-400">
+              <motion.div
+                initial={{ opacity: 0, y: 16, scale: 0.94 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ type: 'spring', stiffness: 350, damping: 26, delay: 0.05 }}
+                whileHover={{ y: -3 }}
+                className="bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-750 rounded-2xl p-3 text-center shadow-xs hover:border-sky-400/40 transition-colors"
+              >
+                <div className="text-xl sm:text-2xl font-black text-[#0097FB] dark:text-sky-400 tabular-nums">
                   +{doctor.experienceYears}
                 </div>
                 <div className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-0.5">
                   {content.experienceBadge}
                 </div>
-              </div>
+              </motion.div>
 
-              <div className="bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-750 rounded-2xl p-3 text-center">
-                <div className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400">
+              <motion.div
+                initial={{ opacity: 0, y: 16, scale: 0.94 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ type: 'spring', stiffness: 350, damping: 26, delay: 0.1 }}
+                whileHover={{ y: -3 }}
+                className="bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-750 rounded-2xl p-3 text-center shadow-xs hover:border-emerald-400/40 transition-colors"
+              >
+                <div className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 tabular-nums">
                   +{surgeries.toLocaleString()}
                 </div>
                 <div className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-0.5">
                   {content.surgeriesBadge}
                 </div>
-              </div>
+              </motion.div>
 
-              <div className="bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-750 rounded-2xl p-3 text-center">
-                <div className="text-xl sm:text-2xl font-black text-slate-800 dark:text-slate-200">
+              <motion.div
+                initial={{ opacity: 0, y: 16, scale: 0.94 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ type: 'spring', stiffness: 350, damping: 26, delay: 0.15 }}
+                whileHover={{ y: -3 }}
+                className="bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-750 rounded-2xl p-3 text-center shadow-xs hover:border-sky-400/40 transition-colors"
+              >
+                <div className="text-xl sm:text-2xl font-black text-slate-800 dark:text-slate-200 tabular-nums">
                   +{publications}
                 </div>
                 <div className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-0.5">
                   {content.publicationsBadge}
                 </div>
-              </div>
+              </motion.div>
 
-              <div className="bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-750 rounded-2xl p-3 text-center">
-                <div className="text-xl sm:text-2xl font-black text-amber-500 flex items-center justify-center gap-1">
+              <motion.div
+                initial={{ opacity: 0, y: 16, scale: 0.94 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ type: 'spring', stiffness: 350, damping: 26, delay: 0.2 }}
+                whileHover={{ y: -3 }}
+                className="bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-750 rounded-2xl p-3 text-center shadow-xs hover:border-amber-400/40 transition-colors"
+              >
+                <div className="text-xl sm:text-2xl font-black text-amber-500 flex items-center justify-center gap-1 tabular-nums">
                   <Star className="w-5 h-5 fill-current" />
                   <span>{doctor.rating}</span>
                 </div>
                 <div className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-0.5">
                   ({doctor.reviewCount} {content.reviewsText})
                 </div>
-              </div>
+              </motion.div>
             </div>
 
             {/* Spoken Languages */}
@@ -430,71 +460,50 @@ export default function DoctorDetailPage() {
       </div>
 
       {/* ══════════════════════════════════════════════════════════
-          3. STICKY QUICK JUMP PILL NAVIGATION
+          3. STICKY QUICK JUMP PILL NAVIGATION WITH SLIDING SPRING PILL
       ══════════════════════════════════════════════════════════ */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-2 shadow-xs border border-slate-200/80 dark:border-slate-800 flex items-center gap-1.5 overflow-x-auto scrollbar-thin">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-1.5 shadow-sm border border-slate-200/80 dark:border-slate-800 flex items-center gap-1 overflow-x-auto scrollbar-thin">
           <div className="text-[11px] font-extrabold text-slate-400 dark:text-slate-500 px-3 whitespace-nowrap uppercase tracking-wider flex items-center gap-1">
             <BookOpen className="w-3.5 h-3.5 text-[#0097FB] dark:text-sky-400" />
             <span>{content.quickNavTitle}:</span>
           </div>
-          <a
-            href="#bio"
-            className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-[#EAF6FF] dark:hover:bg-sky-950/50 hover:text-[#0097FB] dark:hover:text-sky-400 whitespace-nowrap transition-colors"
-          >
-            {content.navBio}
-          </a>
-          {videosList.length > 0 && (
-            <a
-              href="#video"
-              className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-[#EAF6FF] dark:hover:bg-sky-950/50 hover:text-[#0097FB] dark:hover:text-sky-400 whitespace-nowrap transition-colors flex items-center gap-1"
-            >
-              <Video className="w-3.5 h-3.5 text-rose-500" />
-              <span>{content.navVideo}</span>
-            </a>
-          )}
-          <a
-            href="#expertise"
-            className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-[#EAF6FF] dark:hover:bg-sky-950/50 hover:text-[#0097FB] dark:hover:text-sky-400 whitespace-nowrap transition-colors"
-          >
-            {content.navExpertise}
-          </a>
-          <a
-            href="#procedures"
-            className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-[#EAF6FF] dark:hover:bg-sky-950/50 hover:text-[#0097FB] dark:hover:text-sky-400 whitespace-nowrap transition-colors"
-          >
-            {content.navProcedures}
-          </a>
-          {doctor.careerHistory && doctor.careerHistory.length > 0 && (
-            <a
-              href="#career"
-              className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-[#EAF6FF] dark:hover:bg-sky-950/50 hover:text-[#0097FB] dark:hover:text-sky-400 whitespace-nowrap transition-colors"
-            >
-              {content.navCareer}
-            </a>
-          )}
-          <a
-            href="#education"
-            className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-[#EAF6FF] dark:hover:bg-sky-950/50 hover:text-[#0097FB] dark:hover:text-sky-400 whitespace-nowrap transition-colors"
-          >
-            {content.navEducation}
-          </a>
-          {doctor.memberships && doctor.memberships[language]?.length > 0 && (
-            <a
-              href="#memberships"
-              className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-[#EAF6FF] dark:hover:bg-sky-950/50 hover:text-[#0097FB] dark:hover:text-sky-400 whitespace-nowrap transition-colors"
-            >
-              {content.navMemberships}
-            </a>
-          )}
-          {doctor.technologies && doctor.technologies[language]?.length > 0 && (
-            <a
-              href="#technologies"
-              className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-[#EAF6FF] dark:hover:bg-sky-950/50 hover:text-[#0097FB] dark:hover:text-sky-400 whitespace-nowrap transition-colors"
-            >
-              {content.navTechnologies}
-            </a>
-          )}
+
+          {[
+            { id: 'bio', label: content.navBio, icon: BookOpen },
+            ...(videosList.length > 0 ? [{ id: 'video', label: content.navVideo, icon: Video }] : []),
+            { id: 'expertise', label: content.navExpertise, icon: Stethoscope },
+            { id: 'procedures', label: content.navProcedures, icon: Activity },
+            ...(doctor.careerHistory && doctor.careerHistory.length > 0 ? [{ id: 'career', label: content.navCareer, icon: Briefcase }] : []),
+            { id: 'education', label: content.navEducation, icon: GraduationCap },
+            ...(doctor.memberships && doctor.memberships[language]?.length > 0 ? [{ id: 'memberships', label: content.navMemberships, icon: Users }] : []),
+            ...(doctor.technologies && doctor.technologies[language]?.length > 0 ? [{ id: 'technologies', label: content.navTechnologies, icon: Cpu }] : []),
+          ].map((tab) => {
+            const Icon = tab.icon;
+            const isTabActive = activeTab === tab.id;
+            return (
+              <a
+                key={tab.id}
+                href={`#${tab.id}`}
+                onClick={() => setActiveTab(tab.id)}
+                className={`relative px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-colors flex items-center gap-1.5 z-10 select-none ${
+                  isTabActive
+                    ? 'text-white'
+                    : 'text-slate-700 dark:text-slate-300 hover:text-[#0097FB] dark:hover:text-sky-400'
+                }`}
+              >
+                {isTabActive && (
+                  <motion.div
+                    layoutId="active-doctor-nav-pill"
+                    transition={{ type: 'spring', stiffness: 380, damping: 28 }}
+                    className="absolute inset-0 rounded-xl bg-gradient-to-r from-sky-500 to-teal-500 shadow-md shadow-sky-500/20 -z-10"
+                  />
+                )}
+                <Icon className={`w-3.5 h-3.5 ${isTabActive ? 'text-white' : 'text-slate-400'}`} />
+                <span>{tab.label}</span>
+              </a>
+            );
+          })}
         </div>
       </div>
 
@@ -773,11 +782,22 @@ export default function DoctorDetailPage() {
 
           {/* Sidebar Column (4 cols) */}
           <div className="lg:col-span-4 space-y-6">
-            {/* Direct Booking Box */}
-            <div className="bg-gradient-to-br from-[#021838] via-[#032654] to-[#0c366e] text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden sticky top-28 border border-sky-950">
+            {/* Direct Booking Box (Smoothly Sticky top-28) */}
+            <div className="bg-gradient-to-br from-[#021838] via-[#032654] to-[#082247] text-white rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden sticky top-28 border border-sky-400/30 backdrop-blur-xl">
+              <div className="pointer-events-none absolute -top-16 -right-16 h-48 w-48 rounded-full bg-sky-500/20 blur-3xl" />
               <div className="relative z-10 space-y-4">
-                <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center">
-                  <Calendar className="w-6 h-6 text-[#00BFFF]" />
+                <div className="flex items-center gap-3">
+                  <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-2xl border-2 border-sky-400/40 bg-slate-900 shadow-md">
+                    <img
+                      src={doctor.image}
+                      alt={doctor.name[language]}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                  <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-3 py-1 text-[11px] font-bold text-emerald-300">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                    <span>{language === 'ar' ? 'متاح للاستشارة الفورية' : 'Available for Consultation'}</span>
+                  </div>
                 </div>
 
                 <h3 className="text-xl font-bold leading-snug">
@@ -793,7 +813,7 @@ export default function DoctorDetailPage() {
                     href={whatsappUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full inline-flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-emerald-500/25 transition-all text-xs sm:text-sm cursor-pointer"
+                    className="w-full inline-flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-emerald-500/25 transition-all text-xs sm:text-sm cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
                   >
                     <MessageCircle className="w-4 h-4 fill-current flex-shrink-0" />
                     <span>{content.whatsappBtn}</span>
@@ -801,7 +821,7 @@ export default function DoctorDetailPage() {
 
                   <Link
                     href={`/contact?doctor=${doctor.slug}`}
-                    className="w-full inline-flex items-center justify-center gap-2 bg-[#0097FB] hover:bg-[#0082d6] text-white font-bold py-3.5 px-4 rounded-xl shadow-md transition-all text-xs sm:text-sm cursor-pointer"
+                    className="w-full inline-flex items-center justify-center gap-2 bg-[#0097FB] hover:bg-[#0082d6] text-white font-bold py-3.5 px-4 rounded-xl shadow-md transition-all text-xs sm:text-sm cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
                   >
                     <Calendar className="w-4 h-4 flex-shrink-0" />
                     <span>{content.requestConsultationBtn}</span>
