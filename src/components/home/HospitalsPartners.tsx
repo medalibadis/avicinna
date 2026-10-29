@@ -241,9 +241,10 @@ const DraggableHospitalRow: React.FC<DraggableHospitalRowProps> = ({
             </div>
             <div className="pt-2 sm:pt-3 pointer-events-none">
               <h4
-                className={`text-xs sm:text-sm font-bold text-white transition-colors line-clamp-1 leading-snug ${
+                className={`text-xs sm:text-sm font-bold text-white transition-colors line-clamp-2 min-h-[2rem] sm:min-h-0 sm:line-clamp-1 leading-snug ${
                   accentColor === 'teal' ? 'group-hover:text-teal-300' : 'group-hover:text-sky-300'
                 }`}
+                style={{ unicodeBidi: 'plaintext' }}
               >
                 {hosp.name[language]}
               </h4>
@@ -321,7 +322,7 @@ export const HospitalsPartners: React.FC = () => {
   }, [hospitals]);
 
   return (
-    <section className="py-20 bg-[#032654] text-white relative overflow-hidden">
+    <section className="py-12 sm:py-20 bg-[#032654] text-white relative overflow-hidden">
       {/* Subtle Background Glow */}
       <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#0097FB]/15 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-[#00BFFF]/10 rounded-full blur-3xl pointer-events-none" />
@@ -511,11 +512,11 @@ export const HospitalsPartners: React.FC = () => {
           <div className="absolute left-0 top-16 bottom-16 w-12 sm:w-28 z-20 pointer-events-none bg-gradient-to-r from-[#032654] to-transparent" />
           <div className="absolute right-0 top-16 bottom-16 w-12 sm:w-28 z-20 pointer-events-none bg-gradient-to-l from-[#032654] to-transparent" />
 
-          {/* Row 1: Smooth Glide Left (Draggable with Cursor) */}
-          <div className="relative mb-3">
+          {/* Mobile Single Glide Row (All Hospitals in one clean stream to avoid two-row vertical clutter) */}
+          <div className="relative mb-4 sm:hidden">
             <DraggableHospitalRow
-              rowId="row-1"
-              items={row1Hospitals}
+              rowId="row-mobile"
+              items={hospitals}
               direction="left"
               speed={0.8}
               language={language}
@@ -524,27 +525,43 @@ export const HospitalsPartners: React.FC = () => {
             />
           </div>
 
-          {/* Row 2: Smooth Glide Right (Draggable with Cursor) */}
-          <div className="relative mb-6">
-            <DraggableHospitalRow
-              rowId="row-2"
-              items={row2Hospitals}
-              direction="right"
-              speed={0.75}
-              language={language}
-              accentColor="teal"
-              onDragStateChange={(dragging) => setIsAnyRowDragging(dragging)}
-            />
+          {/* Desktop Dual-Glide Rows (Untouched on sm+) */}
+          <div className="hidden sm:block">
+            {/* Row 1: Smooth Glide Left (Draggable with Cursor) */}
+            <div className="relative mb-3">
+              <DraggableHospitalRow
+                rowId="row-1"
+                items={row1Hospitals}
+                direction="left"
+                speed={0.8}
+                language={language}
+                accentColor="sky"
+                onDragStateChange={(dragging) => setIsAnyRowDragging(dragging)}
+              />
+            </div>
+
+            {/* Row 2: Smooth Glide Right (Draggable with Cursor) */}
+            <div className="relative mb-6">
+              <DraggableHospitalRow
+                rowId="row-2"
+                items={row2Hospitals}
+                direction="right"
+                speed={0.75}
+                language={language}
+                accentColor="teal"
+                onDragStateChange={(dragging) => setIsAnyRowDragging(dragging)}
+              />
+            </div>
           </div>
 
           {/* CTA to Full Hospitals Page */}
-          <div className="mt-6 text-center">
+          <div className="mt-4 sm:mt-6 text-center">
             <Link
               href="/hospitals"
-              className="inline-flex items-center gap-2.5 bg-gradient-to-r from-[#0097FB] to-[#00BFFF] hover:from-[#0080d8] hover:to-[#00a8e0] text-white font-extrabold text-sm sm:text-base py-3.5 px-8 rounded-full shadow-lg shadow-[#0097FB]/30 hover:shadow-[#0097FB]/50 transition-all duration-300 transform hover:scale-105 active:scale-95"
+              className="inline-flex items-center justify-center gap-2 sm:gap-2.5 bg-gradient-to-r from-[#0097FB] to-[#00BFFF] hover:from-[#0080d8] hover:to-[#00a8e0] text-white font-extrabold text-xs sm:text-base py-3 sm:py-3.5 px-5 sm:px-8 rounded-full shadow-lg shadow-[#0097FB]/30 hover:shadow-[#0097FB]/50 transition-all duration-300 transform hover:scale-105 active:scale-95 max-w-[calc(100vw-2.5rem)]"
             >
-              <Building2 className="w-5 h-5" />
-              <span>
+              <Building2 className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+              <span className="truncate">
                 {language === 'ar'
                   ? 'استكشف كافة المستشفيات والاعتمادات'
                   : language === 'fr'
@@ -552,12 +569,12 @@ export const HospitalsPartners: React.FC = () => {
                   : 'Explore All Partner Hospitals'}
               </span>
               {language === 'ar' ? (
-                <ArrowLeft className="w-4 h-4" />
+                <ArrowLeft className="w-4 h-4 shrink-0" />
               ) : (
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4 shrink-0" />
               )}
             </Link>
-            <p className="text-xs text-slate-400 mt-2.5">
+            <p className="text-[11px] sm:text-xs text-slate-400 mt-2 sm:mt-2.5 px-3">
               {language === 'ar'
                 ? 'انقر على أي مستشفى للاطلاع على التجهيزات الجراحية والتقنيات وسعة الأسرّة'
                 : language === 'fr'

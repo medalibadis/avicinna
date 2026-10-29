@@ -33,7 +33,7 @@ export const AboutSection: React.FC = () => {
             </div>
 
             {/* 10+ Years Excellence Floating Video Medallion (Placement C) */}
-            <div className={`absolute -bottom-6 z-20 ${isRtl ? '-right-4 sm:right-6' : '-left-4 sm:left-6'}`}>
+            <div className={`absolute -bottom-6 z-20 ${isRtl ? 'right-2 sm:right-6' : 'left-2 sm:left-6'}`}>
               <AboutVideoMedallion locale={language as any} />
             </div>
           </motion.div>

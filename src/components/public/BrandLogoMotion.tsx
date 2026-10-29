@@ -130,8 +130,10 @@ export function BrandLogoRevealIntro() {
  */
 export function AnimatedNavbarLogo({
   locale = 'ar',
+  isDark = false,
 }: {
   locale?: 'ar' | 'fr' | 'en';
+  isDark?: boolean;
 }) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
@@ -165,7 +167,13 @@ export function AnimatedNavbarLogo({
         />
       </div>
       <div className="flex flex-col">
-        <span className="text-base sm:text-lg font-black tracking-tight text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
+        <span
+          className={`text-base sm:text-lg font-black tracking-tight transition-colors ${
+            isDark
+              ? 'text-white group-hover:text-sky-300'
+              : 'text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400'
+          }`}
+        >
           AVICINNA
         </span>
         <span className="hidden sm:inline-block text-[10px] sm:text-[11px] font-semibold text-sky-600 dark:text-sky-400 line-clamp-1">
@@ -188,7 +196,7 @@ export function AboutVideoMedallion({
     <motion.div
       whileHover={{ y: -5, scale: 1.02 }}
       transition={{ type: 'spring', stiffness: 360, damping: 26 }}
-      className="flex items-center gap-3.5 rounded-3xl border border-white/20 bg-slate-950/90 p-3.5 text-white shadow-2xl backdrop-blur-2xl ring-1 ring-sky-500/20"
+      className="flex items-center gap-2.5 sm:gap-3.5 rounded-2xl sm:rounded-3xl border border-white/20 bg-slate-950/90 p-2.5 sm:p-3.5 text-white shadow-2xl backdrop-blur-2xl ring-1 ring-sky-500/20 max-w-[calc(100vw-2.5rem)] sm:max-w-none"
     >
       <div className="h-14 w-14 shrink-0 overflow-hidden rounded-2xl border border-sky-400/30 bg-black shadow-inner">
         <video

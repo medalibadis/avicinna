@@ -25,6 +25,7 @@ const heroSearchDict = {
   ar: {
     quickSearchBtn: 'بحث سريع',
     searchPlaceholder: 'ابحث عن طبيب، مستشفى، أو تخصص طبي...',
+    searchPlaceholderMobile: 'ابحث عن طبيب أو مستشفى...',
     doctorsCategory: 'الأطباء والاستشاريون',
     hospitalsCategory: 'المستشفيات الشريكة المعتمدة',
     treatmentsCategory: 'التخصصات والعمليات الجراحية',
@@ -41,6 +42,7 @@ const heroSearchDict = {
   en: {
     quickSearchBtn: 'Search',
     searchPlaceholder: 'Search by doctor name, hospital, or medical procedure...',
+    searchPlaceholderMobile: 'Search doctor, hospital, specialty...',
     doctorsCategory: 'Consultant Physicians & Surgeons',
     hospitalsCategory: 'Accredited Partner Hospitals',
     treatmentsCategory: 'Treatments & Procedures',
@@ -57,6 +59,7 @@ const heroSearchDict = {
   fr: {
     quickSearchBtn: 'Rechercher',
     searchPlaceholder: 'Rechercher un médecin, hôpital ou spécialité...',
+    searchPlaceholderMobile: 'Médecin, hôpital, soin...',
     doctorsCategory: 'Médecins & Chirurgiens Spécialistes',
     hospitalsCategory: 'Hôpitaux Partenaires Agréés',
     treatmentsCategory: 'Soins & Interventions Chirurgicales',
@@ -208,7 +211,7 @@ export const HeroSection: React.FC = () => {
   };
 
   return (
-    <section className="relative z-30 min-h-0 sm:min-h-[90vh] flex items-center justify-center pt-20 sm:pt-28 pb-10 sm:pb-16 bg-[#032654] w-full max-w-full overflow-x-clip">
+    <section className="relative z-30 min-h-0 sm:min-h-[90vh] flex items-center justify-center pt-24 sm:pt-28 pb-10 sm:pb-16 bg-[#032654] w-full max-w-full overflow-x-clip">
       {/* 1. AUTO-PLAYING AMBIENT MEDICAL VIDEO BACKGROUND */}
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
         <video
@@ -255,7 +258,7 @@ export const HeroSection: React.FC = () => {
         </p>
 
         {/* ─── Search / Consultation Entry Component with Live Autocomplete ─── */}
-        <div ref={containerRef} className="w-full max-w-2xl mx-auto mb-10 relative z-30">
+        <div ref={containerRef} className="w-full max-w-2xl mx-auto mb-8 sm:mb-10 relative z-30">
           {/* Search Bar + Floating Dropdown Anchor */}
           <div className="relative w-full">
             <form
@@ -278,8 +281,8 @@ export const HeroSection: React.FC = () => {
                     setIsDropdownOpen(true);
                   }
                 }}
-                placeholder={dict.searchPlaceholder}
-                className="w-full min-w-0 flex-1 bg-transparent text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-400 text-xs sm:text-base font-medium focus:outline-none px-1.5 sm:px-2 py-1.5 sm:py-2"
+                placeholder={(dict as any).searchPlaceholderMobile || dict.searchPlaceholder}
+                className="w-full min-w-0 flex-1 bg-transparent text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-400 text-sm sm:text-base font-medium focus:outline-none px-1.5 sm:px-2 py-1.5 sm:py-2"
               />
               {searchQuery && (
                 <button
@@ -296,7 +299,7 @@ export const HeroSection: React.FC = () => {
               )}
               <button
                 type="submit"
-                className="bg-[#0097FB] hover:bg-[#0082d6] text-white font-bold text-xs sm:text-sm px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-full transition-all duration-200 shadow-md shadow-[#0097FB]/30 flex-shrink-0 cursor-pointer"
+                className="bg-[#0097FB] hover:bg-[#0082d6] text-white font-bold text-xs sm:text-sm px-3.5 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-full transition-all duration-200 shadow-md shadow-[#0097FB]/30 flex-shrink-0 cursor-pointer"
               >
                 {dict.quickSearchBtn}
               </button>
@@ -346,7 +349,7 @@ export const HeroSection: React.FC = () => {
                                   </div>
                                 </div>
                                 <span className="text-[11px] text-sky-400 font-semibold px-2 py-1 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center gap-1 flex-shrink-0 ml-2 rtl:ml-0 rtl:mr-2">
-                                  <span>{dict.viewDoctor}</span>
+                                  <span className="hidden sm:inline">{dict.viewDoctor}</span>
                                   <ArrowIcon className="w-3 h-3" />
                                 </span>
                               </Link>
@@ -388,7 +391,7 @@ export const HeroSection: React.FC = () => {
                                   </div>
                                 </div>
                                 <span className="text-[11px] text-emerald-400 font-semibold px-2 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-1 flex-shrink-0 ml-2 rtl:ml-0 rtl:mr-2">
-                                  <span>{dict.viewHospital}</span>
+                                  <span className="hidden sm:inline">{dict.viewHospital}</span>
                                   <ArrowIcon className="w-3 h-3" />
                                 </span>
                               </Link>
@@ -430,7 +433,7 @@ export const HeroSection: React.FC = () => {
                                   </div>
                                 </div>
                                 <span className="text-[11px] text-purple-400 font-semibold px-2 py-1 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center gap-1 flex-shrink-0 ml-2 rtl:ml-0 rtl:mr-2">
-                                  <span>{dict.viewTreatment}</span>
+                                  <span className="hidden sm:inline">{dict.viewTreatment}</span>
                                   <ArrowIcon className="w-3 h-3" />
                                 </span>
                               </Link>
@@ -473,7 +476,7 @@ export const HeroSection: React.FC = () => {
           </div>
 
           {/* Quick-Filter Popular Specialty Chips */}
-          <div className="mt-3 flex items-center sm:justify-center gap-1.5 sm:gap-2 overflow-x-auto sm:flex-wrap no-scrollbar px-1 sm:px-0 py-1 relative z-10 w-full max-w-full">
+          <div className="mt-3 flex items-center sm:justify-center gap-1.5 sm:gap-2 overflow-x-auto sm:flex-wrap no-scrollbar px-2 sm:px-0 py-1 relative z-10 w-full max-w-full -mx-1 sm:mx-0 scroll-smooth">
             {[
               language === 'ar' ? 'جراحة الأورام' : language === 'fr' ? 'Oncologie' : 'Oncology',
               language === 'ar' ? 'جراحة القلب' : language === 'fr' ? 'Chirurgie Cardiaque' : 'Heart Surgery',
@@ -497,7 +500,7 @@ export const HeroSection: React.FC = () => {
         </div>
 
         {/* Dual Primary / Secondary CTAs */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-8 sm:mb-12">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-6 sm:mb-12">
           <a
             href="#consultation"
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-[#0097FB] hover:bg-[#0082d6] text-white font-bold text-sm sm:text-base px-6 sm:px-8 py-3.5 sm:py-4 rounded-full shadow-lg shadow-[#0097FB]/25 transition-all duration-200 transform hover:-translate-y-0.5 cursor-pointer"
@@ -516,14 +519,17 @@ export const HeroSection: React.FC = () => {
         </div>
 
         {/* Trust Badges Bar */}
-        <div className="pt-6 border-t border-white/10 flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-xs sm:text-sm text-slate-300 font-medium">
-          <div className="flex items-center gap-2">
-            <Shield className="w-4 h-4 text-[#00BFFF]" />
-            <span>{t.hero.trustBadge}</span>
+        <div className="pt-5 sm:pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-10 text-xs sm:text-sm text-slate-300 font-medium">
+          <div className="inline-flex items-center justify-center gap-2 text-center px-3.5 py-1.5 sm:p-0 rounded-full bg-white/5 sm:bg-transparent border border-white/10 sm:border-0 max-w-full">
+            <Shield className="w-4 h-4 text-[#00BFFF] shrink-0" />
+            <span className="leading-snug">{t.hero.trustBadge}</span>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-            <span>{dict.freeConsultationBadge}</span>
+          <div className="inline-flex items-center justify-center gap-2 text-center px-3.5 py-1.5 sm:p-0 rounded-full bg-white/5 sm:bg-transparent border border-white/10 sm:border-0 max-w-full">
+            <span className="relative flex h-2 w-2 shrink-0">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+            </span>
+            <span className="leading-snug">{dict.freeConsultationBadge}</span>
           </div>
         </div>
       </div>

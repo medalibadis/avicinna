@@ -34,9 +34,9 @@ export const QuickValueCards: React.FC = () => {
             return (
               <div
                 key={idx}
-                className="bg-white dark:bg-slate-900 rounded-2xl p-5 sm:p-7 border border-slate-200/70 dark:border-slate-800 shadow-xs sm:shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 group flex sm:flex-col items-start gap-4 sm:gap-0"
+                className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-7 border border-slate-200/70 dark:border-slate-800 shadow-xs sm:shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 group flex sm:flex-col items-start gap-3.5 sm:gap-0"
               >
-                <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0 sm:mb-5 border border-sky-100 dark:border-sky-800/60 group-hover:bg-sky-500 group-hover:text-white transition-colors duration-300">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0 sm:mb-5 border border-sky-100 dark:border-sky-800/60 group-hover:bg-sky-500 group-hover:text-white transition-colors duration-300">
                   <Icon className="w-5 h-5 sm:w-6 sm:h-6 stroke-[1.75]" />
                 </div>
                 <div>

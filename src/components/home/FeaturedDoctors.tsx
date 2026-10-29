@@ -44,7 +44,7 @@ export const FeaturedDoctors: React.FC = () => {
       : doctors.filter((doc) => doc.specialtySlug === selectedSpecialty);
 
   return (
-    <section id="doctors" className="py-20 bg-white dark:bg-[#080E1A]">
+    <section id="doctors" className="py-12 sm:py-20 bg-white dark:bg-[#080E1A]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-10">
@@ -60,7 +60,7 @@ export const FeaturedDoctors: React.FC = () => {
         </div>
 
         {/* Specialty Filter Tabs */}
-        <div className="flex items-center justify-center flex-wrap gap-2 mb-12">
+        <div className="flex items-center sm:justify-center overflow-x-auto sm:flex-wrap no-scrollbar pb-2 sm:pb-0 gap-2 mb-8 sm:mb-12 px-2 sm:px-0 -mx-2 sm:mx-0 scroll-smooth">
           {filterTabs.map((tab) => {
             const isActive = selectedSpecialty === tab.slug;
             return (
@@ -68,7 +68,7 @@ export const FeaturedDoctors: React.FC = () => {
                 key={tab.slug}
                 onClick={() => setSelectedSpecialty(tab.slug)}
                 type="button"
-                className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer ${
+                className={`px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer shrink-0 whitespace-nowrap ${
                   isActive
                     ? 'bg-[#0097FB] text-white shadow-sm shadow-[#0097FB]/25 scale-105'
                     : 'bg-[#F4F7FA] dark:bg-slate-800 text-[#163B63] dark:text-slate-200 hover:bg-[#EAF6FF] dark:hover:bg-slate-700'

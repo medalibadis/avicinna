@@ -68,7 +68,7 @@ export const Header: React.FC = () => {
           <div className="flex items-center justify-between gap-1 sm:gap-4">
             {/* Logo */}
             <div className="shrink-0">
-              <AnimatedNavbarLogo locale={language as any} />
+              <AnimatedNavbarLogo locale={language as any} isDark={isDarkLogo} />
             </div>
 
             {/* Desktop Navigation (Visible at xl+ / 1280px+) */}
@@ -222,50 +222,58 @@ export const Header: React.FC = () => {
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="xl:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-xl px-4 pt-3 pb-6 space-y-2 animate-in slide-in-from-top-4 duration-200">
-            <div className="space-y-1">
-              {navLinks.map((link) => {
-                const isActive =
-                  link.href === '/'
-                    ? pathname === '/'
-                    : pathname.startsWith(link.href);
+          <>
+            <div
+              className="fixed inset-0 top-[60px] bg-black/50 backdrop-blur-xs z-40 xl:hidden animate-in fade-in duration-200"
+              onClick={() => setMobileMenuOpen(false)}
+              aria-hidden="true"
+            />
+            <div className="relative z-50 xl:hidden bg-white/98 dark:bg-slate-900/98 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 shadow-2xl px-4 pt-3 pb-6 space-y-2 animate-in slide-in-from-top-4 duration-200 max-h-[calc(100dvh-4.5rem)] overflow-y-auto">
+              <div className="space-y-1">
+                {navLinks.map((link) => {
+                  const isActive =
+                    link.href === '/'
+                      ? pathname === '/'
+                      : pathname.startsWith(link.href);
 
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={`block px-4 py-2.5 rounded-xl text-base font-medium transition-colors ${
-                      isActive
-                        ? 'bg-[#EAF6FF] dark:bg-sky-950/60 text-[#0097FB] dark:text-sky-400 font-bold'
-                        : 'text-[#163B63] dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800'
-                    }`}
-                  >
-                    {link.label}
-                  </Link>
-                );
-              })}
-            </div>
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`block px-4 py-2.5 rounded-xl text-base font-medium transition-colors ${
+                        isActive
+                          ? 'bg-[#EAF6FF] dark:bg-sky-950/60 text-[#0097FB] dark:text-sky-400 font-bold'
+                          : 'text-[#163B63] dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800'
+                      }`}
+                    >
+                      {link.label}
+                    </Link>
+                  );
+                })}
+              </div>
 
-            <div className="pt-3 border-t border-slate-100">
-              <a
-                href={pathname === '/' ? '#consultation' : '/#consultation'}
-                onClick={(e) => {
-                  setMobileMenuOpen(false);
-                  if (pathname === '/') {
-                    e.preventDefault();
-                    const el = document.getElementById('consultation');
-                    if (el) {
-                      el.scrollIntoView({ behavior: 'smooth' });
+              <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
+                <a
+                  href={pathname === '/' ? '#consultation' : '/#consultation'}
+                  onClick={(e) => {
+                    setMobileMenuOpen(false);
+                    if (pathname === '/') {
+                      e.preventDefault();
+                      const el = document.getElementById('consultation');
+                      if (el) {
+                        el.scrollIntoView({ behavior: 'smooth' });
+                      }
                     }
-                  }
-                }}
-                className="w-full flex items-center justify-center gap-2 bg-[#0097FB] hover:bg-[#0082d6] text-white font-semibold py-3 rounded-xl shadow-md shadow-[#0097FB]/20 transition-colors"
-              >
-                <Calendar className="w-5 h-5 flex-shrink-0" />
-                <span>{t.nav.freeConsultation}</span>
-              </a>
+                  }}
+                  className="w-full flex items-center justify-center gap-2 bg-[#0097FB] hover:bg-[#0082d6] text-white font-semibold py-3 rounded-xl shadow-md shadow-[#0097FB]/20 transition-colors"
+                >
+                  <Calendar className="w-5 h-5 flex-shrink-0" />
+                  <span>{t.nav.freeConsultation}</span>
+                </a>
+              </div>
             </div>
-          </div>
+          </>
         )}
       </header>
     </>

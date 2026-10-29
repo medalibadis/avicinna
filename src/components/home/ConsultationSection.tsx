@@ -170,7 +170,7 @@ export const ConsultationSection: React.FC = () => {
 
           {/* Right Column: Interactive Consultation Form (7 cols) */}
           <div className="lg:col-span-7">
-            <div className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white rounded-3xl p-6 sm:p-10 shadow-2xl border border-white/20 dark:border-slate-800">
+            <div className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white rounded-3xl p-5 sm:p-10 shadow-2xl border border-white/20 dark:border-slate-800">
               {isSubmitted ? (
                 <div className="text-center py-10 space-y-5 animate-in fade-in zoom-in-95 duration-300">
                   <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-2">
@@ -251,7 +251,7 @@ export const ConsultationSection: React.FC = () => {
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
                         placeholder={language === 'ar' ? 'مثال: محمد العمري' : language === 'fr' ? 'ex. Jean Dupont' : 'e.g., John Smith'}
-                        className="w-full bg-[#F4F7FA] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#0097FB] dark:focus:border-sky-500 focus:bg-white dark:focus:bg-slate-800 transition-colors"
+                        className="w-full bg-[#F4F7FA] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl px-4 py-3 text-base sm:text-sm focus:outline-none focus:border-[#0097FB] dark:focus:border-sky-500 focus:bg-white dark:focus:bg-slate-800 transition-colors"
                       />
                     </div>
 
@@ -267,7 +267,7 @@ export const ConsultationSection: React.FC = () => {
                         onChange={(e) => setPhone(e.target.value)}
                         placeholder="+966 5X XXX XXXX"
                         dir="ltr"
-                        className="w-full bg-[#F4F7FA] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#0097FB] dark:focus:border-sky-500 focus:bg-white dark:focus:bg-slate-800 transition-colors"
+                        className="w-full bg-[#F4F7FA] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl px-4 py-3 text-base sm:text-sm focus:outline-none focus:border-[#0097FB] dark:focus:border-sky-500 focus:bg-white dark:focus:bg-slate-800 transition-colors"
                       />
                     </div>
                   </div>
@@ -284,7 +284,7 @@ export const ConsultationSection: React.FC = () => {
                         value={country}
                         onChange={(e) => setCountry(e.target.value)}
                         placeholder={language === 'ar' ? 'السعودية، الكويت، الجزائر...' : language === 'fr' ? 'France, Algérie, Suisse...' : 'Country of residence'}
-                        className="w-full bg-[#F4F7FA] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#0097FB] dark:focus:border-sky-500 focus:bg-white dark:focus:bg-slate-800 transition-colors"
+                        className="w-full bg-[#F4F7FA] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl px-4 py-3 text-base sm:text-sm focus:outline-none focus:border-[#0097FB] dark:focus:border-sky-500 focus:bg-white dark:focus:bg-slate-800 transition-colors"
                       />
                     </div>
 
@@ -297,7 +297,7 @@ export const ConsultationSection: React.FC = () => {
                         value={specialty}
                         onChange={(e) => setSpecialty(e.target.value)}
                         required
-                        className="w-full bg-[#F4F7FA] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#0097FB] dark:focus:border-sky-500 focus:bg-white dark:focus:bg-slate-800 transition-colors cursor-pointer"
+                        className="w-full bg-[#F4F7FA] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-4 py-3 text-base sm:text-sm focus:outline-none focus:border-[#0097FB] dark:focus:border-sky-500 focus:bg-white dark:focus:bg-slate-800 transition-colors cursor-pointer"
                       >
                         <option value="" className="dark:bg-slate-900">{language === 'ar' ? 'اختر التخصص المطلوب...' : language === 'fr' ? 'Sélectionnez une spécialité...' : 'Select specialty...'}</option>
                         {treatmentsData.map((item) => (
@@ -319,7 +319,7 @@ export const ConsultationSection: React.FC = () => {
                       value={caseNotes}
                       onChange={(e) => setCaseNotes(e.target.value)}
                       placeholder={language === 'ar' ? 'يرجى كتابة التشخيص السابق أو الأعراض التي تشكو منها...' : language === 'fr' ? 'Décrivez vos symptômes ou votre diagnostic médical...' : 'Describe symptoms or medical history...'}
-                      className="w-full bg-[#F4F7FA] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#0097FB] dark:focus:border-sky-500 focus:bg-white dark:focus:bg-slate-800 transition-colors"
+                      className="w-full bg-[#F4F7FA] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl px-4 py-3 text-base sm:text-sm focus:outline-none focus:border-[#0097FB] dark:focus:border-sky-500 focus:bg-white dark:focus:bg-slate-800 transition-colors"
                     />
                   </div>
 
