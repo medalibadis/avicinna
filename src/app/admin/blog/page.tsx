@@ -989,6 +989,7 @@ export default function AdminBlogPage() {
                 excerpt={excerpts[editorTab]}
                 setBody={(val) => setBodies((prev) => ({ ...prev, [editorTab]: val }))}
                 setExcerpt={(val) => setExcerpts((prev) => ({ ...prev, [editorTab]: val }))}
+                slug={editingArticle?.slug || ''}
                 categorySlug={categorySlug}
                 imageUrl={imageUrl}
                 authorName={authorName[langKey] || authorName.ar}
