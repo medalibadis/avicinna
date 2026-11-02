@@ -15,11 +15,11 @@ const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SI
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'أفيسينا | منصة الرعاية الطبية في تركيا',
+    default: 'AVICINNA | أفيسينا للرعاية الطبية والسياحة العلاجية في تركيا - Medical Tourism Turkey',
     template: '%s',
   },
   description:
-    'منصة أفيسينا الطبية الدولية تربطكم بأفضل الأطباء والمستشفيات المعتمدة دولياً (JCI) في تركيا. استشارة مجانية ومرافقة طبية كاملة في إسطنبول.',
+    'AVICINNA Premier Medical Tourism Turkey: منصة أفيسينا الطبية الدولية تربطكم بأفضل الأطباء والمستشفيات المعتمدة دولياً (JCI) في إسطنبول تركيا. استشارة مجانية وخطة علاج متكاملة.',
   creator: 'AVICINNA',
   formatDetection: {
     email: false,
@@ -30,9 +30,9 @@ export const metadata: Metadata = {
     canonical: 'https://avicinna.com',
   },
   openGraph: {
-    title: 'أفيسينا | منصة الرعاية الطبية في تركيا',
+    title: 'AVICINNA | أفيسينا للرعاية الطبية والسياحة العلاجية في تركيا - Medical Tourism Turkey',
     description:
-      'ربط المرضى الدوليين بأرقى المستشفيات المعتمدة JCI ونخبة البروفيسورات في إسطنبول. استشارة مجانية وخطة علاجية متكاملة.',
+      'AVICINNA Premier Healthcare Turkey: ربط المرضى الدوليين بأرقى مستشفيات تركيا المعتمدة JCI ونخبة البروفيسورات في إسطنبول. استشارة مجانية وخطة علاجية متكاملة.',
     url: 'https://avicinna.com',
     siteName: 'AVICINNA',
     images: [
@@ -48,9 +48,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'أفيسينا | منصة الرعاية الطبية في تركيا',
+    title: 'AVICINNA | أفيسينا للرعاية الطبية والسياحة العلاجية في تركيا - Medical Tourism Turkey',
     description:
-      'استشارة طبية مجانية خلال 24 ساعة للعمليات الجراحية في أفضل مستشفيات إسطنبول المعتمدة دولياً.',
+      'AVICINNA Healthcare Turkey: استشارة طبية مجانية خلال 24 ساعة للعمليات الجراحية في أفضل مستشفيات إسطنبول المعتمدة دولياً.',
     images: ['https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?q=80&w=1200&auto=format&fit=crop'],
   },
   robots: {
