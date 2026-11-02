@@ -6,53 +6,66 @@ import { initialSiteConfig } from '@/data/siteConfig';
 export const MedicalOrganizationSchema: React.FC = () => {
   const schema = {
     '@context': 'https://schema.org',
-    '@type': 'MedicalBusiness',
-    '@id': 'https://avicinna.com/#organization',
-    name: 'AVICINNA',
-    alternateName: ['أفيسينا للرعاية الطبية الدولية', 'Avicinna International Healthcare Turkey'],
-    url: 'https://avicinna.com',
-    logo: 'https://avicinna.com/logo.png',
-    image: 'https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?q=80&w=1200',
-    description:
-      'Premier international medical assistance and medical tourism platform connecting global patients with top accredited hospitals, professors, and advanced surgical care in Istanbul, Turkey.',
-    telephone: initialSiteConfig.contact.phone,
-    email: initialSiteConfig.contact.email,
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: 'Levent & Atasehir Medical District',
-      addressLocality: 'Istanbul',
-      addressRegion: 'Marmara',
-      addressCountry: 'TR',
-    },
-    geo: {
-      '@type': 'GeoCoordinates',
-      latitude: 41.0082,
-      longitude: 28.9784,
-    },
-    openingHoursSpecification: [
+    '@graph': [
       {
-        '@type': 'OpeningHoursSpecification',
-        dayOfWeek: [
-          'Monday',
-          'Tuesday',
-          'Wednesday',
-          'Thursday',
-          'Friday',
-          'Saturday',
-          'Sunday',
+        '@type': 'MedicalBusiness',
+        '@id': 'https://avicinna.com/#organization',
+        name: 'AVICINNA',
+        alternateName: ['أفيسينا للرعاية الطبية الدولية', 'Avicinna International Healthcare Turkey'],
+        url: 'https://avicinna.com',
+        logo: 'https://avicinna.com/logo.png',
+        image: 'https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?q=80&w=1200',
+        description:
+          'Premier international medical assistance and medical tourism platform connecting global patients with top accredited hospitals, professors, and advanced surgical care in Istanbul, Turkey.',
+        telephone: initialSiteConfig.contact.phone,
+        email: initialSiteConfig.contact.email,
+        address: {
+          '@type': 'PostalAddress',
+          streetAddress: 'Levent & Atasehir Medical District',
+          addressLocality: 'Istanbul',
+          addressRegion: 'Marmara',
+          addressCountry: 'TR',
+        },
+        geo: {
+          '@type': 'GeoCoordinates',
+          latitude: 41.0082,
+          longitude: 28.9784,
+        },
+        openingHoursSpecification: [
+          {
+            '@type': 'OpeningHoursSpecification',
+            dayOfWeek: [
+              'Monday',
+              'Tuesday',
+              'Wednesday',
+              'Thursday',
+              'Friday',
+              'Saturday',
+              'Sunday',
+            ],
+            opens: '00:00',
+            closes: '23:59',
+          },
         ],
-        opens: '00:00',
-        closes: '23:59',
+        priceRange: '$$',
+        medicalSpecialty: [
+          'Cardiovascular',
+          'Neurology',
+          'Orthopedics',
+          'Oncology',
+          'PlasticSurgery',
+          'Dentistry',
+        ],
       },
-    ],
-    priceRange: '$$',
-    medicalSpecialty: [
-      'Cardiovascular',
-      'Neurology',
-      'Orthopedics',
-      'Oncology',
-      'PlasticSurgery',
-      'Dentistry',
+      {
+        '@type': 'WebSite',
+        '@id': 'https://avicinna.com/#website',
+        url: 'https://avicinna.com',
+        name: 'AVICINNA',
+        publisher: {
+          '@id': 'https://avicinna.com/#organization',
+        },
+      },
     ],
   };
 

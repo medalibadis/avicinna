@@ -19,6 +19,8 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 import { StatusDropdown } from '@/components/admin/StatusDropdown';
+import { useConfirmDialog } from '@/context/ConfirmDialogContext';
+import { toast } from 'sonner';
 
 const inquiriesDict = {
   ar: {
@@ -139,9 +141,21 @@ function AdminInquiriesContent() {
     return matchesStatus && matchesSearch;
   });
 
-  const handleDelete = (inq: ConsultationInquiry) => {
-    if (window.confirm(d.confirmDelete(inq.fullName))) {
+  const { confirm } = useConfirmDialog();
+
+  const handleDelete = async (inq: ConsultationInquiry) => {
+    const ok = await confirm({
+      title: langKey === 'ar' ? 'تأكيد حذف طلب الاستشارة' : 'Delete Consultation Lead',
+      message: d.confirmDelete(inq.fullName),
+      itemName: inq.fullName,
+      variant: 'danger',
+      icon: 'trash',
+      confirmText: langKey === 'ar' ? 'نعم، احذف الطلب' : 'Delete Lead',
+    });
+
+    if (ok) {
       deleteInquiry(inq.id);
+      toast.success(langKey === 'ar' ? `تم حذف طلب ${inq.fullName} بنجاح` : `Inquiry for "${inq.fullName}" deleted successfully.`);
     }
   };
 

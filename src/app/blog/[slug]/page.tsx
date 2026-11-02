@@ -161,12 +161,12 @@ export default async function ArticleDetailPage({ params }: Props) {
         },
         publisher: {
           '@type': 'MedicalOrganization',
-          '@id': 'https://avicinna.netlify.app/#organization',
+          '@id': 'https://avicinna.com/#organization',
           name: 'AVICINNA Medical Tourism Turkey',
-          url: 'https://avicinna.netlify.app',
+          url: 'https://avicinna.com',
           logo: {
             '@type': 'ImageObject',
-            url: 'https://avicinna.netlify.app/favicon.ico',
+            url: 'https://avicinna.com/favicon.ico',
           },
         },
       },
@@ -177,13 +177,13 @@ export default async function ArticleDetailPage({ params }: Props) {
             '@type': 'ListItem',
             position: 1,
             name: 'الرئيسية',
-            item: 'https://avicinna.netlify.app',
+            item: 'https://avicinna.com',
           },
           {
             '@type': 'ListItem',
             position: 2,
             name: 'المدونة الطبية',
-            item: 'https://avicinna.netlify.app/blog',
+            item: 'https://avicinna.com/blog',
           },
           {
             '@type': 'ListItem',

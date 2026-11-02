@@ -4,6 +4,7 @@ import React, { useState, useRef } from 'react';
 import { uploadImageFile } from '@/lib/supabase';
 import { useLanguage } from '@/context/LanguageContext';
 import { Upload, Link2, X, Image as ImageIcon, Loader2, CheckCircle2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface ImageUploadFieldProps {
   label: string;
@@ -78,12 +79,12 @@ export function ImageUploadField({
 
   const handleFile = async (file: File) => {
     if (!file.type.startsWith('image/')) {
-      alert(t.invalidFile);
+      toast.error(t.invalidFile);
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      alert(t.tooLarge);
+      toast.error(t.tooLarge);
       return;
     }
 
@@ -92,10 +93,11 @@ export function ImageUploadField({
       const resultUrl = await uploadImageFile(file, folder);
       if (resultUrl) {
         onChange(resultUrl);
+        toast.success(t.success);
       }
     } catch (err) {
       console.error('Failed to process image:', err);
-      alert(t.failed);
+      toast.error(t.failed);
     } finally {
       setIsUploading(false);
     }

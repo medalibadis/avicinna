@@ -5,9 +5,12 @@ import { articlesData } from '@/data/articles';
 import { doctorsData } from '@/data/doctors';
 import { treatmentsData } from '@/data/treatments';
 import { patientStoriesData } from '@/data/stories';
+import { hospitalsData } from '@/data/hospitals';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://avicinna.netlify.app';
+  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('localhost'))
+    ? process.env.NEXT_PUBLIC_SITE_URL
+    : 'https://avicinna.com';
 
   const staticRoutes: MetadataRoute.Sitemap = [
     {
@@ -15,13 +18,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 1.0,
-      alternates: {
-        languages: {
-          ar: `${baseUrl}?lang=ar`,
-          en: `${baseUrl}?lang=en`,
-          fr: `${baseUrl}?lang=fr`,
-        },
-      },
     },
     {
       url: `${baseUrl}/about`,
@@ -43,6 +39,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     {
       url: `${baseUrl}/treatments`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/hospitals`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.9,
@@ -161,8 +163,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
   }
 
+  // Hospital Partner Detail routes
+  const hospitalRoutes: MetadataRoute.Sitemap = hospitalsData.map((hosp) => ({
+    url: `${baseUrl}/hospitals/${hosp.id}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.85,
+  }));
+
   return [
     ...staticRoutes,
+    ...hospitalRoutes,
     ...treatmentRoutes,
     ...doctorRoutes,
     ...storyRoutes,

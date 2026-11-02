@@ -38,6 +38,7 @@ import { VideoUploadField } from '@/components/admin/VideoUploadField';
 import { CustomSelect } from '@/components/admin/CustomSelect';
 import { ModalPortal } from '@/components/admin/ModalPortal';
 import { SmartTranslatableField } from '@/components/admin/SingleInputAutoTranslator';
+import { useConfirmDialog } from '@/context/ConfirmDialogContext';
 import { ContextualSectionTip } from '@/components/admin/AdminOnboardingGuide';
 
 const hospitalsDict = {
@@ -454,7 +455,7 @@ function HospitalsContent() {
     const finalNameFr = nameFr || nameEn || nameAr;
 
     if (!finalNameAr && !finalNameEn) {
-      alert(langKey === 'ar' ? 'يرجى إدخال اسم المستشفى' : 'Please provide hospital name.');
+      showToast(langKey === 'ar' ? 'يرجى إدخال اسم المستشفى' : 'Please provide hospital name.');
       return;
     }
 
@@ -523,9 +524,20 @@ function HospitalsContent() {
   };
 
   // Delete Hospital
-  const handleDeleteHospital = (hosp: HospitalPartner) => {
+  const { confirm } = useConfirmDialog();
+
+  const handleDeleteHospital = async (hosp: HospitalPartner) => {
     const hospName = hosp.name[langKey] || hosp.name.ar;
-    if (window.confirm(d.deleteConfirm(hospName))) {
+    const ok = await confirm({
+      title: langKey === 'ar' ? 'تأكيد حذف المستشفى' : 'Delete Partner Hospital',
+      message: d.deleteConfirm(hospName),
+      itemName: hospName,
+      variant: 'danger',
+      icon: 'trash',
+      confirmText: langKey === 'ar' ? 'نعم، احذف المستشفى' : 'Delete Hospital',
+    });
+
+    if (ok) {
       deleteHospital(hosp.id);
       showToast(d.toastDeleted);
     }

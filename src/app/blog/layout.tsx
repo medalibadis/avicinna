@@ -1,26 +1,19 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'المدونة الطبية - مقالات ونصائح صحية | Medical Blog - AVICINNA',
+  title: 'المدونة الطبية | مقالات ونصائح السياحة العلاجية',
   description:
-    'اقرأ أحدث المقالات والنصائح الطبية حول العلاج في تركيا، السياحة العلاجية، زراعة الشعر، جراحة القلب، تجميل الأسنان والمزيد من المواضيع الصحية المتخصصة.',
-  keywords: [
-    'مدونة طبية',
-    'مقالات صحية تركيا',
-    'نصائح العلاج في تركيا',
-    'تجربتي في العلاج بتركيا',
-    'medical blog Turkey',
-    'health articles Istanbul',
-    'blog médical Turquie',
-  ],
+    'أحدث المقالات والنصائح الطبية حول العلاج في تركيا، جراحة القلب، زراعة الشعر، وتجميل الأسنان بإشراف نخبة الأطباء والاستشاريين في إسطنبول.',
   openGraph: {
-    title: 'المدونة الطبية | AVICINNA Medical Blog',
+    title: 'المدونة الطبية | مقالات ونصائح السياحة العلاجية',
     description:
       'مقالات طبية متخصصة ونصائح صحية حول العلاج والسياحة العلاجية في تركيا.',
+    url: 'https://avicinna.com/blog',
+    siteName: 'AVICINNA',
     type: 'website',
   },
   alternates: {
-    canonical: '/blog',
+    canonical: 'https://avicinna.com/blog',
   },
 };
 

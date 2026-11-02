@@ -1,28 +1,18 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'أفضل أطباء وجراحين في تركيا | Best Doctors in Turkey - AVICINNA',
+  title: 'أفضل أطباء وجراحين في تركيا | نخبة استشاريي إسطنبول',
   description:
-    'تعرف على نخبة الأطباء والجراحين الاستشاريين في أفضل مستشفيات إسطنبول المعتمدة دولياً JCI. جراحة قلب، زراعة شعر، جراحة عظام، أسنان وتجميل. Top surgeons and professors in Istanbul JCI-accredited hospitals.',
-  keywords: [
-    'أفضل أطباء تركيا',
-    'جراحين إسطنبول',
-    'أطباء قلب تركيا',
-    'جراح تجميل إسطنبول',
-    'أفضل دكتور زراعة شعر تركيا',
-    'طبيب عظام إسطنبول',
-    'best doctors Turkey',
-    'top surgeons Istanbul',
-    'meilleurs chirurgiens Turquie',
-  ],
+    'تعرف على نخبة الأطباء والجراحين الاستشاريين في أفضل مستشفيات إسطنبول المعتمدة دولياً JCI. جراحة قلب، زراعة شعر، جراحة عظام، أسنان وتجميل.',
   openGraph: {
-    title: 'أفضل الأطباء والجراحين في تركيا | AVICINNA Doctors',
+    title: 'أفضل أطباء وجراحين في تركيا | نخبة استشاريي إسطنبول',
     description:
       'نخبة البروفيسورات والجراحين الاستشاريين في أرقى مستشفيات إسطنبول المعتمدة دولياً.',
+    url: 'https://avicinna.com/doctors',
     type: 'website',
   },
   alternates: {
-    canonical: '/doctors',
+    canonical: 'https://avicinna.com/doctors',
   },
 };
 

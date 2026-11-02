@@ -206,7 +206,7 @@ const DraggableHospitalRow: React.FC<DraggableHospitalRowProps> = ({
         {repeatedHospitals.map((hosp, idx) => (
           <Link
             key={`${rowId}-${hosp.id}-${idx}`}
-            href={`/hospitals?id=${hosp.id}`}
+            href={`/hospitals/${hosp.id}`}
             onClick={handleCardClick}
             draggable={false}
             dir={language === 'ar' ? 'rtl' : 'ltr'}

@@ -1,10 +1,33 @@
 'use client';
 
-import React, { useState, useMemo, useEffect, Suspense } from 'react';
+import React, { useState, useMemo, useEffect, useCallback, Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+
+function HospitalsSearchParamsHandler({
+  onParams,
+}: {
+  onParams: (search: string, city: string, specialty: string, id: string) => void;
+}) {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  useEffect(() => {
+    const paramId = searchParams.get('id') || searchParams.get('slug');
+    if (paramId) {
+      router.replace(`/hospitals/${paramId}`);
+      return;
+    }
+    const paramSearch = searchParams.get('search') || searchParams.get('q') || '';
+    const paramCity = searchParams.get('city') || 'all';
+    const paramSpecialty = searchParams.get('specialty') || 'all';
+    onParams(paramSearch, paramCity, paramSpecialty, paramId || '');
+  }, [searchParams, router, onParams]);
+
+  return null;
+}
 import { useLanguage } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
 import { HospitalPartner } from '@/data/hospitals';
@@ -133,7 +156,6 @@ function FilterDropdown({
 function HospitalsPageContent() {
   const { language, direction, t } = useLanguage();
   const { hospitals, doctors, treatments } = useData();
-  const searchParams = useSearchParams();
   const ArrowIcon = direction === 'rtl' ? ChevronLeft : ChevronRight;
   const isRtl = direction === 'rtl';
 
@@ -169,34 +191,12 @@ function HospitalsPageContent() {
   const [selectedHospital, setSelectedHospital] = useState<HospitalPartner | null>(null);
   const [hospitalSpecialtyFilter, setHospitalSpecialtyFilter] = useState<string>('all');
 
-  // Deep-linking from search or external link
-  const paramId = searchParams.get('id') || searchParams.get('slug');
-  const paramSearch = searchParams.get('search') || searchParams.get('q');
-  const paramCity = searchParams.get('city');
-  const paramSpecialty = searchParams.get('specialty');
-
-  useEffect(() => {
-    if (paramSearch) {
-      setSearchQuery(paramSearch);
-    }
-    if (paramCity) {
-      setSelectedCity(paramCity);
-    }
-    if (paramSpecialty) {
-      setSelectedSpecialty(paramSpecialty);
-    }
-    if (paramId && hospitals?.length) {
-      const matched = hospitals.find(
-        (h) =>
-          h.id.toLowerCase() === paramId.toLowerCase() ||
-          h.slug.toLowerCase() === paramId.toLowerCase()
-      );
-      if (matched) {
-        setSelectedHospital(matched);
-        setHospitalSpecialtyFilter('all');
-      }
-    }
-  }, [paramId, paramSearch, paramCity, paramSpecialty, hospitals]);
+  // Deep-linking params handler
+  const handleParams = useCallback((search: string, city: string, specialty: string) => {
+    if (search) setSearchQuery(search);
+    if (city && city !== 'all') setSelectedCity(city);
+    if (specialty && specialty !== 'all') setSelectedSpecialty(specialty);
+  }, []);
 
   // Selected Doctor for CV Modal
   const [selectedDoctorForCv, setSelectedDoctorForCv] = useState<Doctor | null>(null);
@@ -354,6 +354,9 @@ function HospitalsPageContent() {
 
   return (
     <div className="pt-28 lg:pt-36 pb-20 bg-slate-50 dark:bg-[#080E1A] min-h-screen transition-colors">
+      <Suspense fallback={null}>
+        <HospitalsSearchParamsHandler onParams={handleParams} />
+      </Suspense>
       {/* ─── Hero Header ─── */}
       <div className="bg-gradient-to-b from-[#021838] via-[#032654] to-[#043370] text-white py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
         {/* Glow ambient effects */}
@@ -840,6 +843,16 @@ function HospitalsPageContent() {
 
                         {/* Action Buttons */}
                         <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-2">
+                          {/* View Dedicated Hospital Page */}
+                          <Link
+                            href={`/hospitals/${hosp.id}`}
+                            className="w-full flex items-center justify-center gap-2 bg-sky-50 dark:bg-sky-950/40 hover:bg-sky-100 dark:hover:bg-sky-900/50 text-sky-700 dark:text-sky-300 font-bold py-2 px-4 rounded-xl border border-sky-200/80 dark:border-sky-800/60 transition-all text-xs"
+                          >
+                            <Building2 className="w-3.5 h-3.5" />
+                            <span>{language === 'ar' ? 'صفحة المستشفى والاعتمادات' : language === 'fr' ? 'Détails de l’Hôpital' : 'Hospital Profile & Details'}</span>
+                            <ArrowIcon className="w-3.5 h-3.5" />
+                          </Link>
+
                           {/* Explore Doctors button */}
                           <button
                             onClick={() => {
@@ -1492,15 +1505,5 @@ function HospitalsPageContent() {
 }
 
 export default function HospitalsPage() {
-  return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen bg-slate-50 dark:bg-[#080E1A] flex items-center justify-center">
-          <div className="w-8 h-8 rounded-full border-2 border-[#0097FB] border-t-transparent animate-spin" />
-        </div>
-      }
-    >
-      <HospitalsPageContent />
-    </Suspense>
-  );
+  return <HospitalsPageContent />;
 }

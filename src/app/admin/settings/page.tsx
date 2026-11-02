@@ -36,6 +36,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAdminGuideStatus } from '@/components/admin/AdminOnboardingGuide';
+import { useConfirmDialog } from '@/context/ConfirmDialogContext';
 
 const SETTINGS_STORAGE_KEY = 'avicinna_admin_settings_v1';
 
@@ -409,6 +410,7 @@ export default function AdminSettingsPage() {
   const [isSyncing, setIsSyncing] = useState(false);
 
   const { isEnabled: guideEnabled, setGuideEnabled } = useAdminGuideStatus();
+  const { confirm } = useConfirmDialog();
 
   // Settings State initialized from initialSiteConfig + localStorage
   const [settings, setSettings] = useState<SiteConfig>(() => {
@@ -1198,9 +1200,17 @@ export default function AdminSettingsPage() {
 
                 <button
                   type="button"
-                  onClick={() => {
-                    if (window.confirm(d.database.confirmReset)) {
+                  onClick={async () => {
+                    const ok = await confirm({
+                      title: locale === 'ar' ? 'إعادة تعيين وضبط الكاش المحلي' : 'Reset Local Cache',
+                      message: d.database.confirmReset,
+                      variant: 'warning',
+                      icon: 'refresh',
+                      confirmText: locale === 'ar' ? 'نعم، أعد الضبط' : 'Reset Cache',
+                    });
+                    if (ok) {
                       clearLocalCache();
+                      toast.success(locale === 'ar' ? 'تمت إعادة ضبط وتطهير الكاش بنجاح' : 'Local cache purged successfully.');
                     }
                   }}
                   className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 text-xs font-bold transition-all cursor-pointer"

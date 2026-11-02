@@ -4,6 +4,7 @@ import React, { useState, useRef } from 'react';
 import { uploadImageFile } from '@/lib/supabase';
 import { useLanguage } from '@/context/LanguageContext';
 import { Video, Upload, Link2, X, Play, Loader2, CheckCircle2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface VideoUploadFieldProps {
   label: string;
@@ -104,12 +105,12 @@ export function VideoUploadField({
 
   const handleFile = async (file: File) => {
     if (!file.type.startsWith('video/')) {
-      alert(t.invalidFile);
+      toast.error(t.invalidFile);
       return;
     }
 
     if (file.size > 50 * 1024 * 1024) {
-      alert(t.tooLarge);
+      toast.error(t.tooLarge);
       return;
     }
 
@@ -118,10 +119,11 @@ export function VideoUploadField({
       const resultUrl = await uploadImageFile(file, 'videos');
       if (resultUrl) {
         onVideoUrlChange(resultUrl);
+        toast.success(langKey === 'ar' ? 'تم اختيار ورفع الفيديو بنجاح!' : 'Video uploaded successfully!');
       }
     } catch (err) {
       console.error('Failed to upload video:', err);
-      alert(t.failed);
+      toast.error(t.failed);
     } finally {
       setIsUploading(false);
     }

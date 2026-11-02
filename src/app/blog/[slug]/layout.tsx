@@ -22,14 +22,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       return {
         title,
         description,
-        keywords: [
-          wpArticle.seo.focusKeyword,
-          wpArticle.title.ar,
-          wpArticle.categoryName.ar,
-          'العلاج في تركيا',
-          'سياحة علاجية إسطنبول',
-          'AVICINNA Healthcare',
-        ].filter(Boolean),
         openGraph: {
           title,
           description,

@@ -30,6 +30,8 @@ import { ModalPortal } from '@/components/admin/ModalPortal';
 import { ArticleSeoStudio } from '@/components/admin/ArticleSeoStudio';
 import { AdminSeoGuideModal } from '@/components/admin/AdminSeoGuideModal';
 import { analyzeArticleSeo } from '@/lib/seoAnalyzer';
+import { useConfirmDialog } from '@/context/ConfirmDialogContext';
+import { toast } from 'sonner';
 
 type Lang = 'ar' | 'en' | 'fr';
 
@@ -309,7 +311,7 @@ export default function AdminBlogPage() {
     const currentBody = bodies[editorTab].trim();
 
     if (!currentTitle) {
-      alert('Please enter at least a title before auto-translating.');
+      toast.error(langKey === 'ar' ? 'يرجى إدخال عنوان المقال أولاً قبل بدء الترجمة' : 'Please enter at least a title before auto-translating.');
       return;
     }
 
@@ -477,10 +479,22 @@ export default function AdminBlogPage() {
     }, 1000);
   };
 
-  const handleDelete = (art: Article) => {
+  const { confirm } = useConfirmDialog();
+
+  const handleDelete = async (art: Article) => {
     const artTitle = art.title[langKey] || art.title.ar;
-    if (window.confirm(t.deleteConfirm(artTitle))) {
+    const ok = await confirm({
+      title: langKey === 'ar' ? 'تأكيد حذف المقال الطبي' : 'Delete Clinical Article',
+      message: t.deleteConfirm(artTitle),
+      itemName: artTitle,
+      variant: 'danger',
+      icon: 'trash',
+      confirmText: langKey === 'ar' ? 'نعم، احذف المقال' : 'Delete Article',
+    });
+
+    if (ok) {
       deleteArticle(art.id);
+      toast.success(langKey === 'ar' ? `تم حذف مقال: ${artTitle}` : `Article "${artTitle}" deleted successfully.`);
     }
   };
 

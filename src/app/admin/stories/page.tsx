@@ -23,6 +23,8 @@ import confetti from 'canvas-confetti';
 import { ImageUploadField } from '@/components/admin/ImageUploadField';
 import { CustomSelect } from '@/components/admin/CustomSelect';
 import { ModalPortal } from '@/components/admin/ModalPortal';
+import { useConfirmDialog } from '@/context/ConfirmDialogContext';
+import { toast } from 'sonner';
 
 type Lang = 'ar' | 'en' | 'fr';
 
@@ -270,7 +272,7 @@ export default function AdminStoriesPage() {
     const currentFull = fullExperiences[editorTab].trim();
 
     if (!currentTitle) {
-      alert('Please enter at least a story title before translating.');
+      toast.error(langKey === 'ar' ? 'يرجى إدخال عنوان القصة أولاً قبل بدء الترجمة' : 'Please enter at least a story title before translating.');
       return;
     }
 
@@ -413,9 +415,22 @@ export default function AdminStoriesPage() {
     setModalOpen(false);
   };
 
-  const handleDelete = (s: PatientStory) => {
-    if (window.confirm(t.deleteConfirm(getPatientName(s.patientName, langKey)))) {
+  const { confirm } = useConfirmDialog();
+
+  const handleDelete = async (s: PatientStory) => {
+    const pName = getPatientName(s.patientName, langKey);
+    const ok = await confirm({
+      title: langKey === 'ar' ? 'تأكيد حذف قصة المريض' : 'Delete Patient Story',
+      message: t.deleteConfirm(pName),
+      itemName: pName,
+      variant: 'danger',
+      icon: 'trash',
+      confirmText: langKey === 'ar' ? 'نعم، احذف القصة' : 'Delete Story',
+    });
+
+    if (ok) {
       deleteStory(s.id);
+      toast.success(langKey === 'ar' ? `تم حذف تجربة ${pName} بنجاح` : `Story for "${pName}" deleted successfully.`);
     }
   };
 

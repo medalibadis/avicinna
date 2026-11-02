@@ -172,7 +172,7 @@ export function BlogClientView({ initialArticles, isLiveWp }: BlogClientViewProp
     itemListElement: paginatedArticles.map((art, index) => ({
       '@type': 'ListItem',
       position: index + 1,
-      url: `https://avicinna.netlify.app/blog/${art.slug}`,
+      url: `https://avicinna.com/blog/${art.slug}`,
       name: art.title[language] || art.title.ar,
       description: art.excerpt[language] || art.excerpt.ar,
       image: art.image,

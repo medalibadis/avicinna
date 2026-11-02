@@ -29,3 +29,10 @@
   for = "/*.(jpg|jpeg|png|webp|svg|ico)"
   [headers.values]
     Cache-Control = "public, max-age=86400, stale-while-revalidate=604800"
+
+# 301 Permanent Redirects: Eliminate duplicate content by forwarding all netlify.app traffic to avicinna.com
+[[redirects]]
+  from = "/*"
+  to = "https://avicinna.com/:splat"
+  status = 301
+  force = true

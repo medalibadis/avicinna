@@ -6,26 +6,17 @@ import type { Metadata } from 'next';
 export const revalidate = 60; // Incremental Static Regeneration (ISR) every 60s
 
 export const metadata: Metadata = {
-  title: 'المدونة الطبية | دليل العلاج والسياحة الطبية في تركيا - AVICINNA',
+  title: 'المدونة الطبية | دليل السياحة العلاجية في تركيا',
   description:
     'دليل شامل وموثق لعلاج الأورام، جراحة القلب، زراعة الشعر، وتجميل الأسنان في أفضل مستشفيات إسطنبول المعتمدة دولياً. استشارات مجانية من كبار الأطباء.',
-  keywords: [
-    'العلاج في تركيا',
-    'السياحة العلاجية تركيا',
-    'علاج الأورام إسطنبول',
-    'زراعة الشعر بالسفير',
-    'ابتسامة هوليوود تركيا',
-    'تكلفة العمليات في تركيا',
-    'AVICINNA Medical Tourism',
-  ],
   alternates: {
-    canonical: 'https://avicinna.netlify.app/blog',
+    canonical: 'https://avicinna.com/blog',
   },
   openGraph: {
-    title: 'المدونة الطبية المعتمدة | AVICINNA Healthcare Turkey',
+    title: 'المدونة الطبية | دليل السياحة العلاجية في تركيا',
     description:
       'مقالات طبية استشارية ومقارنات تكاليف موثقة لنخبة أطباء وجراحي إسطنبول لمساعدتك في اتخاذ قرارات صحية واعية.',
-    url: 'https://avicinna.netlify.app/blog',
+    url: 'https://avicinna.com/blog',
     type: 'website',
   },
 };
@@ -33,10 +24,53 @@ export const metadata: Metadata = {
 export default async function BlogPage() {
   const wpRes = await fetchWordPressPosts({ perPage: 50 });
 
+  const blogSchema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'MedicalWebPage',
+        '@id': 'https://avicinna.com/blog#webpage',
+        url: 'https://avicinna.com/blog',
+        name: 'المدونة الطبية | دليل السياحة العلاجية في تركيا',
+        description: 'دليل شامل وموثق لعلاج الأورام، جراحة القلب، زراعة الشعر وتجميل الأسنان في إسطنبول.',
+        inLanguage: 'ar',
+        publisher: {
+          '@type': 'MedicalOrganization',
+          '@id': 'https://avicinna.com/#organization',
+          name: 'AVICINNA Healthcare Turkey',
+          url: 'https://avicinna.com',
+        },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: 'الرئيسية',
+            item: 'https://avicinna.com',
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: 'المدونة الطبية',
+            item: 'https://avicinna.com/blog',
+          },
+        ],
+      },
+    ],
+  };
+
   return (
-    <BlogClientView
-      initialArticles={wpRes.posts}
-      isLiveWp={wpRes.isLiveWp}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogSchema) }}
+      />
+      <BlogClientView
+        initialArticles={wpRes.posts}
+        isLiveWp={wpRes.isLiveWp}
+      />
+    </>
   );
 }

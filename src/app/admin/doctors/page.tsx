@@ -39,6 +39,7 @@ import { CustomSelect } from '@/components/admin/CustomSelect';
 import { ModalPortal } from '@/components/admin/ModalPortal';
 import { SmartTranslatableField } from '@/components/admin/SingleInputAutoTranslator';
 import { ContextualSectionTip } from '@/components/admin/AdminOnboardingGuide';
+import { useConfirmDialog } from '@/context/ConfirmDialogContext';
 
 const DEFAULT_LANGUAGES_MAP: Record<'ar' | 'en' | 'fr', string[]> = {
   ar: [
@@ -724,7 +725,7 @@ function DoctorsContent() {
     const finalNameFr = nameFr.trim() || nameEn.trim() || nameAr.trim();
 
     if (!finalNameAr && !finalNameEn) {
-      alert(langKey === 'ar' ? 'يرجى إدخال اسم الطبيب.' : 'Please provide doctor name.');
+      showToast(langKey === 'ar' ? 'يرجى إدخال اسم الطبيب.' : 'Please provide doctor name.');
       return;
     }
 
@@ -869,13 +870,24 @@ function DoctorsContent() {
       setModalOpen(false);
     } catch (err) {
       console.error(err);
-      alert('Error saving doctor profile.');
+      showToast(langKey === 'ar' ? 'حدث خطأ أثناء حفظ الملف الطبي للطبيب' : 'Error saving doctor profile.');
     }
   };
 
+  const { confirm } = useConfirmDialog();
+
   const handleDelete = async (doc: Doctor) => {
     const docName = doc.name[langKey] || doc.name.ar;
-    if (window.confirm(d.deleteConfirm(docName))) {
+    const ok = await confirm({
+      title: langKey === 'ar' ? 'تأكيد حذف الطبيب الاستشاري' : 'Delete Physician Profile',
+      message: d.deleteConfirm(docName),
+      itemName: docName,
+      variant: 'danger',
+      icon: 'trash',
+      confirmText: langKey === 'ar' ? 'نعم، احذف الطبيب' : 'Delete Doctor',
+    });
+
+    if (ok) {
       await deleteDoctor(doc.id);
       showToast(d.deletedToast(docName));
     }

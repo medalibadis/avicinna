@@ -19,6 +19,8 @@ import {
 } from 'lucide-react';
 import { ImageUploadField } from '@/components/admin/ImageUploadField';
 import { ModalPortal } from '@/components/admin/ModalPortal';
+import { useConfirmDialog } from '@/context/ConfirmDialogContext';
+import { toast } from 'sonner';
 
 const treatmentsDict = {
   ar: {
@@ -265,10 +267,22 @@ function AdminTreatmentsContent() {
     setModalOpen(false);
   };
 
-  const handleDelete = (t: Treatment) => {
+  const { confirm } = useConfirmDialog();
+
+  const handleDelete = async (t: Treatment) => {
     const tName = t.title[langKey] || t.title.ar;
-    if (window.confirm(d.deleteConfirm(tName))) {
+    const ok = await confirm({
+      title: langKey === 'ar' ? 'تأكيد حذف التخصص الطبي' : 'Delete Clinical Specialty',
+      message: d.deleteConfirm(tName),
+      itemName: tName,
+      variant: 'danger',
+      icon: 'trash',
+      confirmText: langKey === 'ar' ? 'نعم، احذف التخصص' : 'Delete Treatment',
+    });
+
+    if (ok) {
       deleteTreatment(t.id);
+      toast.success(langKey === 'ar' ? `تم حذف ${tName} بنجاح` : `Deleted ${tName} successfully.`);
     }
   };
 

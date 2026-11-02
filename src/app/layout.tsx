@@ -8,52 +8,33 @@ const inter = Inter({
   display: "swap",
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://avicinna.netlify.app';
+const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('localhost'))
+  ? process.env.NEXT_PUBLIC_SITE_URL
+  : 'https://avicinna.com';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'AVICINNA | أفيسينا - منصة الرعاية الطبية الدولية في تركيا',
-    template: '%s | AVICINNA Healthcare Turkey',
+    default: 'أفيسينا | منصة الرعاية الطبية في تركيا',
+    template: '%s',
   },
   description:
-    'منصة أفيسينا الطبية الدولية تربطكم بأفضل الأطباء والمستشفيات المعتمدة دولياً (JCI) في تركيا. استشارة مجانية، مرافقة كاملة ورحلة علاجية متميزة في إسطنبول.',
-  keywords: [
-    'علاج في تركيا',
-    'مستشفيات إسطنبول',
-    'سياحة علاجية تركيا',
-    'زراعة شعر في تركيا',
-    'جراحة قلب تركيا',
-    'جراحة عظام إسطنبول',
-    'أفيسينا',
-    'AVICINNA',
-    'medical tourism Turkey',
-    'Istanbul hospitals JCI',
-    'best doctors Turkey',
-    'traitement médical Turquie',
-  ],
-  authors: [{ name: 'AVICINNA International Healthcare Board' }],
+    'منصة أفيسينا الطبية الدولية تربطكم بأفضل الأطباء والمستشفيات المعتمدة دولياً (JCI) في تركيا. استشارة مجانية ومرافقة طبية كاملة في إسطنبول.',
   creator: 'AVICINNA',
-  publisher: 'AVICINNA Medical Group',
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
   alternates: {
-    canonical: '/',
-    languages: {
-      'ar-SA': '/?lang=ar',
-      'en-US': '/?lang=en',
-      'fr-FR': '/?lang=fr',
-    },
+    canonical: 'https://avicinna.com',
   },
   openGraph: {
-    title: 'AVICINNA | Premier Medical Care & Surgery in Turkey',
+    title: 'أفيسينا | منصة الرعاية الطبية في تركيا',
     description:
-      'Connecting international patients with leading JCI-accredited hospitals and specialist professors in Istanbul, Turkey. Free 24h medical assessment.',
-    url: siteUrl,
-    siteName: 'AVICINNA Healthcare Turkey',
+      'ربط المرضى الدوليين بأرقى المستشفيات المعتمدة JCI ونخبة البروفيسورات في إسطنبول. استشارة مجانية وخطة علاجية متكاملة.',
+    url: 'https://avicinna.com',
+    siteName: 'AVICINNA',
     images: [
       {
         url: 'https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?q=80&w=1200&auto=format&fit=crop',
@@ -63,14 +44,13 @@ export const metadata: Metadata = {
       },
     ],
     locale: 'ar_SA',
-    alternateLocale: ['en_US', 'fr_FR'],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AVICINNA | Premier Medical Tourism in Istanbul, Turkey',
+    title: 'أفيسينا | منصة الرعاية الطبية في تركيا',
     description:
-      'Direct access to top JCI-accredited hospitals and distinguished surgical professors in Turkey. Free 24h treatment assessment.',
+      'استشارة طبية مجانية خلال 24 ساعة للعمليات الجراحية في أفضل مستشفيات إسطنبول المعتمدة دولياً.',
     images: ['https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?q=80&w=1200&auto=format&fit=crop'],
   },
   robots: {

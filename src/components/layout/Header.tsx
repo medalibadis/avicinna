@@ -158,7 +158,8 @@ export const Header: React.FC = () => {
 
             {/* Language Switcher & Primary CTA (xl+) */}
             <div className="hidden xl:flex items-center gap-2.5 2xl:gap-3 flex-shrink-0">
-              <LanguageSwitcher isScrolled={isScrolled || !isDarkHeroPage} id="header-desktop" />
+              {/* Language Switcher hidden until dedicated /en/ and /fr/ localized sub-routes and hreflang are finalized */}
+              {false && <LanguageSwitcher isScrolled={isScrolled || !isDarkHeroPage} id="header-desktop" />}
 
               {/* Celestial Liquid Theme Switcher */}
               <CelestialThemeSwitch theme={theme} onToggle={toggleTheme} />
@@ -183,7 +184,8 @@ export const Header: React.FC = () => {
 
             {/* Mobile & Tablet Controls (< xl) */}
             <div className="flex items-center gap-1 sm:gap-2 xl:hidden flex-shrink-0">
-              <LanguageSwitcher isScrolled={isScrolled || !isDarkHeroPage} id="header-mobile" />
+              {/* Language Switcher hidden until dedicated /en/ and /fr/ localized sub-routes and hreflang are finalized */}
+              {false && <LanguageSwitcher isScrolled={isScrolled || !isDarkHeroPage} id="header-mobile" />}
 
               <CelestialThemeSwitch theme={theme} onToggle={toggleTheme} />
 

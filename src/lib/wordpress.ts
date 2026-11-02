@@ -85,10 +85,14 @@ export function getWordPressUrl(): string {
 }
 
 export function getPublicSiteUrl(): string {
-  return (
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000')
-  ).replace(/\/+$/, '');
+  const envUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
+    return envUrl.replace(/\/+$/, '');
+  }
+  if (typeof window !== 'undefined' && !window.location.origin.includes('localhost')) {
+    return window.location.origin.replace(/\/+$/, '');
+  }
+  return 'https://avicinna.com';
 }
 
 /**
@@ -124,7 +128,10 @@ export function normalizeWordPressPost(raw: WordPressRawPost): WordPressArticle 
   // Clean canonical: strictly ensures it points to public Next.js domain
   const rawCanonical = raw.rank_math_seo?.canonical || '';
   const cleanCanonical = rawCanonical
-    ? rawCanonical.replace(/https?:\/\/cms\.[^/]+/i, publicBaseUrl)
+    ? rawCanonical
+        .replace(/https?:\/\/cms\.[^/]+/i, publicBaseUrl)
+        .replace(/https?:\/\/avicinna\.netlify\.app/i, publicBaseUrl)
+        .replace(/https?:\/\/localhost(:\d+)?/i, publicBaseUrl)
     : `${publicBaseUrl}/blog/${raw.slug}`;
 
   const isTitleArabic = /[\u0600-\u06FF]/.test(cleanTitle);

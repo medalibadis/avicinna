@@ -190,7 +190,7 @@ export const HeroSection: React.FC = () => {
 
     // If there is a single clear hospital match, navigate to hospital detail directly
     if (suggestions.matchingHospitals.length === 1 && suggestions.matchingDoctors.length === 0) {
-      router.push(`/hospitals?id=${suggestions.matchingHospitals[0].id}`);
+      router.push(`/hospitals/${suggestions.matchingHospitals[0].id}`);
       return;
     }
 
@@ -373,7 +373,7 @@ export const HeroSection: React.FC = () => {
                             return (
                               <Link
                                 key={hosp.id}
-                                href={`/hospitals?id=${hosp.id}`}
+                                href={`/hospitals/${hosp.id}`}
                                 onClick={() => setIsDropdownOpen(false)}
                                 className="flex items-center justify-between p-2.5 rounded-xl hover:bg-white/10 transition-colors group cursor-pointer border border-transparent hover:border-white/10"
                               >
