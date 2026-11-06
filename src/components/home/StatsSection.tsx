@@ -109,9 +109,9 @@ export const StatsSection: React.FC = () => {
   ];
 
   return (
-    <section ref={sectionRef} className="relative z-40 -mt-6 sm:-mt-10 max-w-6xl mx-auto px-3 sm:px-6 lg:px-8">
-      <div className="bg-white dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 p-3.5 sm:p-10 pt-5 sm:pt-10">
-        <div className="grid grid-cols-3 gap-1.5 sm:gap-8 divide-x rtl:divide-x-reverse divide-slate-100 dark:divide-slate-800">
+    <section ref={sectionRef} className="relative z-20 -mt-4 sm:-mt-8 md:-mt-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="bg-white dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 p-4 sm:p-8 lg:p-10 transition-all duration-300">
+        <div className="grid grid-cols-3 gap-2 sm:gap-8 divide-x rtl:divide-x-reverse divide-slate-100 dark:divide-slate-800">
           {stats.map((stat, idx) => {
             const Icon = stat.icon;
             return (

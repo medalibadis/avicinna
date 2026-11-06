@@ -13,51 +13,42 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>('light');
+  // Website is strictly locked to Luxury Light mode across all viewports (mobile & desktop)
+  const [theme] = useState<Theme>('light');
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem('avicinna_theme') as Theme | null;
-      if (saved === 'dark' || saved === 'light') {
-        setThemeState(saved);
-        if (saved === 'dark') {
-          document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
-        }
-      } else {
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if (prefersDark) {
-          setThemeState('dark');
-          document.documentElement.classList.add('dark');
-        }
+    // Strip any dark class from documentElement and body
+    if (typeof document !== 'undefined') {
+      document.documentElement.classList.remove('dark');
+      document.body.classList.remove('dark');
+      try {
+        localStorage.setItem('avicinna_theme', 'light');
+      } catch {
+        // Ignore
       }
-    } catch {
-      // Ignore localStorage errors
     }
   }, []);
 
-  const setTheme = (t: Theme) => {
-    setThemeState(t);
-    try {
-      localStorage.setItem('avicinna_theme', t);
-    } catch {
-      // Ignore
-    }
-    if (t === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
+  const setTheme = (_t: Theme) => {
+    // Strictly enforced light mode
+    if (typeof document !== 'undefined') {
       document.documentElement.classList.remove('dark');
+      document.body.classList.remove('dark');
+      try {
+        localStorage.setItem('avicinna_theme', 'light');
+      } catch {
+        // Ignore
+      }
     }
   };
 
   const toggleTheme = () => {
-    const next = theme === 'light' ? 'dark' : 'light';
-    setTheme(next);
+    // Night mode removed across mobile and desktop per client request
+    setTheme('light');
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>
+    <ThemeContext.Provider value={{ theme: 'light', toggleTheme, setTheme }}>
       {children}
     </ThemeContext.Provider>
   );

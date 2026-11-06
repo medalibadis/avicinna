@@ -11,6 +11,7 @@ import { HospitalsPartners } from '@/components/home/HospitalsPartners';
 import { FeaturedDoctors } from '@/components/home/FeaturedDoctors';
 import { ConsultationSection } from '@/components/home/ConsultationSection';
 import { PatientStoriesPreview } from '@/components/home/PatientStoriesPreview';
+import { SocialReelsSection } from '@/components/home/SocialReelsSection';
 import { MedicalBlogPreview } from '@/components/home/MedicalBlogPreview';
 import { MedicalJourneyTimeline } from '@/components/common/MedicalJourneyTimeline';
 import { FinalCTA } from '@/components/home/FinalCTA';
@@ -51,13 +52,16 @@ export default function HomePage() {
         {/* 10. Patient Stories Preview */}
         <PatientStoriesPreview />
 
-        {/* 11. Medical Blog Preview */}
+        {/* 11. Social Media Video Reels & Stories */}
+        <SocialReelsSection />
+
+        {/* 12. Medical Blog Preview */}
         <MedicalBlogPreview />
 
-        {/* 12. Medical Journey Timeline */}
+        {/* 13. Medical Journey Timeline */}
         <MedicalJourneyTimeline />
 
-        {/* 13. Final CTA */}
+        {/* 14. Final CTA */}
         <FinalCTA />
       </main>
     </>

@@ -210,6 +210,12 @@ export const doctorsData: Doctor[] = [
         'Échocardiographie transœsophagienne 3D peropératoire',
       ],
     },
+    videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-doctors-walking-in-a-modern-hospital-corridor-41446-large.mp4',
+    videoTitle: {
+      ar: 'شرح استشاري: تقنيات جراحة القلب والأوعية الدموية بالروبوت',
+      en: 'Clinical Insights: Robotic Cardiovascular Surgery Innovations',
+      fr: 'Présentation clinique : Chirurgie cardiovasculaire robotisée',
+    },
   },
   {
     id: 'doc-2',

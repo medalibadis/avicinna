@@ -252,10 +252,9 @@ function LoginForm() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
         {/* Left Column: Brand Telemetry & Executive Platform Credentials */}
         <div className="lg:col-span-5 flex flex-col justify-center space-y-6 text-start">
-          {/* Logo Showcase with Ambient Glow */}
+          {/* Clean Static Logo Showcase */}
           <div className="relative inline-block w-fit">
-            <div className="absolute -inset-4 bg-gradient-to-r from-[#0097FB]/25 to-teal-500/20 rounded-3xl blur-2xl opacity-75 pointer-events-none" />
-            <div className="relative p-2 rounded-2xl bg-slate-900/40 border border-white/5 backdrop-blur-md">
+            <div className="relative p-2 rounded-2xl bg-slate-900/40 border border-white/10 backdrop-blur-md">
               <Logo variant="full-white" size="lg" />
             </div>
           </div>

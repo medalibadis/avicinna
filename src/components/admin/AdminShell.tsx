@@ -17,6 +17,7 @@ import {
   BookOpen,
   Inbox,
   Settings,
+  Video,
   ChevronLeft,
   ChevronRight,
   PanelLeftClose,
@@ -105,6 +106,14 @@ export const NAV_ITEMS: NavItem[] = [
     icon: BookOpen,
     category: 'cms',
     shortcut: 'G B',
+  },
+  {
+    id: 'social-videos',
+    path: '/admin/social-videos',
+    label: { en: 'Social Media Reels', fr: 'Vidéos & Reels', ar: 'فيديوهات السوشيال ميديا' },
+    icon: Video,
+    category: 'cms',
+    shortcut: 'G V',
   },
   {
     id: 'inquiries',
@@ -302,19 +311,19 @@ export function AdminShell({
             aria-label="AVICINNA"
           >
             {isCollapsed ? (
-              <motion.div whileHover={{ scale: 1.08 }} className="relative h-9 w-9 flex items-center justify-center">
+              <div className="relative h-9 w-9 flex items-center justify-center">
                 <img
                   src={theme === 'dark' ? '/images/logo-icon-white.png' : '/images/logo-icon.png'}
                   alt="AVICINNA Logo"
-                  className="h-8 w-8 object-contain drop-shadow-xs"
+                  className="h-8 w-8 object-contain"
                 />
-              </motion.div>
+              </div>
             ) : (
               <div className="flex items-center gap-2.5 min-w-0">
                 <img
                   src={theme === 'dark' ? '/images/logo-icon-white.png' : '/images/logo-icon.png'}
                   alt="AVICINNA Logo"
-                  className="h-8 w-8 object-contain drop-shadow-xs shrink-0"
+                  className="h-8 w-8 object-contain shrink-0"
                 />
                 <div className="flex flex-col min-w-0">
                   <span className="text-base font-black tracking-tight text-slate-900 dark:text-white leading-tight">

@@ -1,11 +1,23 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
-import { Play, Star, MapPin, Calendar, ArrowRight, ArrowLeft, X, ShieldCheck, CheckCircle2, Stethoscope, Building2 } from 'lucide-react';
+import {
+  Play,
+  Star,
+  MapPin,
+  Calendar,
+  ArrowRight,
+  ArrowLeft,
+  X,
+  ShieldCheck,
+  CheckCircle2,
+  Stethoscope,
+  Building2,
+} from 'lucide-react';
 import { getPatientName, PatientStory } from '@/data/stories';
 
 export const PatientStoriesPreview: React.FC = () => {
@@ -13,6 +25,149 @@ export const PatientStoriesPreview: React.FC = () => {
   const { stories } = useData();
   const isRtl = direction === 'rtl';
   const [selectedStory, setSelectedStory] = useState<PatientStory | null>(null);
+
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const previewStories = stories.slice(0, 3);
+
+  // Synchronize mobile scroll tracking with active indicator dot
+  const handleScroll = useCallback(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const containerCenter = containerRect.left + containerRect.width / 2;
+
+    let closestIndex = 0;
+    let minDistance = Infinity;
+
+    cardRefs.current.forEach((el, idx) => {
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const itemCenter = rect.left + rect.width / 2;
+      const distance = Math.abs(containerCenter - itemCenter);
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestIndex = idx;
+      }
+    });
+
+    setActiveIndex(closestIndex);
+  }, []);
+
+  const scrollToCard = (index: number) => {
+    const target = cardRefs.current[index];
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      setActiveIndex(index);
+    }
+  };
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+    };
+  }, [handleScroll]);
+
+  const renderStoryCard = (story: PatientStory) => (
+    <div className="bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-200/80 dark:border-slate-800 shadow-sm hover:shadow-2xl hover:shadow-sky-500/10 transition-all duration-300 flex flex-col group h-full">
+      {/* Thumbnail / Video */}
+      <div className="relative h-60 overflow-hidden bg-slate-100 dark:bg-slate-800">
+        <img
+          src={story.image}
+          alt={getPatientName(story.patientName, language)}
+          className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-700"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent" />
+
+        {/* Treatment Pill */}
+        <div className="absolute top-3 right-3 rtl:right-auto rtl:left-3 bg-[#0097FB] text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-md">
+          {story.treatment[language]}
+        </div>
+
+        {/* Acoustic Pulse Wave Play Button */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <button
+            type="button"
+            onClick={() => setSelectedStory(story)}
+            aria-label="Play patient story video"
+            className="group/btn relative flex items-center justify-center cursor-pointer p-3"
+          >
+            {/* Acoustic wave ripple waves */}
+            <span className="absolute inset-0 rounded-full bg-sky-400/35 animate-ping opacity-75" />
+            <span className="absolute -inset-2 rounded-full bg-teal-400/30 animate-pulse" />
+            <div className="relative w-14 h-14 rounded-full bg-white/95 dark:bg-slate-950/90 text-[#0097FB] dark:text-sky-400 shadow-2xl flex items-center justify-center group-hover/btn:scale-115 group-hover/btn:bg-gradient-to-br group-hover/btn:from-sky-500 group-hover/btn:to-teal-500 group-hover/btn:text-white transition-all duration-300 border border-white/20">
+              <Play className="w-6 h-6 fill-current ml-0.5" />
+            </div>
+          </button>
+        </div>
+
+        {/* Patient Country & Duration */}
+        <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white text-xs">
+          <span className="font-bold flex items-center gap-1.5">
+            <MapPin className="w-3.5 h-3.5 text-[#00BFFF]" />
+            {story.country[language]}
+          </span>
+          <span className="bg-black/50 px-2.5 py-0.5 rounded-full text-[11px] backdrop-blur-xs font-medium">
+            {story.duration[language]}
+          </span>
+        </div>
+      </div>
+
+      {/* Story Content */}
+      <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
+        <div>
+          <div className="flex items-center gap-1 mb-2">
+            {[...Array(5)].map((_, i) => (
+              <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+            ))}
+          </div>
+
+          <h3
+            onClick={() => setSelectedStory(story)}
+            className="text-base sm:text-lg font-bold text-[#032654] dark:text-white mb-2 leading-snug group-hover:text-[#0097FB] dark:group-hover:text-sky-400 transition-colors cursor-pointer"
+          >
+            {story.title[language]}
+          </h3>
+
+          <p className="text-xs sm:text-sm text-[#64748B] dark:text-slate-400 leading-relaxed line-clamp-3">
+            {story.shortStory[language]}
+          </p>
+        </div>
+
+        {/* Link to Detail Page or Lightbox */}
+        <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+          <button
+            type="button"
+            onClick={() => setSelectedStory(story)}
+            className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-[#0097FB] hover:text-[#032654] dark:hover:text-white transition-colors cursor-pointer"
+          >
+            <span>
+              {language === 'ar'
+                ? 'مشاهدة تجربة التعافي'
+                : language === 'fr'
+                ? 'Voir le Témoignage'
+                : 'Watch Story & Recovery'}
+            </span>
+            <Play className="w-3 h-3 fill-current" />
+          </button>
+
+          <Link
+            href={`/patient-stories/${story.slug}`}
+            className="text-xs font-semibold text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
+          >
+            {isRtl ? <ArrowLeft className="w-3.5 h-3.5" /> : <ArrowRight className="w-3.5 h-3.5" />}
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <section id="stories" className="py-20 bg-white dark:bg-[#080E1A] transition-colors">
@@ -30,94 +185,50 @@ export const PatientStoriesPreview: React.FC = () => {
           </p>
         </div>
 
-        {/* Stories Grid (3 cards) */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-          {stories.slice(0, 3).map((story) => (
-            <div
-              key={story.id}
-              className="bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-200/80 dark:border-slate-800 shadow-sm hover:shadow-2xl hover:shadow-sky-500/10 transition-all duration-300 flex flex-col group"
-            >
-              {/* Thumbnail / Video */}
-              <div className="relative h-60 overflow-hidden bg-slate-100 dark:bg-slate-800">
-                <img
-                  src={story.image}
-                  alt={getPatientName(story.patientName, language)}
-                  className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-700"
+        {/* ─── MOBILE VIEW ONLY (< md): Horizontal Swipeable Carousel ─── */}
+        <div className="block md:hidden mb-8">
+          <div
+            ref={scrollContainerRef}
+            className="flex overflow-x-auto snap-x snap-mandatory scrollbar-none [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden -mx-4 px-4 sm:-mx-6 sm:px-6 gap-4 pb-4 pt-1"
+            style={{ WebkitOverflowScrolling: 'touch' }}
+          >
+            {previewStories.map((story, idx) => (
+              <div
+                key={story.id}
+                ref={(el) => {
+                  cardRefs.current[idx] = el;
+                }}
+                className="w-[86vw] max-w-[360px] flex-shrink-0 snap-center"
+              >
+                {renderStoryCard(story)}
+              </div>
+            ))}
+          </div>
+
+          {/* Mobile Swipe Pagination Dots Indicator */}
+          {previewStories.length > 1 && (
+            <div className="flex items-center justify-center gap-1.5 pt-2 pb-1">
+              {previewStories.map((_, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  aria-label={`Story slide ${idx + 1}`}
+                  onClick={() => scrollToCard(idx)}
+                  className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                    activeIndex === idx
+                      ? 'w-6 bg-[#0097FB] dark:bg-sky-400'
+                      : 'w-1.5 bg-slate-300 dark:bg-slate-700 hover:bg-slate-400'
+                  }`}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent" />
-
-                {/* Treatment Pill */}
-                <div className="absolute top-3 right-3 rtl:right-auto rtl:left-3 bg-[#0097FB] text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-md">
-                  {story.treatment[language]}
-                </div>
-
-                {/* Acoustic Pulse Wave Play Button */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <button
-                    type="button"
-                    onClick={() => setSelectedStory(story)}
-                    aria-label="Play patient story video"
-                    className="group/btn relative flex items-center justify-center cursor-pointer p-3"
-                  >
-                    {/* Acoustic wave ripple waves */}
-                    <span className="absolute inset-0 rounded-full bg-sky-400/35 animate-ping opacity-75" />
-                    <span className="absolute -inset-2 rounded-full bg-teal-400/30 animate-pulse" />
-                    <div className="relative w-14 h-14 rounded-full bg-white/95 dark:bg-slate-950/90 text-[#0097FB] dark:text-sky-400 shadow-2xl flex items-center justify-center group-hover/btn:scale-115 group-hover/btn:bg-gradient-to-br group-hover/btn:from-sky-500 group-hover/btn:to-teal-500 group-hover/btn:text-white transition-all duration-300 border border-white/20">
-                      <Play className="w-6 h-6 fill-current ml-0.5" />
-                    </div>
-                  </button>
-                </div>
-
-                {/* Patient Country & Duration */}
-                <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white text-xs">
-                  <span className="font-bold flex items-center gap-1.5">
-                    <MapPin className="w-3.5 h-3.5 text-[#00BFFF]" />
-                    {story.country[language]}
-                  </span>
-                  <span className="bg-black/50 px-2.5 py-0.5 rounded-full text-[11px] backdrop-blur-xs font-medium">
-                    {story.duration[language]}
-                  </span>
-                </div>
-              </div>
-
-              {/* Story Content */}
-              <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
-                <div>
-                  <div className="flex items-center gap-1 mb-2">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                    ))}
-                  </div>
-
-                  <h3 className="text-base sm:text-lg font-bold text-[#032654] dark:text-white mb-2 leading-snug group-hover:text-[#0097FB] dark:group-hover:text-sky-400 transition-colors">
-                    {story.title[language]}
-                  </h3>
-
-                  <p className="text-xs sm:text-sm text-[#64748B] dark:text-slate-400 leading-relaxed line-clamp-3">
-                    {story.shortStory[language]}
-                  </p>
-                </div>
-
-                {/* Link to Detail Page or Lightbox */}
-                <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                  <button
-                    type="button"
-                    onClick={() => setSelectedStory(story)}
-                    className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-[#0097FB] hover:text-[#032654] dark:hover:text-white transition-colors cursor-pointer"
-                  >
-                    <span>{language === 'ar' ? 'مشاهدة تجربة التعافي' : language === 'fr' ? 'Voir le Témoignage' : 'Watch Story & Recovery'}</span>
-                    <Play className="w-3 h-3 fill-current" />
-                  </button>
-
-                  <Link
-                    href={`/patient-stories/${story.slug}`}
-                    className="text-xs font-semibold text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
-                  >
-                    {isRtl ? <ArrowLeft className="w-3.5 h-3.5" /> : <ArrowRight className="w-3.5 h-3.5" />}
-                  </Link>
-                </div>
-              </div>
+              ))}
             </div>
+          )}
+        </div>
+
+        {/* ─── DESKTOP VIEW ONLY (>= md): 3-Column Grid ─── */}
+        <div className="hidden md:grid md:grid-cols-3 gap-8 mb-12">
+          {previewStories.map((story) => (
+            <div key={story.id}>{renderStoryCard(story)}</div>
           ))}
         </div>
 
@@ -187,7 +298,8 @@ export const PatientStoriesPreview: React.FC = () => {
               {/* Video Player Presentation */}
               <div className="relative aspect-video w-full bg-black">
                 <video
-                  src="/videos/logo-reveal.mp4"
+                  src="https://assets.mixkit.co/videos/preview/mixkit-doctors-walking-in-a-modern-hospital-corridor-41446-large.mp4"
+                  poster={selectedStory.image}
                   autoPlay
                   controls
                   playsInline

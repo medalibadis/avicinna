@@ -26,10 +26,11 @@ import {
   Activity,
   CheckCircle2,
   Clock,
-  Building2,
-  UserCheck,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import Link from 'next/link';
+import { useRef } from 'react';
 
 export function LuxuryCinemaHero({ locale = 'ar' }: { locale?: 'ar' | 'fr' | 'en' }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -355,12 +356,34 @@ const JOURNEY_STEPS = [
 export function InteractivePatientJourney({ locale = 'ar' }: { locale?: 'ar' | 'fr' | 'en' }) {
   const [activeStep, setActiveStep] = useState(0);
   const isRTL = locale === 'ar';
+  const mobileScrollRef = useRef<HTMLDivElement>(null);
+  const mobileButtonRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  const handleSelectStep = (idx: number) => {
+    setActiveStep(idx);
+    const target = mobileButtonRefs.current[idx];
+    if (target && mobileScrollRef.current) {
+      target.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+  };
+
+  const handlePrev = () => {
+    if (activeStep > 0) {
+      handleSelectStep(activeStep - 1);
+    }
+  };
+
+  const handleNext = () => {
+    if (activeStep < JOURNEY_STEPS.length - 1) {
+      handleSelectStep(activeStep + 1);
+    }
+  };
 
   return (
     <section
       id="patient-journey"
       dir={isRTL ? 'rtl' : 'ltr'}
-      className="relative overflow-hidden bg-slate-50 py-24 dark:bg-[#070E1C] transition-colors"
+      className="relative overflow-hidden bg-slate-50 py-14 sm:py-24 dark:bg-[#070E1C] transition-colors"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="text-center max-w-3xl mx-auto">
@@ -371,14 +394,14 @@ export function InteractivePatientJourney({ locale = 'ar' }: { locale?: 'ar' | '
               ? 'Parcours Patient Accompagné'
               : 'Seamless Recovery Protocol'}
           </span>
-          <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl dark:text-white text-balance">
+          <h2 className="mt-3 text-2xl sm:text-4xl font-black tracking-tight text-slate-900 dark:text-white text-balance">
             {locale === 'ar'
               ? 'رحلتك العلاجية معنا من الاستفسار إلى تمام الشفاء'
               : locale === 'fr'
               ? 'Votre Parcours de Soins en 8 Étapes Claires'
               : 'Your 8-Step Medical Journey from Inquiry to Recovery'}
           </h2>
-          <p className="mt-3 text-sm text-slate-600 dark:text-slate-400">
+          <p className="mt-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
             {locale === 'ar'
               ? 'نضمن لك تجربة علاجية سلسة وآمنة وفق أرقى المعايير العالمية مع مرافقة شخصية على مدار الساعة.'
               : locale === 'fr'
@@ -387,8 +410,50 @@ export function InteractivePatientJourney({ locale = 'ar' }: { locale?: 'ar' | '
           </p>
         </div>
 
-        {/* Interactive 8-Step Bento Stepper with Connected Visual Beam */}
-        <div className="mt-12 grid grid-cols-2 gap-3.5 sm:grid-cols-4 lg:grid-cols-8 relative">
+        {/* Mobile Horizontal Snap Carousel Stepper (< sm) */}
+        <div
+          ref={mobileScrollRef}
+          className="mt-6 flex sm:hidden overflow-x-auto snap-x snap-mandatory gap-2.5 pb-2 pt-1 no-scrollbar -mx-4 px-4 scroll-smooth"
+        >
+          {JOURNEY_STEPS.map((step, idx) => {
+            const Icon = step.icon;
+            const isSelected = activeStep === idx;
+            return (
+              <button
+                key={step.num}
+                ref={(el) => {
+                  mobileButtonRefs.current[idx] = el;
+                }}
+                type="button"
+                onClick={() => handleSelectStep(idx)}
+                className={`shrink-0 snap-center min-w-[120px] max-w-[130px] rounded-2xl border p-3 flex flex-col items-center justify-center text-center transition-all ${
+                  isSelected
+                    ? 'border-sky-500 bg-white text-slate-950 shadow-lg shadow-sky-500/15 dark:bg-slate-900 dark:text-white ring-2 ring-sky-500/40 scale-[1.02]'
+                    : 'border-slate-200/80 bg-white/70 text-slate-600 hover:bg-white dark:border-slate-800 dark:bg-slate-900/40 dark:text-slate-400'
+                }`}
+              >
+                <span className="font-mono text-xs font-black text-sky-600 dark:text-sky-400 tabular-nums">
+                  {step.num}
+                </span>
+                <div
+                  className={`my-2 flex h-9 w-9 items-center justify-center rounded-xl transition-colors ${
+                    isSelected
+                      ? 'bg-gradient-to-br from-sky-500 to-teal-500 text-white shadow-sm'
+                      : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'
+                  }`}
+                >
+                  <Icon className="h-4 w-4" />
+                </div>
+                <span className="text-[11px] font-bold leading-snug line-clamp-1">
+                  {step.title[locale]}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Desktop Bento Stepper (>= sm) */}
+        <div className="mt-12 hidden sm:grid sm:grid-cols-4 lg:grid-cols-8 gap-3.5 relative">
           {JOURNEY_STEPS.map((step, idx) => {
             const Icon = step.icon;
             const isSelected = activeStep === idx;
@@ -440,34 +505,86 @@ export function InteractivePatientJourney({ locale = 'ar' }: { locale?: 'ar' | '
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -14 }}
             transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-            className="mx-auto mt-8 flex max-w-3xl flex-col items-center justify-between gap-5 rounded-3xl border border-sky-500/30 bg-white p-6 shadow-xl sm:flex-row dark:bg-slate-900/95 backdrop-blur-xl"
+            className="mx-auto mt-5 sm:mt-8 flex max-w-3xl flex-col items-stretch gap-4 rounded-3xl border border-sky-500/30 bg-white p-5 sm:p-6 shadow-xl dark:bg-slate-900/95 backdrop-blur-xl"
           >
-            <div className="flex items-center gap-4">
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-500 to-teal-500 text-xl font-black text-white tabular-nums shadow-lg shadow-sky-500/20">
-                {JOURNEY_STEPS[activeStep].num}
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="text-lg font-extrabold text-slate-900 dark:text-white">
-                    {JOURNEY_STEPS[activeStep].title[locale]}
-                  </h3>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-700 dark:text-teal-300 border border-teal-500/20">
-                    {JOURNEY_STEPS[activeStep].badge[locale]}
-                  </span>
+            {/* Mobile Step Counter & Navigation Header */}
+            <div className="flex sm:hidden items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-sky-600 dark:text-sky-400">
+                  {locale === 'ar'
+                    ? `الخطوة ${activeStep + 1} من ${JOURNEY_STEPS.length}`
+                    : locale === 'fr'
+                    ? `Étape ${activeStep + 1} sur ${JOURNEY_STEPS.length}`
+                    : `Step ${activeStep + 1} of ${JOURNEY_STEPS.length}`}
+                </span>
+                <div className="flex items-center gap-1">
+                  {JOURNEY_STEPS.map((_, i) => (
+                    <span
+                      key={i}
+                      className={`h-1.5 rounded-full transition-all ${
+                        i === activeStep
+                          ? 'w-4 bg-sky-500'
+                          : i < activeStep
+                          ? 'w-1.5 bg-teal-500'
+                          : 'w-1.5 bg-slate-200 dark:bg-slate-700'
+                      }`}
+                    />
+                  ))}
                 </div>
-                <p className="mt-1 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                  {JOURNEY_STEPS[activeStep].desc[locale]}
-                </p>
+              </div>
+
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={isRTL ? handleNext : handlePrev}
+                  disabled={isRTL ? activeStep === JOURNEY_STEPS.length - 1 : activeStep === 0}
+                  className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  aria-label="Previous step"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={isRTL ? handlePrev : handleNext}
+                  disabled={isRTL ? activeStep === 0 : activeStep === JOURNEY_STEPS.length - 1}
+                  className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  aria-label="Next step"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
               </div>
             </div>
 
-            <a
-              href="#consultation"
-              className="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-teal-600 hover:from-sky-700 hover:to-teal-700 text-white text-xs font-bold shadow-md shadow-sky-600/20 active:scale-95 transition-all"
-            >
-              <span>{locale === 'ar' ? 'ابدأ خطوتك الآن' : 'Start Step Now'}</span>
-              {isRTL ? <ArrowLeft className="w-3.5 h-3.5" /> : <ArrowRight className="w-3.5 h-3.5" />}
-            </a>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-start sm:items-center gap-4">
+                <div className="flex h-12 w-12 sm:h-14 sm:w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-500 to-teal-500 text-lg sm:text-xl font-black text-white tabular-nums shadow-lg shadow-sky-500/20">
+                  {JOURNEY_STEPS[activeStep].num}
+                </div>
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white">
+                      {JOURNEY_STEPS[activeStep].title[locale]}
+                    </h3>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-700 dark:text-teal-300 border border-teal-500/20">
+                      {JOURNEY_STEPS[activeStep].badge[locale]}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                    {JOURNEY_STEPS[activeStep].desc[locale]}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 self-end sm:self-auto shrink-0 w-full sm:w-auto">
+                <a
+                  href="#consultation"
+                  className="w-full sm:w-auto text-center inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-teal-600 hover:from-sky-700 hover:to-teal-700 text-white text-xs font-bold shadow-md shadow-sky-600/20 active:scale-95 transition-all"
+                >
+                  <span>{locale === 'ar' ? 'ابدأ خطوتك الآن' : 'Start Step Now'}</span>
+                  {isRTL ? <ArrowLeft className="w-3.5 h-3.5" /> : <ArrowRight className="w-3.5 h-3.5" />}
+                </a>
+              </div>
+            </div>
           </motion.div>
         </AnimatePresence>
       </div>

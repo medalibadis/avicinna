@@ -7,6 +7,7 @@ import { PatientStory, patientStoriesData } from '@/data/stories';
 import { Article, articlesData } from '@/data/articles';
 import { HospitalPartner, hospitalsData } from '@/data/hospitals';
 import { initialInquiriesData } from '@/data/inquiries';
+import { SocialVideo, initialSocialVideos } from '@/data/socialVideos';
 import {
   isSupabaseConfigured,
   fetchSectionsFromDb,
@@ -224,6 +225,11 @@ export interface DataContextType {
   addInquiry: (inquiry: Omit<ConsultationInquiry, 'id' | 'trackingId' | 'createdAt' | 'status'>) => Promise<string>;
   updateInquiryStatus: (id: string, status: ConsultationInquiry['status']) => Promise<void>;
   deleteInquiry: (id: string) => Promise<void>;
+  // Social Videos / Reels
+  socialVideos: SocialVideo[];
+  addSocialVideo: (video: SocialVideo) => Promise<void>;
+  updateSocialVideo: (video: SocialVideo) => Promise<void>;
+  deleteSocialVideo: (id: string) => Promise<void>;
   // Clear local cache
   clearLocalCache: () => void;
 }
@@ -333,6 +339,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const [hospitals, setHospitals] = useState<HospitalPartner[]>(hospitalsData);
   const [sections, setSections] = useState<SiteSectionsData>(defaultSections);
   const [inquiries, setInquiries] = useState<ConsultationInquiry[]>(initialInquiriesData);
+  const [socialVideos, setSocialVideos] = useState<SocialVideo[]>(initialSocialVideos);
   const [isLoaded, setIsLoaded] = useState(false);
   const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'synced' | 'error'>('idle');
 
@@ -424,6 +431,18 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         setHospitals(hospitalsData);
         setInquiries(initialInquiriesData);
       }
+
+      const savedVideos = localStorage.getItem('avicinna_social_videos');
+      if (savedVideos) {
+        try {
+          const parsedVids = JSON.parse(savedVideos);
+          if (Array.isArray(parsedVids) && parsedVids.length > 0) {
+            setSocialVideos(parsedVids);
+          }
+        } catch {
+          // fallback to initial
+        }
+      }
     } catch (e) {
       console.error('Failed to load CMS data from localStorage:', e);
       setDoctors(doctorsData);
@@ -455,10 +474,11 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         inquiries,
       };
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(payload));
+      localStorage.setItem('avicinna_social_videos', JSON.stringify(socialVideos));
     } catch (e) {
       console.error('Failed to save CMS data to localStorage:', e);
     }
-  }, [doctors, treatments, stories, articles, hospitals, sections, inquiries, isLoaded]);
+  }, [doctors, treatments, stories, articles, hospitals, sections, inquiries, socialVideos, isLoaded]);
 
   // Doctor CRUD
   const addDoctor = async (doc: Doctor) => {
@@ -674,6 +694,19 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // Social Videos CRUD
+  const addSocialVideo = async (video: SocialVideo) => {
+    setSocialVideos((prev) => [video, ...prev]);
+  };
+
+  const updateSocialVideo = async (video: SocialVideo) => {
+    setSocialVideos((prev) => prev.map((v) => (v.id === video.id ? video : v)));
+  };
+
+  const deleteSocialVideo = async (id: string) => {
+    setSocialVideos((prev) => prev.filter((v) => v.id !== id));
+  };
+
   return (
     <DataContext.Provider
       value={{
@@ -684,6 +717,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         hospitals,
         sections,
         inquiries,
+        socialVideos,
         isSupabaseConnected: isSupabaseConfigured,
         syncStatus,
         refreshFromSupabase,
@@ -706,6 +740,9 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         addInquiry,
         updateInquiryStatus,
         deleteInquiry,
+        addSocialVideo,
+        updateSocialVideo,
+        deleteSocialVideo,
         clearLocalCache,
       }}
     >

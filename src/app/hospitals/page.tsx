@@ -485,24 +485,9 @@ function HospitalsPageContent() {
                 )}
               </div>
 
-              {/* Middle Row: 3 Structured Dropdown Selectors */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 pt-1">
-                {/* 1. Location / City */}
-                <div className="bg-slate-50/80 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-3 hover:border-[#0097FB]/40 dark:hover:border-sky-500/50 transition-colors">
-                  <FilterDropdown
-                    id="city"
-                    label={content.filterByCity}
-                    icon={MapPin}
-                    value={selectedCity}
-                    options={cityOptions}
-                    onChange={setSelectedCity}
-                    isOpen={openDropdown === 'city'}
-                    onToggle={() => toggleDropdown('city')}
-                  />
-                </div>
-
-                {/* 2. Medical Specialty */}
-                <div className="bg-slate-50/80 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-3 hover:border-[#0097FB]/40 dark:hover:border-sky-500/50 transition-colors">
+              {/* Middle Row: Structured Specialty Selector */}
+              <div className="pt-1">
+                <div className="bg-slate-50/80 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-3 hover:border-[#0097FB]/40 dark:hover:border-sky-500/50 transition-colors shadow-xs">
                   <FilterDropdown
                     id="specialty"
                     label={content.filterBySpecialty}
@@ -512,20 +497,6 @@ function HospitalsPageContent() {
                     onChange={setSelectedSpecialty}
                     isOpen={openDropdown === 'specialty'}
                     onToggle={() => toggleDropdown('specialty')}
-                  />
-                </div>
-
-                {/* 3. Accreditation */}
-                <div className="bg-slate-50/80 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-3 hover:border-emerald-500/40 dark:hover:border-emerald-400/50 transition-colors">
-                  <FilterDropdown
-                    id="accreditation"
-                    label={content.filterByAccreditation}
-                    icon={ShieldCheck}
-                    value={selectedAccreditation}
-                    options={accreditationOptions}
-                    onChange={setSelectedAccreditation}
-                    isOpen={openDropdown === 'accreditation'}
-                    onToggle={() => toggleDropdown('accreditation')}
                   />
                 </div>
               </div>
@@ -541,60 +512,12 @@ function HospitalsPageContent() {
                   <button
                     onClick={handleResetFilters}
                     className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer ${
-                      selectedCity === 'all' && selectedSpecialty === 'all' && selectedAccreditation === 'all' && !searchQuery
+                      selectedSpecialty === 'all' && !searchQuery
                         ? 'bg-[#032654] dark:bg-sky-500 text-white shadow-sm'
                         : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'
                     }`}
                   >
                     {language === 'ar' ? 'الكل' : language === 'fr' ? 'Tous' : 'All'} ({hospitals?.length || 11})
-                  </button>
-
-                  {/* Istanbul Europe */}
-                  <button
-                    onClick={() => setSelectedCity(selectedCity === 'istanbul-europe' ? 'all' : 'istanbul-europe')}
-                    className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer ${
-                      selectedCity === 'istanbul-europe'
-                        ? 'bg-[#0097FB] text-white shadow-sm'
-                        : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'
-                    }`}
-                  >
-                    {content.cityEurope}
-                  </button>
-
-                  {/* Istanbul Asia */}
-                  <button
-                    onClick={() => setSelectedCity(selectedCity === 'istanbul-asia' ? 'all' : 'istanbul-asia')}
-                    className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer ${
-                      selectedCity === 'istanbul-asia'
-                        ? 'bg-[#0097FB] text-white shadow-sm'
-                        : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'
-                    }`}
-                  >
-                    {content.cityAsia}
-                  </button>
-
-                  {/* Ankara */}
-                  <button
-                    onClick={() => setSelectedCity(selectedCity === 'ankara' ? 'all' : 'ankara')}
-                    className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer ${
-                      selectedCity === 'ankara'
-                        ? 'bg-[#0097FB] text-white shadow-sm'
-                        : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'
-                    }`}
-                  >
-                    {content.cityAnkara}
-                  </button>
-
-                  {/* JCI */}
-                  <button
-                    onClick={() => setSelectedAccreditation(selectedAccreditation === 'JCI' ? 'all' : 'JCI')}
-                    className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer ${
-                      selectedAccreditation === 'JCI'
-                        ? 'bg-emerald-600 text-white shadow-sm'
-                        : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'
-                    }`}
-                  >
-                    JCI
                   </button>
 
                   {/* Cardiology */}
@@ -632,6 +555,42 @@ function HospitalsPageContent() {
                   >
                     {language === 'ar' ? 'جراحة العظام' : language === 'fr' ? 'Orthopédie' : 'Orthopedics'}
                   </button>
+
+                  {/* Neurosurgery */}
+                  <button
+                    onClick={() => setSelectedSpecialty(selectedSpecialty === 'neurosurgery' ? 'all' : 'neurosurgery')}
+                    className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer ${
+                      selectedSpecialty === 'neurosurgery'
+                        ? 'bg-[#0097FB] text-white shadow-sm'
+                        : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'
+                    }`}
+                  >
+                    {language === 'ar' ? 'جراحة الأعصاب' : language === 'fr' ? 'Neurochirurgie' : 'Neurosurgery'}
+                  </button>
+
+                  {/* Hair Transplant */}
+                  <button
+                    onClick={() => setSelectedSpecialty(selectedSpecialty === 'hair-transplant' ? 'all' : 'hair-transplant')}
+                    className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer ${
+                      selectedSpecialty === 'hair-transplant'
+                        ? 'bg-[#0097FB] text-white shadow-sm'
+                        : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'
+                    }`}
+                  >
+                    {language === 'ar' ? 'زراعة الشعر' : language === 'fr' ? 'Greffe de Cheveux' : 'Hair Transplant'}
+                  </button>
+
+                  {/* Dentistry */}
+                  <button
+                    onClick={() => setSelectedSpecialty(selectedSpecialty === 'dentistry' ? 'all' : 'dentistry')}
+                    className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer ${
+                      selectedSpecialty === 'dentistry'
+                        ? 'bg-[#0097FB] text-white shadow-sm'
+                        : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'
+                    }`}
+                  >
+                    {language === 'ar' ? 'طب الأسنان' : language === 'fr' ? 'Dentisterie' : 'Dentistry'}
+                  </button>
                 </div>
               </div>
 
@@ -654,28 +613,10 @@ function HospitalsPageContent() {
 
                 {/* Active Filter Badges and Reset button */}
                 <div className="flex flex-wrap items-center gap-2">
-                  {selectedCity !== 'all' && (
-                    <span className="inline-flex items-center gap-1 bg-[#032654]/10 dark:bg-sky-500/20 text-[#032654] dark:text-sky-300 font-bold px-2.5 py-1 rounded-lg text-[11px] border border-transparent dark:border-sky-500/30">
-                      <span>{cityOptions.find((c) => c.id === selectedCity)?.label}</span>
-                      <button onClick={() => setSelectedCity('all')} className="hover:text-red-500 cursor-pointer" aria-label="Remove city filter">
-                        <X className="w-3 h-3" />
-                      </button>
-                    </span>
-                  )}
-
                   {selectedSpecialty !== 'all' && (
                     <span className="inline-flex items-center gap-1 bg-[#0097FB]/10 dark:bg-sky-500/20 text-[#0097FB] dark:text-sky-300 font-bold px-2.5 py-1 rounded-lg text-[11px] border border-transparent dark:border-sky-500/30">
                       <span>{specialtyOptions.find((s) => s.id === selectedSpecialty)?.label}</span>
                       <button onClick={() => setSelectedSpecialty('all')} className="hover:text-red-500 cursor-pointer" aria-label="Remove specialty filter">
-                        <X className="w-3 h-3" />
-                      </button>
-                    </span>
-                  )}
-
-                  {selectedAccreditation !== 'all' && (
-                    <span className="inline-flex items-center gap-1 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 font-bold px-2.5 py-1 rounded-lg text-[11px] border border-transparent dark:border-emerald-500/30">
-                      <span>{accreditationOptions.find((a) => a.id === selectedAccreditation)?.label}</span>
-                      <button onClick={() => setSelectedAccreditation('all')} className="hover:text-red-500 cursor-pointer" aria-label="Remove accreditation filter">
                         <X className="w-3 h-3" />
                       </button>
                     </span>
@@ -690,10 +631,7 @@ function HospitalsPageContent() {
                     </span>
                   )}
 
-                  {(selectedCity !== 'all' ||
-                    selectedSpecialty !== 'all' ||
-                    selectedAccreditation !== 'all' ||
-                    searchQuery) && (
+                  {(selectedSpecialty !== 'all' || searchQuery) && (
                     <button
                       onClick={handleResetFilters}
                       className="inline-flex items-center gap-1 text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors ps-2 cursor-pointer"

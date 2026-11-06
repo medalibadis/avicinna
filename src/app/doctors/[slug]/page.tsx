@@ -37,7 +37,7 @@ function getEmbedUrl(url?: string): string {
   if (!url) return '';
   const trimmed = url.trim();
 
-  const ytMatch = trimmed.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  const ytMatch = trimmed.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
   if (ytMatch && ytMatch[1]) {
     return `https://www.youtube.com/embed/${ytMatch[1]}`;
   }
@@ -454,6 +454,18 @@ export default function DoctorDetailPage() {
                 <Calendar className="w-4 h-4" />
                 <span>{content.requestConsultationBtn}</span>
               </Link>
+
+              {hasVideo && (
+                <a
+                  href="#video"
+                  className="inline-flex items-center gap-2 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/60 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800 text-xs sm:text-sm font-bold px-5 py-3 rounded-xl shadow-xs transition-all cursor-pointer"
+                >
+                  <Play className="w-4 h-4 fill-current" />
+                  <span>
+                    {language === 'ar' ? 'فيديو وشرح الطبيب' : language === 'fr' ? 'Vidéo du médecin' : 'Doctor Video'}
+                  </span>
+                </a>
+              )}
             </div>
           </div>
         </div>

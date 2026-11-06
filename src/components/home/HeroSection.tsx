@@ -75,6 +75,27 @@ const heroSearchDict = {
   },
 };
 
+const mobileHeroText = {
+  ar: {
+    eyebrow: 'وجهتكم الأولى للرعاية الصحية في إسطنبول',
+    headlinePart1: 'أفضل المستشفيات وأشهر الأطباء في تركيا ',
+    headlineHighlight: 'لرعايتكم الصحية',
+    subtitle: 'نربطكم بأعلى المستشفيات المعتمدة دولياً (JCI) مع استشارة مجانية فورية.',
+  },
+  en: {
+    eyebrow: 'Premier Healthcare in Istanbul',
+    headlinePart1: "Turkey's Top Hospitals & Elite Surgeons for ",
+    headlineHighlight: 'Your Healthcare',
+    subtitle: 'Connecting you with JCI-accredited hospitals and free instant consultation.',
+  },
+  fr: {
+    eyebrow: "Soins Médicaux d'Excellence à Istanbul",
+    headlinePart1: 'Les Meilleurs Hôpitaux et Chirurgiens de Turquie pour ',
+    headlineHighlight: 'Votre Santé',
+    subtitle: 'Accédez aux hôpitaux accrédités JCI avec une consultation gratuite immédiate.',
+  },
+};
+
 export const HeroSection: React.FC = () => {
   const { t, language, direction } = useLanguage();
   const { sections, doctors, hospitals, treatments } = useData();
@@ -211,9 +232,9 @@ export const HeroSection: React.FC = () => {
   };
 
   return (
-    <section className="relative z-30 min-h-0 sm:min-h-[90vh] flex items-center justify-center pt-24 sm:pt-28 pb-10 sm:pb-16 bg-[#032654] w-full max-w-full overflow-x-clip">
-      {/* 1. AUTO-PLAYING AMBIENT MEDICAL VIDEO BACKGROUND */}
-      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+    <section className="relative z-30 min-h-0 md:min-h-[85vh] flex items-center justify-center pt-20 sm:pt-24 md:pt-28 pb-10 sm:pb-14 md:pb-20 bg-[#032654] w-full max-w-full overflow-x-clip">
+      {/* 1A. DESKTOP & TABLET: AUTO-PLAYING AMBIENT MEDICAL VIDEO BACKGROUND (>= 768px) */}
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden hidden md:block">
         <video
           autoPlay
           loop
@@ -234,31 +255,70 @@ export const HeroSection: React.FC = () => {
         <div className="absolute -bottom-24 right-1/4 h-72 w-72 rounded-full bg-teal-500/15 blur-[120px] pointer-events-none" />
       </div>
 
+      {/* 1B. MOBILE: MEMORIAL BAHÇELİEVLER HOSPITAL FULL-BLEED STATIC BACKGROUND (< 768px) */}
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden block md:hidden">
+        <img
+          src="/images/hospitals/memorial-bahcelievler.jpg"
+          alt="Memorial Bahçelievler Hospital"
+          className="h-full w-full object-cover object-center"
+        />
+        {/* Optimized Contrast Overlay for Mobile Typography */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/90 via-[#021838]/88 to-[#032654]/95" />
+        <div className="absolute -top-20 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-sky-500/25 blur-3xl pointer-events-none" />
+      </div>
+
       <div className="relative z-10 w-full max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 text-center text-white">
-        {/* Trust Eyebrow Badge */}
-        <div className="inline-flex items-center gap-2 bg-[#0097FB]/15 border border-[#00BFFF]/30 backdrop-blur-md px-3.5 sm:px-4 py-1 sm:py-1.5 rounded-full mb-4 sm:mb-5 shadow-xs">
-          <Sparkles className="w-3.5 h-3.5 text-[#00BFFF] animate-spin duration-3000" />
-          <span className="text-[11px] sm:text-sm font-semibold text-[#00BFFF] tracking-wide">
-            {eyebrow}
-          </span>
+        {/* ─── DESKTOP HERO TEXT (>= 768px) ─── */}
+        <div className="hidden md:block">
+          {/* Trust Eyebrow Badge */}
+          <div className="inline-flex items-center gap-2 bg-[#0097FB]/15 border border-[#00BFFF]/30 backdrop-blur-md px-4 py-1.5 rounded-full mb-5 shadow-xs">
+            <Sparkles className="w-3.5 h-3.5 text-[#00BFFF]" />
+            <span className="text-sm font-semibold text-[#00BFFF] tracking-wide">
+              {eyebrow}
+            </span>
+          </div>
+
+          {/* Main Headline */}
+          <h1 className="text-3xl lg:text-5xl font-black tracking-tight leading-tight lg:leading-[1.2] mb-5 max-w-3xl mx-auto">
+            <span>{cleanPart1}</span>{' '}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0097FB] via-[#00BFFF] to-[#0097FB] inline">
+              {cleanHighlight}
+            </span>
+            {cleanPart2 && <span> {cleanPart2}</span>}
+          </h1>
+
+          {/* Supporting Subtitle */}
+          <p className="text-base lg:text-lg text-slate-200/90 max-w-2xl mx-auto leading-relaxed mb-8 font-normal">
+            {subtitle}
+          </p>
         </div>
 
-        {/* Main Headline (Optimized typography hierarchy & line balance) */}
-        <h1 className="text-xl sm:text-3xl lg:text-5xl font-black tracking-tight leading-tight sm:leading-[1.2] mb-3 sm:mb-5 max-w-3xl mx-auto">
-          <span>{cleanPart1}</span>{' '}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0097FB] via-[#00BFFF] to-[#0097FB] inline">
-            {cleanHighlight}
-          </span>
-          {cleanPart2 && <span> {cleanPart2}</span>}
-        </h1>
+        {/* ─── MOBILE HERO TEXT (< 768px) - High-Impact & Concise ─── */}
+        <div className="block md:hidden">
+          {/* Mobile Eyebrow Badge */}
+          <div className="inline-flex items-center gap-1.5 bg-[#0097FB]/15 border border-[#00BFFF]/30 backdrop-blur-md px-3 py-1 rounded-full mb-3 shadow-xs">
+            <Sparkles className="w-3 h-3 text-[#00BFFF]" />
+            <span className="text-[11px] font-semibold text-[#00BFFF] tracking-wide">
+              {mobileHeroText[langKey].eyebrow}
+            </span>
+          </div>
 
-        {/* Supporting Subtitle */}
-        <p className="text-xs sm:text-base lg:text-lg text-slate-200/90 max-w-2xl mx-auto leading-relaxed mb-6 sm:mb-8 font-normal line-clamp-3 sm:line-clamp-none">
-          {subtitle}
-        </p>
+          {/* Mobile Main Headline */}
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight leading-snug mb-2 max-w-md mx-auto">
+            <span>{mobileHeroText[langKey].headlinePart1}</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0097FB] via-[#00BFFF] to-[#0097FB] inline">
+              {mobileHeroText[langKey].headlineHighlight}
+            </span>
+          </h1>
+
+          {/* Mobile Subtitle (1-2 lines max, clean & punchy) */}
+          <p className="text-sm leading-relaxed text-slate-200/90 max-w-sm sm:max-w-md mx-auto mb-4 font-normal line-clamp-2">
+            {mobileHeroText[langKey].subtitle}
+          </p>
+        </div>
 
         {/* ─── Search / Consultation Entry Component with Live Autocomplete ─── */}
-        <div ref={containerRef} className="w-full max-w-2xl mx-auto mb-8 sm:mb-10 relative z-30">
+        <div ref={containerRef} className="w-full max-w-2xl mx-auto mb-5 sm:mb-8 relative z-30">
           {/* Search Bar + Floating Dropdown Anchor */}
           <div className="relative w-full">
             <form
@@ -500,7 +560,7 @@ export const HeroSection: React.FC = () => {
         </div>
 
         {/* Dual Primary / Secondary CTAs */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-6 sm:mb-12">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-6 sm:mb-10">
           <a
             href="#consultation"
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-[#0097FB] hover:bg-[#0082d6] text-white font-bold text-sm sm:text-base px-6 sm:px-8 py-3.5 sm:py-4 rounded-full shadow-lg shadow-[#0097FB]/25 transition-all duration-200 transform hover:-translate-y-0.5 cursor-pointer"
@@ -517,21 +577,22 @@ export const HeroSection: React.FC = () => {
             {isRtl ? <ArrowLeft className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}
           </a>
         </div>
+      </div>
 
-        {/* Trust Badges Bar */}
-        <div className="pt-5 sm:pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-10 text-xs sm:text-sm text-slate-300 font-medium">
-          <div className="inline-flex items-center justify-center gap-2 text-center px-3.5 py-1.5 sm:p-0 rounded-full bg-white/5 sm:bg-transparent border border-white/10 sm:border-0 max-w-full">
-            <Shield className="w-4 h-4 text-[#00BFFF] shrink-0" />
-            <span className="leading-snug">{t.hero.trustBadge}</span>
-          </div>
-          <div className="inline-flex items-center justify-center gap-2 text-center px-3.5 py-1.5 sm:p-0 rounded-full bg-white/5 sm:bg-transparent border border-white/10 sm:border-0 max-w-full">
-            <span className="relative flex h-2 w-2 shrink-0">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
-            </span>
-            <span className="leading-snug">{dict.freeConsultationBadge}</span>
-          </div>
-        </div>
+      {/* Organic Curved Wave Divider to White Section */}
+      <div className="absolute bottom-0 left-0 right-0 w-full overflow-hidden leading-none z-10 pointer-events-none">
+        <svg
+          viewBox="0 0 1440 60"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          preserveAspectRatio="none"
+          className="w-full h-7 sm:h-10 md:h-14 text-[#F8FAFC] dark:text-[#0B1120]"
+        >
+          <path
+            d="M0,20 C400,60 1040,60 1440,20 L1440,60 L0,60 Z"
+            fill="currentColor"
+          />
+        </svg>
       </div>
     </section>
   );

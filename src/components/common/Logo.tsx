@@ -22,7 +22,7 @@ export const Logo: React.FC<LogoProps> = ({
     return (
       <Link
         href="/"
-        className={`inline-flex items-center justify-center transition-transform duration-200 hover:scale-105 focus:outline-none ${className}`}
+        className={`inline-flex items-center justify-center focus:outline-none ${className}`}
         aria-label="AVICINNA"
       >
         <Image
@@ -44,7 +44,7 @@ export const Logo: React.FC<LogoProps> = ({
     return (
       <Link
         href="/"
-        className={`inline-flex items-center justify-center transition-opacity hover:opacity-95 focus:outline-none ${className}`}
+        className={`inline-flex items-center justify-center focus:outline-none ${className}`}
         aria-label="AVICINNA - International Healthcare Platform"
       >
         <Image
@@ -71,7 +71,7 @@ export const Logo: React.FC<LogoProps> = ({
   return (
     <Link
       href="/"
-      className={`inline-flex items-center transition-opacity hover:opacity-95 focus:outline-none group ${className}`}
+      className={`inline-flex items-center focus:outline-none ${className}`}
       aria-label="AVICINNA - International Healthcare Platform"
     >
       <Image
@@ -79,7 +79,7 @@ export const Logo: React.FC<LogoProps> = ({
         alt="AVICINNA - International Healthcare Platform"
         width={w}
         height={h}
-        className="object-contain h-auto max-h-12 w-auto drop-shadow-xs"
+        className="object-contain h-auto max-h-12 w-auto"
         priority
       />
     </Link>

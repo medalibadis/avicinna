@@ -10,11 +10,10 @@ import { AnimatedNavbarLogo } from '@/components/public/BrandLogoMotion';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { Phone, Menu, X, Calendar, ChevronDown, Sun, Moon } from 'lucide-react';
 import { useData } from '@/context/DataContext';
-import { CelestialThemeSwitch } from '@/components/ui/CelestialThemeSwitch';
 
 export const Header: React.FC = () => {
   const { t, language } = useLanguage();
-  const { theme, toggleTheme } = useTheme();
+  const { theme } = useTheme();
   const { treatments: treatmentsData } = useData();
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
@@ -161,8 +160,6 @@ export const Header: React.FC = () => {
               {/* Language Switcher hidden until dedicated /en/ and /fr/ localized sub-routes and hreflang are finalized */}
               {false && <LanguageSwitcher isScrolled={isScrolled || !isDarkHeroPage} id="header-desktop" />}
 
-              {/* Celestial Liquid Theme Switcher */}
-              <CelestialThemeSwitch theme={theme} onToggle={toggleTheme} />
 
               <a
                 href={pathname === '/' ? '#consultation' : '/#consultation'}
@@ -186,8 +183,6 @@ export const Header: React.FC = () => {
             <div className="flex items-center gap-1 sm:gap-2 xl:hidden flex-shrink-0">
               {/* Language Switcher hidden until dedicated /en/ and /fr/ localized sub-routes and hreflang are finalized */}
               {false && <LanguageSwitcher isScrolled={isScrolled || !isDarkHeroPage} id="header-mobile" />}
-
-              <CelestialThemeSwitch theme={theme} onToggle={toggleTheme} />
 
               <a
                 href={pathname === '/' ? '#consultation' : '/#consultation'}
