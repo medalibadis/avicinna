@@ -498,52 +498,55 @@ export default function SocialVideosAdminPage() {
       </div>
 
       {/* Video Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
         {filteredVideos.map((video) => (
           <div
             key={video.id}
-            className="bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col justify-between group"
+            className="bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-200/80 dark:border-slate-800 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col justify-between group"
           >
-            {/* Poster Thumbnail */}
-            <div className="relative aspect-[9/16] max-h-72 w-full overflow-hidden bg-slate-950">
-              <img
-                src={video.thumbnailUrl || 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&auto=format&fit=crop&q=80'}
-                alt=""
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-slate-950/40 pointer-events-none" />
+            <div className="p-3 pb-0">
+              {/* Thumbnail Container */}
+              <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl bg-slate-950">
+                <img
+                  src={video.thumbnailUrl || 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&auto=format&fit=crop&q=80'}
+                  alt=""
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-slate-950/40 pointer-events-none" />
 
-              {/* Status and Platform Badges */}
-              <div className="absolute top-3 inset-x-3 flex items-center justify-between">
-                <span className="px-2.5 py-1 rounded-full bg-slate-950/70 backdrop-blur-md text-[10px] font-bold text-white border border-white/10">
-                  {video.category?.[langKey] || video.category?.ar || 'Reel'}
-                </span>
+                {/* Top Badges */}
+                <div className="absolute top-2.5 inset-x-2.5 flex items-center justify-between">
+                  <span className="px-2.5 py-1 rounded-full bg-slate-950/75 backdrop-blur-md text-[10px] font-bold text-white border border-white/10">
+                    {video.category?.[langKey] || video.category?.ar || 'Reel'}
+                  </span>
 
-                <div className="flex items-center gap-1.5">
-                  <span className="px-2 py-0.5 rounded-full bg-slate-950/70 backdrop-blur-md text-[10px] font-bold text-pink-400 border border-white/10">
+                  <span className="px-2 py-0.5 rounded-full bg-slate-950/75 backdrop-blur-md text-[10px] font-bold text-pink-400 border border-white/10">
                     {video.platform === 'youtube' ? 'YouTube' : video.videoType === 'upload' ? 'MP4 File' : 'Instagram'}
                   </span>
                 </div>
-              </div>
 
-              {/* Center Play Button icon */}
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="w-12 h-12 rounded-full bg-red-600/90 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                  <Play className="w-5 h-5 fill-current translate-x-0.5" />
+                {/* Center Play Indicator */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="w-11 h-11 rounded-full bg-red-600/90 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                    <Play className="w-5 h-5 fill-current translate-x-0.5" />
+                  </div>
                 </div>
-              </div>
 
-              {/* Bottom stats overlay */}
-              <div className="absolute bottom-2.5 inset-x-3 flex items-center justify-between text-[11px] text-white">
-                <span className="font-mono">{video.duration}</span>
-                <span className="font-bold text-amber-300">{video.views}</span>
+                {/* Bottom stats overlay */}
+                <div className="absolute bottom-2 inset-x-2.5 flex items-center justify-between text-[11px] text-white">
+                  <span className="font-mono text-[10px] bg-slate-950/60 px-1.5 py-0.5 rounded backdrop-blur-sm">{video.duration}</span>
+                  <span className="font-bold text-amber-300 text-[11px] bg-slate-950/60 px-1.5 py-0.5 rounded backdrop-blur-sm">{video.views}</span>
+                </div>
               </div>
             </div>
 
             {/* Details */}
-            <div className="p-4 flex-1 flex flex-col justify-between">
+            <div className="p-4 pt-3 flex-1 flex flex-col justify-between">
               <div>
-                <h3 className="font-extrabold text-sm text-slate-900 dark:text-white line-clamp-2 leading-snug">
+                <h3
+                  onClick={() => handleOpenEditModal(video)}
+                  className="font-extrabold text-sm text-slate-900 dark:text-white line-clamp-2 leading-snug cursor-pointer hover:text-sky-600 transition-colors"
+                >
                   {video.title[langKey] || video.title.ar}
                 </h3>
                 <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 line-clamp-1">
@@ -552,34 +555,37 @@ export default function SocialVideosAdminPage() {
               </div>
 
               {/* Actions Footer */}
-              <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+              <div className="mt-3.5 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
                 {/* Active Toggle Button */}
                 <button
                   type="button"
                   onClick={() => handleToggleActive(video)}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-colors ${
+                  className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
                     video.isActive
-                      ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700'
+                      ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700 hover:bg-slate-200'
                   }`}
+                  title={video.isActive ? 'انقر للإخفاء من الواجهة' : 'انقر للنشر في الواجهة'}
                 >
                   {video.isActive ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
                   <span>{video.isActive ? (langKey === 'ar' ? 'منشور' : 'Live') : (langKey === 'ar' ? 'مخفي' : 'Hidden')}</span>
                 </button>
 
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1.5">
                   <button
                     type="button"
                     onClick={() => handleOpenEditModal(video)}
-                    className="p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400 hover:bg-sky-100 dark:hover:bg-sky-900/60 font-bold text-xs transition-colors cursor-pointer"
                     title={t.btnEdit}
                   >
-                    <Edit2 className="w-4 h-4" />
+                    <Edit2 className="w-3.5 h-3.5" />
+                    <span>{t.btnEdit}</span>
                   </button>
+
                   <button
                     type="button"
                     onClick={() => handleDeleteVideo(video)}
-                    className="p-2 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
+                    className="p-1.5 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
                     title={t.btnDelete}
                   >
                     <Trash2 className="w-4 h-4" />
@@ -592,9 +598,8 @@ export default function SocialVideosAdminPage() {
       </div>
 
       {/* Add / Edit Video Modal */}
-      {isModalOpen && (
-        <ModalPortal>
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md overflow-y-auto">
+      <ModalPortal isOpen={isModalOpen}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md overflow-y-auto">
             <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl p-6 sm:p-8 my-8 max-h-[90vh] overflow-y-auto">
               {/* Modal Header */}
               <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
@@ -868,7 +873,6 @@ export default function SocialVideosAdminPage() {
             </div>
           </div>
         </ModalPortal>
-      )}
     </div>
   );
 }
