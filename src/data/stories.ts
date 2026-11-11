@@ -1,3 +1,5 @@
+import type { LocalizedSlugs, LocalizedSeo } from '@/types/cms';
+
 export interface PatientStory {
   id: string;
   slug: string;
@@ -55,6 +57,9 @@ export interface PatientStory {
   hasVideo: boolean;
   videoDuration?: string;
   rating: number;
+  slugs?: LocalizedSlugs;
+  seo?: LocalizedSeo;
+  updatedAt?: string;
 }
 
 const KNOWN_PATIENT_NAMES: Record<string, { en: string; fr: string }> = {

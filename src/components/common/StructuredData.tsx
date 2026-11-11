@@ -2,8 +2,17 @@
 
 import React from 'react';
 import { initialSiteConfig } from '@/data/siteConfig';
+import type { Locale } from '@/types/cms';
 
-export const MedicalOrganizationSchema: React.FC = () => {
+export const MedicalOrganizationSchema: React.FC<{ locale?: Locale }> = ({ locale = 'ar' }) => {
+  const descriptions: Record<Locale, string> = {
+    ar: 'منصة أفيسينا للرعاية الطبية الدولية تربط المرضى بأرقى المستشفيات التركية المعتمدة (JCI) ونخبة البروفيسورات في إسطنبول مع تنسيق علاجي شامل.',
+    fr: 'AVICINNA met en relation les patients internationaux avec les hôpitaux accrédités JCI et les professeurs de renommée mondiale à Istanbul, en Turquie.',
+    en: 'Premier international medical coordination platform connecting global patients with JCI-accredited hospitals, senior professors, and advanced surgical care in Istanbul, Turkey.',
+  };
+
+  const pageUrl = locale === 'ar' ? 'https://avicinna.com' : `https://avicinna.com/${locale}`;
+
   const schema = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -12,11 +21,10 @@ export const MedicalOrganizationSchema: React.FC = () => {
         '@id': 'https://avicinna.com/#organization',
         name: 'AVICINNA',
         alternateName: ['أفيسينا للرعاية الطبية الدولية', 'Avicinna International Healthcare Turkey'],
-        url: 'https://avicinna.com',
+        url: pageUrl,
         logo: 'https://avicinna.com/logo.png',
         image: 'https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?q=80&w=1200',
-        description:
-          'Premier international medical assistance and medical tourism platform connecting global patients with top accredited hospitals, professors, and advanced surgical care in Istanbul, Turkey.',
+        description: descriptions[locale],
         telephone: initialSiteConfig.contact.phone,
         email: initialSiteConfig.contact.email,
         address: {
@@ -62,6 +70,7 @@ export const MedicalOrganizationSchema: React.FC = () => {
         '@id': 'https://avicinna.com/#website',
         url: 'https://avicinna.com',
         name: 'AVICINNA',
+        inLanguage: locale,
         publisher: {
           '@id': 'https://avicinna.com/#organization',
         },
@@ -82,21 +91,19 @@ export const DoctorSchema: React.FC<{
   specialty: string;
   hospital: string;
   image: string;
-  rating: number;
-  reviewCount: number;
-}> = ({ name, specialty, hospital, image, rating, reviewCount }) => {
+  url?: string;
+}> = ({ name, specialty, hospital, image, url }) => {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'Physician',
     name,
     medicalSpecialty: specialty,
-    hospitalAffiliation: hospital,
-    image,
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: rating,
-      reviewCount: reviewCount,
+    ...(url ? { url } : {}),
+    hospitalAffiliation: {
+      '@type': 'Hospital',
+      name: hospital,
     },
+    image,
   };
 
   return (
@@ -111,13 +118,15 @@ export const MedicalProcedureSchema: React.FC<{
   name: string;
   description: string;
   image: string;
-}> = ({ name, description, image }) => {
+  url?: string;
+}> = ({ name, description, image, url }) => {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'MedicalProcedure',
     name,
     description,
     image,
+    ...(url ? { url } : {}),
     procedureType: 'https://schema.org/SurgicalProcedure',
   };
 
@@ -132,6 +141,7 @@ export const MedicalProcedureSchema: React.FC<{
 export const FAQSchema: React.FC<{
   faqs: { question: string; answer: string }[];
 }> = ({ faqs }) => {
+  if (!faqs || faqs.length === 0) return null;
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',

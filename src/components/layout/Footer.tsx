@@ -5,18 +5,31 @@ import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { Logo } from '@/components/common/Logo';
 import { useData } from '@/context/DataContext';
+import { getLocalizedEntityPath, getLocalizedPath } from '@/lib/i18nRoutes';
 import { Phone, Mail, MapPin, Clock, ShieldCheck, Lock } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   const { t, language } = useLanguage();
-  const { treatments: treatmentsData, sections } = useData();
+  const { treatments: treatmentsData, sections, settings, pages } = useData();
 
   const contactInfo = {
-    address: { ar: 'إسطنبول، ليفنت / أتاشهير، الجمهورية التركية', en: 'Istanbul (Levent & Atasehir), Republic of Turkey', fr: 'Istanbul (Levent & Atasehir), République de Turquie' },
-    phone: sections.finalCta.phone || '+90 544 282 27 69',
-    email: 'contact@avicinna-health.com',
-    workingHours: { ar: 'التنسيق والاستشارات الطبية متاح 24 ساعة / 7 أيام', en: '24/7 International Patient Coordination', fr: 'Coordination internationale disponible 24h/24 et 7j/7' },
+    address: {
+      ar: 'إسطنبول، ليفنت / أتاشهير، الجمهورية التركية',
+      en: 'Istanbul (Levent & Atasehir), Republic of Turkey',
+      fr: 'Istanbul (Levent & Atasehir), République de Turquie',
+    },
+    phone: settings?.contact?.phone || sections.finalCta.phone || '+90 544 282 27 69',
+    email: settings?.contact?.email || 'contact@avicinna-health.com',
+    workingHours: {
+      ar: 'التنسيق والاستشارات الطبية متاح 24 ساعة / 7 أيام',
+      en: '24/7 International Patient Coordination',
+      fr: 'Coordination internationale disponible 24h/24 et 7j/7',
+    },
   };
+
+  const customFooterPages = (pages || []).filter(
+    (p) => p.status === 'published' && p.showInFooter && !['privacy', 'terms'].includes(p.slug)
+  );
 
   return (
     <footer className="bg-[#032654] dark:bg-[#060D1A] text-slate-300 pt-16 pb-10 border-t border-white/10 dark:border-slate-800">
@@ -43,7 +56,7 @@ export const Footer: React.FC = () => {
               {treatmentsData.slice(0, 6).map((item) => (
                 <li key={item.slug}>
                   <Link
-                    href={`/treatments/${item.slug}`}
+                    href={getLocalizedEntityPath('treatments', item, language)}
                     className="text-slate-300/80 hover:text-[#00BFFF] transition-colors flex items-center gap-1.5"
                   >
                     <span className="w-1.5 h-1.5 rounded-full bg-[#0097FB]"></span>
@@ -61,40 +74,50 @@ export const Footer: React.FC = () => {
             </h3>
             <ul className="space-y-2.5 text-sm">
               <li>
-                <Link href="/" className="text-slate-300/80 hover:text-[#00BFFF] transition-colors">
+                <Link href={getLocalizedPath('/', language)} className="text-slate-300/80 hover:text-[#00BFFF] transition-colors">
                   {t.nav.home}
                 </Link>
               </li>
               <li>
-                <Link href="/hospitals" className="text-slate-300/80 hover:text-[#00BFFF] transition-colors">
+                <Link href={getLocalizedPath('/hospitals', language)} className="text-slate-300/80 hover:text-[#00BFFF] transition-colors">
                   {t.nav.hospitals}
                 </Link>
               </li>
               <li>
-                <Link href="/doctors" className="text-slate-300/80 hover:text-[#00BFFF] transition-colors">
+                <Link href={getLocalizedPath('/doctors', language)} className="text-slate-300/80 hover:text-[#00BFFF] transition-colors">
                   {t.nav.doctors}
                 </Link>
               </li>
               <li>
-                <Link href="/patient-stories" className="text-slate-300/80 hover:text-[#00BFFF] transition-colors">
+                <Link href={getLocalizedPath('/patient-stories', language)} className="text-slate-300/80 hover:text-[#00BFFF] transition-colors">
                   {t.nav.patientStories}
                 </Link>
               </li>
               <li>
-                <Link href="/blog" className="text-slate-300/80 hover:text-[#00BFFF] transition-colors">
+                <Link href={getLocalizedPath('/blog', language)} className="text-slate-300/80 hover:text-[#00BFFF] transition-colors">
                   {t.nav.blog}
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="text-slate-300/80 hover:text-[#00BFFF] transition-colors">
+                <Link href={getLocalizedPath('/about', language)} className="text-slate-300/80 hover:text-[#00BFFF] transition-colors">
                   {t.nav.about}
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="text-slate-300/80 hover:text-[#00BFFF] transition-colors">
+                <Link href={getLocalizedPath('/contact', language)} className="text-slate-300/80 hover:text-[#00BFFF] transition-colors">
                   {t.nav.contact}
                 </Link>
               </li>
+              {customFooterPages.map((pg) => (
+                <li key={pg.id}>
+                  <Link
+                    href={getLocalizedPath(`/${pg.slugs?.[language] || pg.slug}`, language)}
+                    className="text-slate-300/80 hover:text-[#00BFFF] transition-colors"
+                  >
+                    {pg.title[language] || pg.title.ar}
+                  </Link>
+                </li>
+              ))}
               <li>
                 <Link href="/admin" className="text-slate-400 hover:text-[#00BFFF] transition-colors inline-flex items-center gap-1 text-xs pt-1">
                   <Lock className="w-3 h-3 text-[#0097FB]" />
@@ -142,13 +165,13 @@ export const Footer: React.FC = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
           <p>{t.footer.rights}</p>
-          <div className="flex items-center gap-6">
-            <Link href="/privacy" className="hover:text-slate-300 transition-colors">
+          <div className="flex flex-wrap items-center gap-6">
+            <Link href={getLocalizedPath('/privacy', language)} className="hover:text-white transition-colors">
               {t.footer.privacy}
             </Link>
-            <Link href="/terms" className="hover:text-slate-300 transition-colors">
+            <Link href={getLocalizedPath('/terms', language)} className="hover:text-white transition-colors">
               {t.footer.terms}
             </Link>
           </div>

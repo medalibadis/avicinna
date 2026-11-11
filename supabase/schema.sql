@@ -21,14 +21,29 @@ CREATE TABLE IF NOT EXISTS public.site_sections (
 -- ==============================================================================
 CREATE TABLE IF NOT EXISTS public.hospitals (
     id TEXT PRIMARY KEY,
+    slug TEXT,
+    slugs JSONB DEFAULT '{}'::JSONB NOT NULL, -- { ar, en, fr }
+    seo JSONB DEFAULT '{}'::JSONB NOT NULL, -- { ar: {title,description,focusKeyword}, en, fr }
     name JSONB NOT NULL, -- { ar, en, fr }
     type JSONB NOT NULL, -- { ar, en, fr }
     city JSONB NOT NULL, -- { ar, en, fr }
+    city_category TEXT DEFAULT 'istanbul-europe' NOT NULL,
+    address JSONB DEFAULT '{}'::JSONB NOT NULL,
     accreditation TEXT NOT NULL,
+    accreditation_badge TEXT DEFAULT 'JCI' NOT NULL,
     description JSONB NOT NULL, -- { ar, en, fr }
     image TEXT NOT NULL,
+    gallery JSONB DEFAULT '[]'::JSONB NOT NULL,
     featured BOOLEAN DEFAULT true NOT NULL,
     specialties_count INTEGER DEFAULT 20 NOT NULL,
+    beds_count INTEGER DEFAULT 250 NOT NULL,
+    icu_beds_count INTEGER DEFAULT 50 NOT NULL,
+    operating_rooms_count INTEGER DEFAULT 12 NOT NULL,
+    established_year INTEGER DEFAULT 2010 NOT NULL,
+    technologies JSONB DEFAULT '{}'::JSONB NOT NULL,
+    specialties JSONB DEFAULT '[]'::JSONB NOT NULL,
+    rating NUMERIC(3, 1) DEFAULT 4.9 NOT NULL,
+    reviews_count INTEGER DEFAULT 150 NOT NULL,
     created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
 );
@@ -41,20 +56,31 @@ CREATE INDEX IF NOT EXISTS idx_hospitals_featured ON public.hospitals(featured);
 CREATE TABLE IF NOT EXISTS public.doctors (
     id TEXT PRIMARY KEY,
     slug TEXT UNIQUE NOT NULL,
+    slugs JSONB DEFAULT '{}'::JSONB NOT NULL,
+    seo JSONB DEFAULT '{}'::JSONB NOT NULL,
     name JSONB NOT NULL, -- { ar, en, fr }
     title JSONB NOT NULL, -- { ar, en, fr }
     specialty_slug TEXT NOT NULL,
     specialty_name JSONB NOT NULL, -- { ar, en, fr }
+    hospital_id TEXT DEFAULT 'acibadem-altunizade' NOT NULL,
     hospital JSONB NOT NULL, -- { ar, en, fr }
     experience_years INTEGER DEFAULT 10 NOT NULL,
     image TEXT NOT NULL,
     rating NUMERIC(3, 1) DEFAULT 4.9 NOT NULL,
     review_count INTEGER DEFAULT 100 NOT NULL,
+    surgeries_count INTEGER DEFAULT 2500 NOT NULL,
+    publications_count INTEGER DEFAULT 40 NOT NULL,
     languages TEXT[] DEFAULT ARRAY['العربية', 'English', 'Türkçe']::TEXT[] NOT NULL,
     biography JSONB NOT NULL, -- { ar, en, fr }
     areas_of_expertise JSONB NOT NULL, -- { ar: [], en: [], fr: [] }
     procedures JSONB NOT NULL, -- { ar: [], en: [], fr: [] }
     education JSONB NOT NULL, -- { ar: [], en: [], fr: [] }
+    career_history JSONB DEFAULT '[]'::JSONB NOT NULL,
+    memberships JSONB DEFAULT '{}'::JSONB NOT NULL,
+    technologies JSONB DEFAULT '{}'::JSONB NOT NULL,
+    videos JSONB DEFAULT '[]'::JSONB NOT NULL,
+    video_url TEXT,
+    video_title JSONB,
     created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
 );
@@ -68,6 +94,8 @@ CREATE INDEX IF NOT EXISTS idx_doctors_specialty ON public.doctors(specialty_slu
 CREATE TABLE IF NOT EXISTS public.treatments (
     id TEXT PRIMARY KEY,
     slug TEXT UNIQUE NOT NULL,
+    slugs JSONB DEFAULT '{}'::JSONB NOT NULL,
+    seo JSONB DEFAULT '{}'::JSONB NOT NULL,
     title JSONB NOT NULL, -- { ar, en, fr }
     short_description JSONB NOT NULL, -- { ar, en, fr }
     full_overview JSONB NOT NULL, -- { ar, en, fr }
@@ -92,7 +120,9 @@ CREATE INDEX IF NOT EXISTS idx_treatments_featured ON public.treatments(featured
 CREATE TABLE IF NOT EXISTS public.patient_stories (
     id TEXT PRIMARY KEY,
     slug TEXT UNIQUE NOT NULL,
-    patient_name TEXT NOT NULL,
+    slugs JSONB DEFAULT '{}'::JSONB NOT NULL,
+    seo JSONB DEFAULT '{}'::JSONB NOT NULL,
+    patient_name JSONB NOT NULL,
     country JSONB NOT NULL, -- { ar, en, fr }
     treatment JSONB NOT NULL, -- { ar, en, fr }
     treatment_slug TEXT,
@@ -119,16 +149,23 @@ CREATE INDEX IF NOT EXISTS idx_patient_stories_slug ON public.patient_stories(sl
 CREATE TABLE IF NOT EXISTS public.articles (
     id TEXT PRIMARY KEY,
     slug TEXT UNIQUE NOT NULL,
+    slugs JSONB DEFAULT '{}'::JSONB NOT NULL,
+    seo JSONB DEFAULT '{}'::JSONB NOT NULL,
     category_slug TEXT NOT NULL,
     category_name JSONB NOT NULL, -- { ar, en, fr }
     title JSONB NOT NULL, -- { ar, en, fr }
     excerpt JSONB NOT NULL, -- { ar, en, fr }
     content JSONB NOT NULL, -- { ar: [], en: [], fr: [] }
+    html_content JSONB DEFAULT '{}'::JSONB NOT NULL, -- { ar, en, fr }
+    faqs JSONB DEFAULT '[]'::JSONB NOT NULL,
     reading_time_minutes INTEGER DEFAULT 5 NOT NULL,
     published_date TEXT NOT NULL,
+    updated_date TEXT,
     source_hospital JSONB NOT NULL, -- { ar, en, fr }
     image TEXT NOT NULL,
+    author_doctor_id TEXT,
     author JSONB NOT NULL, -- { name, role }
+    medical_reviewer JSONB, -- { doctorId, name, role }
     created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
 );
@@ -148,6 +185,13 @@ CREATE TABLE IF NOT EXISTS public.consultation_inquiries (
     country TEXT,
     specialty TEXT,
     notes TEXT,
+    language TEXT DEFAULT 'ar' NOT NULL,
+    source_url TEXT,
+    assigned_to TEXT,
+    assigned_name TEXT,
+    internal_notes JSONB DEFAULT '[]'::JSONB NOT NULL,
+    attachments JSONB DEFAULT '[]'::JSONB NOT NULL,
+    notification_log JSONB DEFAULT '[]'::JSONB NOT NULL,
     status TEXT DEFAULT 'new' NOT NULL, -- 'new', 'in_review', 'contacted', 'scheduled'
     created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
@@ -156,6 +200,87 @@ CREATE TABLE IF NOT EXISTS public.consultation_inquiries (
 CREATE INDEX IF NOT EXISTS idx_inquiries_tracking_id ON public.consultation_inquiries(tracking_id);
 CREATE INDEX IF NOT EXISTS idx_inquiries_status ON public.consultation_inquiries(status);
 CREATE INDEX IF NOT EXISTS idx_inquiries_created_at ON public.consultation_inquiries(created_at DESC);
+
+-- ==============================================================================
+-- TABLE 8: STANDALONE CMS PAGES (PRIVACY, TERMS, LANDING PAGES)
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS public.pages (
+    id TEXT PRIMARY KEY,
+    slug TEXT UNIQUE NOT NULL,
+    slugs JSONB DEFAULT '{}'::JSONB NOT NULL,
+    title JSONB NOT NULL,
+    subtitle JSONB DEFAULT '{}'::JSONB NOT NULL,
+    content_html JSONB NOT NULL,
+    seo JSONB DEFAULT '{}'::JSONB NOT NULL,
+    status TEXT DEFAULT 'published' NOT NULL,
+    is_system BOOLEAN DEFAULT false NOT NULL,
+    show_in_footer BOOLEAN DEFAULT false NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- ==============================================================================
+-- TABLE 9: REDIRECTS MANAGER
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS public.redirects (
+    id TEXT PRIMARY KEY,
+    from_path TEXT UNIQUE NOT NULL,
+    to_path TEXT NOT NULL,
+    status_code INTEGER DEFAULT 301 NOT NULL,
+    is_active BOOLEAN DEFAULT true NOT NULL,
+    hits INTEGER DEFAULT 0 NOT NULL,
+    note TEXT,
+    created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- ==============================================================================
+-- TABLE 10: MEDIA LIBRARY WITH ALT TEXT
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS public.media_items (
+    id TEXT PRIMARY KEY,
+    url TEXT NOT NULL,
+    filename TEXT NOT NULL,
+    mime_type TEXT NOT NULL,
+    size INTEGER DEFAULT 0 NOT NULL,
+    alt JSONB DEFAULT '{}'::JSONB NOT NULL,
+    caption JSONB DEFAULT '{}'::JSONB NOT NULL,
+    folder TEXT DEFAULT 'uploads' NOT NULL,
+    uploaded_by TEXT,
+    created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- ==============================================================================
+-- TABLE 11: ADMIN USERS (RBAC + TOTP 2FA) & ACTIVITY LOGS
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS public.admin_users (
+    id TEXT PRIMARY KEY,
+    username TEXT UNIQUE NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    full_name TEXT NOT NULL,
+    role TEXT DEFAULT 'editor' NOT NULL, -- 'admin' | 'editor' | 'coordinator'
+    password_hash TEXT NOT NULL,
+    totp_secret TEXT,
+    totp_enabled BOOLEAN DEFAULT false NOT NULL,
+    is_active BOOLEAN DEFAULT true NOT NULL,
+    token_version INTEGER DEFAULT 1 NOT NULL,
+    last_login_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS public.activity_logs (
+    id TEXT PRIMARY KEY,
+    actor_id TEXT NOT NULL,
+    actor_username TEXT NOT NULL,
+    actor_role TEXT NOT NULL,
+    action TEXT NOT NULL,
+    target_type TEXT NOT NULL,
+    target_id TEXT,
+    details TEXT NOT NULL,
+    ip_address TEXT,
+    created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
 
 -- ==============================================================================
 -- ROW LEVEL SECURITY (RLS) POLICIES
@@ -169,6 +294,11 @@ ALTER TABLE public.treatments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.patient_stories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.articles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.consultation_inquiries ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.pages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.redirects ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.media_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.admin_users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.activity_logs ENABLE ROW LEVEL SECURITY;
 
 -- 2. Public Read Policies (Allow anyone to view public medical content)
 CREATE POLICY "Public can view site sections" ON public.site_sections FOR SELECT USING (true);
@@ -177,11 +307,14 @@ CREATE POLICY "Public can view doctors" ON public.doctors FOR SELECT USING (true
 CREATE POLICY "Public can view treatments" ON public.treatments FOR SELECT USING (true);
 CREATE POLICY "Public can view patient stories" ON public.patient_stories FOR SELECT USING (true);
 CREATE POLICY "Public can view articles" ON public.articles FOR SELECT USING (true);
+CREATE POLICY "Public can view pages" ON public.pages FOR SELECT USING (true);
+CREATE POLICY "Public can view redirects" ON public.redirects FOR SELECT USING (true);
+CREATE POLICY "Public can view media" ON public.media_items FOR SELECT USING (true);
 
 -- 3. Inquiries: Public can insert their consultation requests
 CREATE POLICY "Public can submit consultation inquiries" ON public.consultation_inquiries FOR INSERT WITH CHECK (true);
 
--- 4. Admin Management Policies (Allow all operations for service_role and anon API key)
+-- 4. Admin Management Policies
 CREATE POLICY "Full access to site sections for anon/authenticated" ON public.site_sections FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Full access to hospitals for anon/authenticated" ON public.hospitals FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Full access to doctors for anon/authenticated" ON public.doctors FOR ALL USING (true) WITH CHECK (true);
@@ -189,6 +322,11 @@ CREATE POLICY "Full access to treatments for anon/authenticated" ON public.treat
 CREATE POLICY "Full access to patient stories for anon/authenticated" ON public.patient_stories FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Full access to articles for anon/authenticated" ON public.articles FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Full access to consultation inquiries for anon/authenticated" ON public.consultation_inquiries FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Full access to pages for anon/authenticated" ON public.pages FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Full access to redirects for anon/authenticated" ON public.redirects FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Full access to media for anon/authenticated" ON public.media_items FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Full access to admin_users for service/authenticated" ON public.admin_users FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Full access to activity_logs for service/authenticated" ON public.activity_logs FOR ALL USING (true) WITH CHECK (true);
 
 -- ==============================================================================
 -- AUTOMATIC TIMESTAMP TRIGGER

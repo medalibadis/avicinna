@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
 import { articleCategories } from '@/data/articles';
+import { getLocalizedEntityPath } from '@/lib/i18nRoutes';
 import {
   Search,
   Clock,
@@ -46,22 +47,30 @@ export function BlogClientView({ initialArticles, isLiveWp }: BlogClientViewProp
         list.push({
           id: loc.id,
           slug: loc.slug,
+          slugs: loc.slugs,
+          localizedSeo: loc.seo,
+          faqs: loc.faqs,
           categorySlug: loc.categorySlug,
           categoryName: loc.categoryName,
           title: loc.title,
           excerpt: loc.excerpt,
-          htmlContent: '',
+          htmlContent: loc.htmlContent?.[language] || loc.htmlContent?.ar || '',
+          htmlContentMap: loc.htmlContent,
           paragraphs: loc.content[language] || loc.content.ar,
           readingTimeMinutes: loc.readingTimeMinutes,
           publishedDate: loc.publishedDate,
+          updatedDate: loc.updatedDate,
+          updatedAt: loc.updatedAt,
           sourceHospital: loc.sourceHospital,
           image: loc.image,
+          authorDoctorId: loc.authorDoctorId,
           author: loc.author,
+          medicalReviewer: loc.medicalReviewer,
           seo: {
-            title: `${loc.title[language] || loc.title.ar} - AVICINNA`,
-            description: loc.excerpt[language] || loc.excerpt.ar,
-            focusKeyword: loc.title[language] || loc.title.ar,
-            canonical: `/blog/${loc.slug}`,
+            title: loc.seo?.[language]?.title || `${loc.title[language] || loc.title.ar} - AVICINNA`,
+            description: loc.seo?.[language]?.description || loc.excerpt[language] || loc.excerpt.ar,
+            focusKeyword: loc.seo?.[language]?.focusKeyword || loc.title[language] || loc.title.ar,
+            canonical: getLocalizedEntityPath('blog', loc, language),
           },
           isFromWordPress: false,
         });
@@ -252,7 +261,11 @@ export function BlogClientView({ initialArticles, isLiveWp }: BlogClientViewProp
             <div className="flex items-center justify-between pb-4 mb-6 border-b border-slate-200/80 dark:border-slate-800 text-xs sm:text-sm text-slate-500 dark:text-slate-400">
               <span>{content.showingResults(startIndex + 1, endIndex, totalArticles)}</span>
               <span>
-                صفحة {currentPage} من {totalPages}
+                {language === 'ar'
+                  ? `صفحة ${currentPage} من ${totalPages}`
+                  : language === 'fr'
+                  ? `Page ${currentPage} sur ${totalPages}`
+                  : `Page ${currentPage} of ${totalPages}`}
               </span>
             </div>
           )}
@@ -264,13 +277,19 @@ export function BlogClientView({ initialArticles, isLiveWp }: BlogClientViewProp
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {paginatedArticles.map((article) => (
+              {paginatedArticles.map((article) => {
+                const articleHref = getLocalizedEntityPath('blog', article, language);
+                return (
                 <div
                   key={article.id}
                   className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden hover:shadow-xl hover:border-sky-200 dark:hover:border-sky-500/40 transition-all duration-300 flex flex-col group"
                 >
-                  {/* Visual Header */}
-                  <div className="relative h-56 overflow-hidden bg-slate-100 dark:bg-slate-800">
+                  {/* Visual Header — Entire image is clickable */}
+                  <Link
+                    href={articleHref}
+                    className="relative h-56 overflow-hidden bg-slate-100 dark:bg-slate-800 block cursor-pointer"
+                    aria-label={article.title[language] || article.title.ar}
+                  >
                     <img
                       src={article.image}
                       alt={article.title[language] || article.title.ar}
@@ -290,18 +309,20 @@ export function BlogClientView({ initialArticles, isLiveWp }: BlogClientViewProp
                         {article.readingTimeMinutes} {content.minRead}
                       </span>
                     </div>
-                  </div>
+                  </Link>
 
                   {/* Body Content */}
                   <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
                     <div>
-                      <h2 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors leading-snug line-clamp-2">
-                        {article.title[language] || article.title.ar}
-                      </h2>
+                      <Link href={articleHref} className="block cursor-pointer">
+                        <h2 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors leading-snug line-clamp-2">
+                          {article.title[language] || article.title.ar}
+                        </h2>
 
-                      <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-2 line-clamp-3 leading-relaxed">
-                        {article.excerpt[language] || article.excerpt.ar}
-                      </p>
+                        <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-2 line-clamp-3 leading-relaxed">
+                          {article.excerpt[language] || article.excerpt.ar}
+                        </p>
+                      </Link>
 
                       <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 space-y-1 text-xs text-slate-500 dark:text-slate-400">
                         <div className="flex items-center gap-1.5">
@@ -327,7 +348,7 @@ export function BlogClientView({ initialArticles, isLiveWp }: BlogClientViewProp
                     {/* Action Link */}
                     <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
                       <Link
-                        href={`/blog/${article.slug}`}
+                        href={articleHref}
                         className="w-full py-2.5 px-4 rounded-xl bg-sky-50 dark:bg-sky-950/40 hover:bg-sky-500 text-sky-700 dark:text-sky-300 hover:text-white font-semibold text-xs transition-colors text-center flex items-center justify-center gap-1.5 cursor-pointer"
                       >
                         <span>{content.readMore}</span>
@@ -336,7 +357,8 @@ export function BlogClientView({ initialArticles, isLiveWp }: BlogClientViewProp
                     </div>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           )}
 

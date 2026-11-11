@@ -313,7 +313,7 @@ export default function AdminOverviewPage() {
 
   // Range-derived dynamic numbers for responsive animated tickers
   const rangeMultiplier = timeRange === '7d' ? 0.35 : timeRange === '90d' ? 2.6 : 1.0;
-  const displayInquiriesCount = Math.max(1, Math.round(inquiries.length * rangeMultiplier));
+  const displayInquiriesCount = inquiries.length === 0 ? 0 : Math.max(1, Math.round(inquiries.length * rangeMultiplier));
   const displayDoctorsCount = doctors.length;
   const displayHospitalsCount = hospitals.length;
   const displayTreatmentsCount = treatments.length;

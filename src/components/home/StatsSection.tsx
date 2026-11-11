@@ -5,59 +5,110 @@ import { useLanguage } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
 import { Users, Building2, Stethoscope } from 'lucide-react';
 
+function parseMetricTarget(rawValue: string): {
+  target: number;
+  prefix: string;
+  suffix: string;
+  useComma: boolean;
+} {
+  const str = String(rawValue || '').trim();
+  const match = str.match(/^([^0-9]*)([0-9][0-9,.]*)(.*)$/);
+  if (!match) return { target: 0, prefix: '', suffix: str, useComma: false };
+  const [, prefix, numPart, suffix] = match;
+  const numeric = parseInt(numPart.replace(/[^0-9]/g, ''), 10) || 0;
+  return {
+    target: numeric,
+    prefix,
+    suffix,
+    useComma: numPart.includes(','),
+  };
+}
+
+function formatMetricProgress(
+  current: number,
+  parsed: { prefix: string; suffix: string; useComma: boolean }
+): string {
+  const formatted = parsed.useComma ? current.toLocaleString('en-US') : String(current);
+  return `${parsed.prefix}${formatted}${parsed.suffix}`;
+}
+
 export const StatsSection: React.FC = () => {
-  const { t, language } = useLanguage();
+  const { language } = useLanguage();
   const { sections } = useData();
-  const [hasAnimated, setHasAnimated] = useState(false);
-  const [patients, setPatients] = useState(0);
-  const [hospitals, setHospitals] = useState(0);
-  const [specialties, setSpecialties] = useState(0);
+  const [animFinished, setAnimFinished] = useState(false);
+  const [animValues, setAnimValues] = useState<[number, number, number] | null>(null);
+  const hasStartedRef = useRef(false);
   const sectionRef = useRef<HTMLDivElement>(null);
 
+  const rawPatients = sections.stats.patientsCount || '+2,500';
+  const rawHospitals = sections.stats.hospitalsCount || '+15';
+  const rawExperience = sections.stats.experienceCount || '+10';
+
+  const parsedPatients = parseMetricTarget(rawPatients);
+  const parsedHospitals = parseMetricTarget(rawHospitals);
+  const parsedExperience = parseMetricTarget(rawExperience);
+
   useEffect(() => {
+    hasStartedRef.current = false;
+    setAnimFinished(false);
+    setAnimValues(null);
+
+    const node = sectionRef.current;
+    if (!node) return;
+
+    const pTarget = parseMetricTarget(rawPatients).target;
+    const hTarget = parseMetricTarget(rawHospitals).target;
+    const eTarget = parseMetricTarget(rawExperience).target;
+
+    const runAnimation = () => {
+      if (hasStartedRef.current) return;
+      hasStartedRef.current = true;
+
+      const duration = 500;
+      const frameRate = 1000 / 60;
+      const totalFrames = Math.max(1, Math.round(duration / frameRate));
+
+      let frame = 0;
+      const timer = setInterval(() => {
+        frame++;
+        const progress = Math.min(1, frame / totalFrames);
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+
+        setAnimValues([
+          Math.round(pTarget * easeOut),
+          Math.round(hTarget * easeOut),
+          Math.round(eTarget * easeOut),
+        ]);
+
+        if (frame >= totalFrames) {
+          clearInterval(timer);
+          setAnimValues(null);
+          setAnimFinished(true);
+        }
+      }, frameRate);
+    };
+
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && !hasAnimated) {
-          setHasAnimated(true);
-
-          // Counter animations
-          const duration = 1500;
-          const frameRate = 1000 / 60;
-          const totalFrames = Math.round(duration / frameRate);
-
-          let frame = 0;
-          const timer = setInterval(() => {
-            frame++;
-            const progress = frame / totalFrames;
-            const easeOut = 1 - Math.pow(1 - progress, 3);
-
-            setPatients(Math.round(2500 * easeOut));
-            setHospitals(Math.round(15 * easeOut));
-            setSpecialties(Math.round(10 * easeOut));
-
-            if (frame === totalFrames) {
-              clearInterval(timer);
-              setPatients(2500);
-              setHospitals(15);
-              setSpecialties(10);
-            }
-          }, frameRate);
+        if (entries[0]?.isIntersecting) {
+          runAnimation();
+          observer.disconnect();
         }
       },
-      { threshold: 0.2 }
+      { threshold: 0.15 }
     );
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
+    observer.observe(node);
     return () => observer.disconnect();
-  }, [hasAnimated]);
+  }, [rawPatients, rawHospitals, rawExperience]);
 
   const stats = [
     {
-      count: hasAnimated ? sections.stats.patientsCount : `+${patients}`,
-      label: sections.stats.patientsLabel[language],
+      count:
+        animValues !== null && !animFinished
+          ? formatMetricProgress(animValues[0], parsedPatients)
+          : rawPatients,
+      label: sections.stats.patientsLabel?.[language] || '',
       icon: Users,
       desc:
         language === 'ar'
@@ -67,8 +118,11 @@ export const StatsSection: React.FC = () => {
           : 'From over 35 countries',
     },
     {
-      count: hasAnimated ? sections.stats.hospitalsCount : `+${hospitals}`,
-      label: sections.stats.hospitalsLabel[language],
+      count:
+        animValues !== null && !animFinished
+          ? formatMetricProgress(animValues[1], parsedHospitals)
+          : rawHospitals,
+      label: sections.stats.hospitalsLabel?.[language] || '',
       icon: Building2,
       desc:
         language === 'ar'
@@ -78,8 +132,11 @@ export const StatsSection: React.FC = () => {
           : 'JCI & ISO accredited',
     },
     {
-      count: hasAnimated ? sections.stats.experienceCount : `+${specialties}`,
-      label: sections.stats.experienceLabel[language],
+      count:
+        animValues !== null && !animFinished
+          ? formatMetricProgress(animValues[2], parsedExperience)
+          : rawExperience,
+      label: sections.stats.experienceLabel?.[language] || '',
       icon: Stethoscope,
       desc:
         language === 'ar'
@@ -87,24 +144,6 @@ export const StatsSection: React.FC = () => {
           : language === 'fr'
           ? 'Technologies chirurgicales avancées'
           : 'Advanced surgical care',
-    },
-  ];
-
-  const mobileShortLabels = [
-    {
-      ar: 'مرضى دوليون',
-      fr: 'Patients Internationaux',
-      en: 'International Patients',
-    },
-    {
-      ar: 'مستشفيات شريكة',
-      fr: 'Hôpitaux Partenaires',
-      en: 'Partner Hospitals',
-    },
-    {
-      ar: 'سنوات خبرة',
-      fr: 'Années d’Excellence',
-      en: 'Years of Excellence',
     },
   ];
 
@@ -122,16 +161,11 @@ export const StatsSection: React.FC = () => {
                 <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-[#EAF6FF] dark:bg-sky-950/60 text-[#0097FB] dark:text-sky-400 flex items-center justify-center mb-1.5 sm:mb-4 border border-[#0097FB]/20 dark:border-sky-800/60 shadow-xs">
                   <Icon className="w-5 h-5 sm:w-7 sm:h-7" />
                 </div>
-                <div dir="ltr" className="text-xl sm:text-4xl lg:text-5xl font-black text-[#032654] dark:text-white tracking-tight font-sans mb-0.5 sm:mb-2">
+                <div dir="ltr" className="text-lg sm:text-4xl lg:text-5xl font-black text-[#032654] dark:text-white tracking-tight font-sans mb-0.5 sm:mb-2">
                   {stat.count}
                 </div>
-                <div className="text-[11px] sm:text-base lg:text-lg font-bold text-[#163B63] dark:text-slate-200 mb-0.5 sm:mb-1 leading-tight sm:leading-normal">
-                  <span className="block sm:hidden">
-                    {mobileShortLabels[idx][language] || stat.label}
-                  </span>
-                  <span className="hidden sm:block line-clamp-2">
-                    {stat.label}
-                  </span>
+                <div className="text-[10.5px] sm:text-base lg:text-lg font-bold text-[#163B63] dark:text-slate-200 mb-0.5 sm:mb-1 leading-snug line-clamp-2">
+                  {stat.label}
                 </div>
                 <div className="hidden sm:block text-xs font-medium text-[#64748B] dark:text-slate-400">
                   {stat.desc}

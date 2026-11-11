@@ -468,19 +468,13 @@ export function ArticleSeoStudio({
             {effectiveTitle}
           </h4>
 
-          {/* Star Rating Rich Snippet */}
+          {/* Authoritative Medical Publication Meta */}
           <div className="mt-1 flex items-center gap-2 text-[11px] text-slate-600 dark:text-slate-400">
-            <div className="flex items-center text-amber-500">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-3 h-3 fill-current" />
-              ))}
-            </div>
-            <span className="font-semibold text-slate-800 dark:text-slate-200">4.9</span>
-            <span className="text-slate-400">(142 {locale === 'ar' ? 'تقييم' : 'reviews'})</span>
-            <span className="text-slate-300 dark:text-slate-700">•</span>
             <span className="text-emerald-700 dark:text-emerald-400 font-medium">
-              {locale === 'ar' ? 'استشارة مجانية' : 'Free Consultation'}
+              {locale === 'ar' ? 'مراجعة طبية معتمدة' : locale === 'fr' ? 'Contenu Médical Vérifié' : 'Medically Reviewed'}
             </span>
+            <span className="text-slate-300 dark:text-slate-700">•</span>
+            <span>avicinna.com</span>
           </div>
 
           {/* Meta Description with Keyword Highlight */}

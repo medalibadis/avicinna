@@ -244,6 +244,15 @@ html, body, html.dark, body.dark, .dark {
   background: #38BDF8;
 }
 
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* Ensure phone numbers and WhatsApp international digits are strictly rendered Left-to-Right in Arabic */
 [dir="rtl"] a[href^="tel:"],
 [dir="rtl"] a[href*="wa.me"] span,

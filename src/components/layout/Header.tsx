@@ -5,52 +5,54 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { useTheme } from '@/context/ThemeContext';
-import { Logo } from '@/components/common/Logo';
 import { AnimatedNavbarLogo } from '@/components/public/BrandLogoMotion';
 import { LanguageSwitcher } from './LanguageSwitcher';
-import { Phone, Menu, X, Calendar, ChevronDown, Sun, Moon } from 'lucide-react';
+import { Menu, X, Calendar, ChevronDown, Globe } from 'lucide-react';
 import { useData } from '@/context/DataContext';
+import {
+  getLocalizedEntityPath,
+  getLocalizedPath,
+  stripLocalePrefix,
+} from '@/lib/i18nRoutes';
 
 export const Header: React.FC = () => {
   const { t, language } = useLanguage();
   const { theme } = useTheme();
   const { treatments: treatmentsData } = useData();
-  const pathname = usePathname();
+  const pathname = usePathname() || '/';
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [servicesDropdownOpen, setServicesDropdownOpen] = useState(false);
 
+  const { barePath } = stripLocalePrefix(pathname);
+
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 20) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
+      setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close mobile menu on route change
   useEffect(() => {
     setMobileMenuOpen(false);
     setServicesDropdownOpen(false);
   }, [pathname]);
 
   const navLinks = [
-    { href: '/', label: t.nav.home },
-    { href: '/treatments', label: t.nav.services, hasDropdown: true },
-    { href: '/hospitals', label: t.nav.hospitals },
-    { href: '/doctors', label: t.nav.doctors },
-    { href: '/patient-stories', label: t.nav.patientStories },
-    { href: '/blog', label: t.nav.blog },
-    { href: '/about', label: t.nav.about },
-    { href: '/contact', label: t.nav.contact },
+    { bare: '/', href: getLocalizedPath('/', language), label: t.nav.home },
+    { bare: '/treatments', href: getLocalizedPath('/treatments', language), label: t.nav.services, hasDropdown: true },
+    { bare: '/hospitals', href: getLocalizedPath('/hospitals', language), label: t.nav.hospitals },
+    { bare: '/doctors', href: getLocalizedPath('/doctors', language), label: t.nav.doctors },
+    { bare: '/patient-stories', href: getLocalizedPath('/patient-stories', language), label: t.nav.patientStories },
+    { bare: '/blog', href: getLocalizedPath('/blog', language), label: t.nav.blog },
+    { bare: '/about', href: getLocalizedPath('/about', language), label: t.nav.about },
+    { bare: '/contact', href: getLocalizedPath('/contact', language), label: t.nav.contact },
   ];
 
-  const isDarkHeroPage = pathname === '/';
+  const isDarkHeroPage = barePath === '/';
   const isDarkLogo = (!isScrolled && isDarkHeroPage) || theme === 'dark';
+  const consultationHref = isDarkHeroPage ? '#consultation' : `${getLocalizedPath('/', language)}#consultation`;
 
   return (
     <>
@@ -67,10 +69,10 @@ export const Header: React.FC = () => {
           <div className="flex items-center justify-between gap-1 sm:gap-4">
             {/* Logo */}
             <div className="shrink-0">
-              <AnimatedNavbarLogo locale={language as any} isDark={isDarkLogo} />
+              <AnimatedNavbarLogo locale={language} isDark={isDarkLogo} />
             </div>
 
-            {/* Desktop Navigation (Visible at xl+ / 1280px+) */}
+            {/* Desktop Navigation (xl+) */}
             <nav
               className={`hidden xl:flex items-center gap-1 2xl:gap-1.5 p-1 rounded-full border backdrop-blur-md transition-colors ${
                 !isScrolled && isDarkHeroPage
@@ -80,14 +82,12 @@ export const Header: React.FC = () => {
             >
               {navLinks.map((link) => {
                 const isActive =
-                  link.href === '/'
-                    ? pathname === '/'
-                    : pathname.startsWith(link.href);
+                  link.bare === '/' ? barePath === '/' : barePath.startsWith(link.bare);
 
                 if (link.hasDropdown) {
                   return (
                     <div
-                      key={link.href}
+                      key={link.bare}
                       className="relative"
                       onMouseEnter={() => setServicesDropdownOpen(true)}
                       onMouseLeave={() => setServicesDropdownOpen(false)}
@@ -106,7 +106,6 @@ export const Header: React.FC = () => {
                         <ChevronDown className="w-3.5 h-3.5 opacity-70" />
                       </Link>
 
-                      {/* Dropdown Menu */}
                       {servicesDropdownOpen && (
                         <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-72 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800 p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                           <div className="text-[11px] font-semibold uppercase tracking-wider text-[#64748B] dark:text-slate-400 px-3 py-1.5 border-b border-slate-100 dark:border-slate-800">
@@ -116,7 +115,7 @@ export const Header: React.FC = () => {
                             {treatmentsData.map((item) => (
                               <Link
                                 key={item.slug}
-                                href={`/treatments/${item.slug}`}
+                                href={getLocalizedEntityPath('treatments', item, language)}
                                 className="block px-3 py-2 rounded-xl text-xs xl:text-sm font-medium text-[#163B63] dark:text-slate-200 hover:bg-[#EAF6FF] dark:hover:bg-slate-800 hover:text-[#0097FB] dark:hover:text-sky-400 transition-colors"
                               >
                                 {item.title[language]}
@@ -125,7 +124,7 @@ export const Header: React.FC = () => {
                           </div>
                           <div className="border-t border-slate-100 dark:border-slate-800 p-1.5 mt-1">
                             <Link
-                              href="/treatments"
+                              href={getLocalizedPath('/treatments', language)}
                               className="block text-center text-xs font-semibold text-[#0097FB] dark:text-sky-400 hover:text-[#032654] dark:hover:text-sky-300 py-1"
                             >
                               {t.specialties.cta} →
@@ -139,7 +138,7 @@ export const Header: React.FC = () => {
 
                 return (
                   <Link
-                    key={link.href}
+                    key={link.bare}
                     href={link.href}
                     className={`inline-flex items-center px-3 2xl:px-4 py-1.5 2xl:py-2 rounded-full text-xs xl:text-[13px] 2xl:text-sm font-semibold whitespace-nowrap transition-all duration-200 select-none ${
                       isActive
@@ -157,19 +156,14 @@ export const Header: React.FC = () => {
 
             {/* Language Switcher & Primary CTA (xl+) */}
             <div className="hidden xl:flex items-center gap-2.5 2xl:gap-3 flex-shrink-0">
-              {/* Language Switcher hidden until dedicated /en/ and /fr/ localized sub-routes and hreflang are finalized */}
-              {false && <LanguageSwitcher isScrolled={isScrolled || !isDarkHeroPage} id="header-desktop" />}
-
+              <LanguageSwitcher isScrolled={isScrolled || !isDarkHeroPage} id="header-desktop" />
 
               <a
-                href={pathname === '/' ? '#consultation' : '/#consultation'}
+                href={consultationHref}
                 onClick={(e) => {
-                  if (pathname === '/') {
+                  if (isDarkHeroPage) {
                     e.preventDefault();
-                    const el = document.getElementById('consultation');
-                    if (el) {
-                      el.scrollIntoView({ behavior: 'smooth' });
-                    }
+                    document.getElementById('consultation')?.scrollIntoView({ behavior: 'smooth' });
                   }
                 }}
                 className="inline-flex items-center gap-2 bg-[#0097FB] hover:bg-[#0082d6] text-white text-xs 2xl:text-sm font-bold px-4 2xl:px-5 py-2 2xl:py-2.5 rounded-full shadow-md shadow-[#0097FB]/25 hover:shadow-[#0097FB]/35 transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer whitespace-nowrap"
@@ -180,19 +174,15 @@ export const Header: React.FC = () => {
             </div>
 
             {/* Mobile & Tablet Controls (< xl) */}
-            <div className="flex items-center gap-1 sm:gap-2 xl:hidden flex-shrink-0">
-              {/* Language Switcher hidden until dedicated /en/ and /fr/ localized sub-routes and hreflang are finalized */}
-              {false && <LanguageSwitcher isScrolled={isScrolled || !isDarkHeroPage} id="header-mobile" />}
+            <div className="flex items-center gap-1.5 sm:gap-2 xl:hidden shrink-0">
+              <LanguageSwitcher isScrolled={isScrolled || !isDarkHeroPage} id="header-mobile" />
 
               <a
-                href={pathname === '/' ? '#consultation' : '/#consultation'}
+                href={consultationHref}
                 onClick={(e) => {
-                  if (pathname === '/') {
+                  if (isDarkHeroPage) {
                     e.preventDefault();
-                    const el = document.getElementById('consultation');
-                    if (el) {
-                      el.scrollIntoView({ behavior: 'smooth' });
-                    }
+                    document.getElementById('consultation')?.scrollIntoView({ behavior: 'smooth' });
                   }
                 }}
                 className="hidden md:inline-flex items-center gap-1.5 bg-[#0097FB] hover:bg-[#0082d6] text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm"
@@ -229,13 +219,11 @@ export const Header: React.FC = () => {
               <div className="space-y-1">
                 {navLinks.map((link) => {
                   const isActive =
-                    link.href === '/'
-                      ? pathname === '/'
-                      : pathname.startsWith(link.href);
+                    link.bare === '/' ? barePath === '/' : barePath.startsWith(link.bare);
 
                   return (
                     <Link
-                      key={link.href}
+                      key={link.bare}
                       href={link.href}
                       onClick={() => setMobileMenuOpen(false)}
                       className={`block px-4 py-2.5 rounded-xl text-base font-medium transition-colors ${
@@ -250,17 +238,24 @@ export const Header: React.FC = () => {
                 })}
               </div>
 
+              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2 px-1">
+                <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#163B63] dark:text-slate-300">
+                  <Globe className="w-4 h-4 text-[#0097FB]" />
+                  <span>
+                    {language === 'ar' ? 'لغة الموقع' : language === 'fr' ? 'Langue' : 'Language'}
+                  </span>
+                </span>
+                <LanguageSwitcher isScrolled id="header-mobile-drawer" />
+              </div>
+
               <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
                 <a
-                  href={pathname === '/' ? '#consultation' : '/#consultation'}
+                  href={consultationHref}
                   onClick={(e) => {
                     setMobileMenuOpen(false);
-                    if (pathname === '/') {
+                    if (isDarkHeroPage) {
                       e.preventDefault();
-                      const el = document.getElementById('consultation');
-                      if (el) {
-                        el.scrollIntoView({ behavior: 'smooth' });
-                      }
+                      document.getElementById('consultation')?.scrollIntoView({ behavior: 'smooth' });
                     }
                   }}
                   className="w-full flex items-center justify-center gap-2 bg-[#0097FB] hover:bg-[#0082d6] text-white font-semibold py-3 rounded-xl shadow-md shadow-[#0097FB]/20 transition-colors"

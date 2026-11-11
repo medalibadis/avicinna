@@ -1,3 +1,5 @@
+import type { LocalizedSlugs, LocalizedSeo } from '@/types/cms';
+
 export interface Treatment {
   id: string;
   slug: string;
@@ -39,6 +41,9 @@ export interface Treatment {
     answer: { ar: string; en: string; fr: string };
   }[];
   doctorIds: string[];
+  slugs?: LocalizedSlugs;
+  seo?: LocalizedSeo;
+  updatedAt?: string;
 }
 
 export const treatmentsData: Treatment[] = [

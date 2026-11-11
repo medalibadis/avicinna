@@ -212,16 +212,17 @@ export function ImageUploadField({
         </div>
       ) : (
         /* Mode 2: Direct URL Input */
-        <div className="relative">
-          <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none text-slate-400">
+        <div className="relative" dir="ltr">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
             <Link2 className="w-4 h-4" />
           </div>
           <input
             type="url"
+            dir="ltr"
             value={value}
             onChange={(e) => onChange(e.target.value)}
             placeholder={t.urlPlaceholder}
-            className="w-full bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl py-2 ps-9 pe-3 text-xs text-slate-800 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all shadow-xs placeholder:text-slate-400 dark:placeholder:text-slate-500"
+            className="w-full bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl py-2 pl-9 pr-3 text-left font-mono text-xs text-slate-800 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all shadow-xs placeholder:text-slate-400 dark:placeholder:text-slate-500"
           />
         </div>
       )}
@@ -252,7 +253,7 @@ export function ImageUploadField({
                   <CheckCircle2 className="w-4 h-4 shrink-0" />
                   <span className="truncate">{t.success}</span>
                 </div>
-                <p className="text-[10px] text-slate-400 dark:text-slate-400 truncate max-w-xs font-mono">
+                <p dir="ltr" className="text-[10px] text-slate-400 dark:text-slate-400 truncate max-w-xs font-mono text-start">
                   {value.startsWith('data:') ? t.localImage : value}
                 </p>
                 <button
@@ -277,7 +278,7 @@ export function ImageUploadField({
                     <span className="block text-xs font-bold text-slate-800 dark:text-slate-100 truncate">
                       {t.success}
                     </span>
-                    <p className="text-[10px] text-slate-400 dark:text-slate-400 truncate max-w-sm font-mono">
+                    <p dir="ltr" className="text-[10px] text-slate-400 dark:text-slate-400 truncate max-w-sm font-mono text-start">
                       {value.startsWith('data:') ? t.localImage : value}
                     </p>
                   </div>

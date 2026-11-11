@@ -1,3 +1,5 @@
+import type { LocalizedSlugs, LocalizedSeo, FaqItem, MedicalReviewerInfo } from '@/types/cms';
+
 export interface ArticleCategory {
   id: string;
   slug: string;
@@ -44,18 +46,30 @@ export interface Article {
     en: string[];
     fr: string[];
   };
+  htmlContent?: {
+    ar: string;
+    en: string;
+    fr: string;
+  };
+  slugs?: LocalizedSlugs;
+  seo?: LocalizedSeo;
+  faqs?: FaqItem[];
   readingTimeMinutes: number;
   publishedDate: string;
+  updatedDate?: string;
+  updatedAt?: string;
   sourceHospital: {
     ar: string;
     en: string;
     fr: string;
   };
   image: string;
+  authorDoctorId?: string;
   author: {
     name: { ar: string; en: string; fr: string };
     role: { ar: string; en: string; fr: string };
   };
+  medicalReviewer?: MedicalReviewerInfo;
 }
 
 export const articlesData: Article[] = [
@@ -100,15 +114,63 @@ export const articlesData: Article[] = [
     },
     readingTimeMinutes: 6,
     publishedDate: '2026-08-15',
+    updatedDate: '2026-10-18',
+    updatedAt: '2026-10-18T10:00:00Z',
+    slugs: {
+      ar: 'cancer-treatment-turkey-guide-cost',
+      en: 'cancer-treatment-turkey-guide-cost',
+      fr: 'traitement-cancer-turquie-guide-couts',
+    },
+    htmlContent: {
+      ar: `
+<h2>لماذا تختار تركيا لعلاج الأورام والسرطان؟</h2>
+<p>أصبحت تركيا في السنوات الأخيرة إحدى الوجهات العالمية المفضلة لعلاج الأورام وأمراض السرطان، بفضل استثماراتها الهائلة في البنية التحتية الطبية وتوفر أحدث التقنيات مثل المعجلات الخطية وجراحة دافنشي الروبوتية والعلاج بالخلايا التائية CAR-T.</p>
+<h3>نهج مجلس الأورام متعدد التخصصات (Tumor Board)</h3>
+<p>ما يميز مراكز الأورام الشريكة لـ <strong>AVICINNA</strong> هو نهج مجلس الأورام متعدد التخصصات، حيث يجتمع نخبة من استشاريي <a href="/treatments/oncology">طب الأورام</a> والجراحة والعلاج الإشعاعي لمراجعة ملف المريض معاً ووضع أنسب خطة علاجية.</p>
+<ul>
+  <li>فحوصات جينية وجزيئية متقدمة لتحديد العلاج الموجه والمناعي بدقة.</li>
+  <li>إشراف مباشر من بروفيسورات معتمدين مثل <a href="/doctors/prof-dr-serdar-turhal">أ. د. سردار تورهال</a>.</li>
+  <li>توفير في التكلفة يتراوح بين 40% و60% مقارنة بأوروبا وأمريكا مع نفس جودة الأدوية المعتمدة من FDA وEMA.</li>
+</ul>
+      `.trim(),
+      en: `
+<h2>Why Choose Turkey for Cancer & Oncology Care?</h2>
+<p>Turkey has emerged as a premier destination for <a href="/en/treatments/oncology">oncology care</a>, driven by state-of-the-art infrastructure including TrueBeam linear accelerators, Da Vinci robotic systems, and targeted CAR-T immunotherapies.</p>
+<h3>The Multidisciplinary Tumor Board Advantage</h3>
+<p>The hallmark of <strong>AVICINNA</strong> partner cancer centers is the multidisciplinary tumor board, uniting medical oncologists, surgical oncologists, radiation experts, and geneticists to chart individualized pathways.</p>
+<ul>
+  <li>Comprehensive genomic biomarker profiling for precision therapy selection.</li>
+  <li>Direct case oversight by senior faculty such as <a href="/en/doctors/prof-dr-serdar-turhal">Prof. Dr. Serdar Turhal</a>.</li>
+  <li>Savings of 40% to 60% compared to Western Europe and the US with FDA/EMA-approved medications.</li>
+</ul>
+      `.trim(),
+      fr: `
+<h2>Pourquoi choisir la Turquie pour traiter le cancer ?</h2>
+<p>La Turquie s’est imposée comme une référence internationale en <a href="/fr/treatments/oncologie">oncologie médicale</a> grâce à des équipements de pointe tels que les accélérateurs TrueBeam et la chirurgie robotique Da Vinci.</p>
+<h3>La Réunion de Concertation Pluridisciplinaire (RCP)</h3>
+<p>La prise en charge au sein des centres partenaires <strong>AVICINNA</strong> repose sur une concertation associant oncologues, chirurgiens, radiothérapeutes et généticiens.</p>
+<ul>
+  <li>Profilage moléculaire avancé pour cibler l’immunothérapie.</li>
+  <li>Supervision directe par des professeurs reconnus tels que <a href="/fr/doctors/prof-dr-serdar-turhal">Prof. Dr. Serdar Turhal</a>.</li>
+  <li>Coûts de 40% à 60% inférieurs à ceux pratiqués en Europe occidentale.</li>
+</ul>
+      `.trim(),
+    },
     sourceHospital: {
       ar: 'مستشفى أجيبادم للأورام والمركز المعتمد بتركيا',
       en: 'Acibadem Comprehensive Cancer Center',
       fr: 'Centre Intégré d’Oncologie Acibadem',
     },
     image: 'https://images.unsplash.com/photo-1579154204601-01588f351e67?q=80&w=1200&auto=format&fit=crop',
+    authorDoctorId: 'doc-3',
     author: {
       name: { ar: 'أ. د. سردار تورهال', en: 'Prof. Dr. Serdar Turhal', fr: 'Prof. Dr. Serdar Turhal' },
       role: { ar: 'استشاري طب الأورام السريري', en: 'Medical Oncology Professor', fr: 'Professeur d’Oncologie Médicale' },
+    },
+    medicalReviewer: {
+      doctorId: 'doc-9',
+      name: { ar: 'أ. د. نجدت أوسكنت', en: 'Prof. Dr. Necdet Uskent', fr: 'Prof. Dr. Necdet Uskent' },
+      role: { ar: 'رئيس لجنة مراجعة الأورام وأمراض الدم', en: 'Head of Oncology & Hematology Review Board', fr: 'Président du Comité de Revue Oncologique' },
     },
   },
   {
@@ -151,15 +213,28 @@ export const articlesData: Article[] = [
     },
     readingTimeMinutes: 5,
     publishedDate: '2026-08-28',
+    updatedDate: '2026-10-12',
+    updatedAt: '2026-10-12T10:00:00Z',
+    slugs: {
+      ar: 'immunotherapy-cancer-treatment-turkey',
+      en: 'immunotherapy-cancer-treatment-turkey',
+      fr: 'immunotherapie-traitement-cancer-turquie',
+    },
     sourceHospital: {
       ar: 'مركز أبحاث الأورام والمناعة الحيوية',
       en: 'Biologic Immuno-Oncology Research Institute',
       fr: 'Institut de Recherche en Immuno-Oncologie',
     },
     image: 'https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?q=80&w=1200&auto=format&fit=crop',
+    authorDoctorId: 'doc-9',
     author: {
       name: { ar: 'د. ليلى جان', en: 'Dr. Leyla Can', fr: 'Dr. Leyla Can' },
       role: { ar: 'أخصائية المناعة السريرية', en: 'Clinical Immunologist', fr: 'Immunologue Clinique' },
+    },
+    medicalReviewer: {
+      doctorId: 'doc-3',
+      name: { ar: 'أ. د. سردار تورهال', en: 'Prof. Dr. Serdar Turhal', fr: 'Prof. Dr. Serdar Turhal' },
+      role: { ar: 'استشاري طب الأورام السريري', en: 'Medical Oncology Reviewer', fr: 'Oncologue Réviseur' },
     },
   },
   {
@@ -202,15 +277,28 @@ export const articlesData: Article[] = [
     },
     readingTimeMinutes: 5,
     publishedDate: '2026-09-02',
+    updatedDate: '2026-10-15',
+    updatedAt: '2026-10-15T10:00:00Z',
+    slugs: {
+      ar: 'cyberknife-robotic-radiosurgery-guide',
+      en: 'cyberknife-robotic-radiosurgery-guide',
+      fr: 'radiochirurgie-robotisee-cyberknife-guide',
+    },
     sourceHospital: {
       ar: 'مستشفى أجيبادم - مركز جراحة الأعصاب الإشعاعية',
       en: 'Acibadem Radiosurgery & Spine Center',
       fr: 'Centre de Radiochirurgie Acibadem',
     },
     image: 'https://images.unsplash.com/photo-1516549655169-df83a0774514?q=80&w=1200&auto=format&fit=crop',
+    authorDoctorId: 'doc-2',
     author: {
       name: { ar: 'أ. د. محمد زكي غوكشيل', en: 'Prof. Dr. Mehmet Zeki Gokcil', fr: 'Prof. Dr. Mehmet Zeki Gokcil' },
       role: { ar: 'استشاري جراحة المخ والأعصاب', en: 'Professor of Neurosurgery', fr: 'Professeur de Neurochirurgie' },
+    },
+    medicalReviewer: {
+      doctorId: 'doc-8',
+      name: { ar: 'أ. د. عزمي حمزة أوغلو', en: 'Prof. Dr. Azmi Hamzaoglu', fr: 'Prof. Dr. Azmi Hamzaoglu' },
+      role: { ar: 'استشاري جراحة الأعصاب والعمود الفقري', en: 'Neuro-Spine Surgical Reviewer', fr: 'Réviseur Chirurgie du Rachis' },
     },
   },
   {
@@ -253,15 +341,28 @@ export const articlesData: Article[] = [
     },
     readingTimeMinutes: 7,
     publishedDate: '2026-09-08',
+    updatedDate: '2026-10-16',
+    updatedAt: '2026-10-16T10:00:00Z',
+    slugs: {
+      ar: 'coronary-artery-bypass-surgery-types-success',
+      en: 'coronary-artery-bypass-surgery-types-success',
+      fr: 'pontage-coronarien-cabg-techniques-reussite',
+    },
     sourceHospital: {
       ar: 'مستشفى أفيسينا والمركز الجامعي للقلب',
       en: 'Avicenna University Heart Center',
       fr: 'Centre Universitaire de Cardiologie Avicenna',
     },
     image: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?q=80&w=1200&auto=format&fit=crop',
+    authorDoctorId: 'doc-1',
     author: {
       name: { ar: 'أ. د. أحمد أوزكارا', en: 'Prof. Dr. Ahmet Ozkara', fr: 'Prof. Dr. Ahmet Ozkara' },
       role: { ar: 'استشاري جراحة القلب والأوعية', en: 'Cardiovascular Surgery Chair', fr: 'Chirurgien Cardiovasculaire' },
+    },
+    medicalReviewer: {
+      doctorId: 'doc-11',
+      name: { ar: 'أ. د. علي جمال أوزجان', en: 'Prof. Dr. Ali Cemal Ozcan', fr: 'Prof. Dr. Ali Cemal Ozcan' },
+      role: { ar: 'استشاري جراحة القلب والأوعية الدموية', en: 'Cardiovascular Peer Reviewer', fr: 'Réviseur Chirurgie Cardiaque' },
     },
   },
   {
@@ -304,6 +405,13 @@ export const articlesData: Article[] = [
     },
     readingTimeMinutes: 5,
     publishedDate: '2026-09-10',
+    updatedDate: '2026-10-19',
+    updatedAt: '2026-10-19T10:00:00Z',
+    slugs: {
+      ar: 'hair-transplant-sapphire-vs-dhi-comparison',
+      en: 'hair-transplant-sapphire-vs-dhi-comparison',
+      fr: 'greffe-cheveux-sapphire-fue-vs-dhi-comparatif',
+    },
     sourceHospital: {
       ar: 'مركز أفيسينا لزراعة الشعر والترميم الجلدي',
       en: 'Avicenna Aesthetic & Hair Center',
@@ -313,6 +421,11 @@ export const articlesData: Article[] = [
     author: {
       name: { ar: 'د. إيمري تشيتشيك', en: 'Dr. Emre Cicek', fr: 'Dr. Emre Cicek' },
       role: { ar: 'استشاري زراعة وترميم الشعر', en: 'Hair Restoration Specialist', fr: 'Spécialiste de la Greffe Capillaire' },
+    },
+    medicalReviewer: {
+      doctorId: 'doc-7',
+      name: { ar: 'د. فولكان بايتكين', en: 'Assoc. Prof. Dr. Volkan Baytekin', fr: 'Prof. Assoc. Dr. Volkan Baytekin' },
+      role: { ar: 'استشاري الجراحة التجميلية والترميمية', en: 'Aesthetic Surgery Medical Reviewer', fr: 'Réviseur Chirurgie Esthétique' },
     },
   },
   {
@@ -355,6 +468,13 @@ export const articlesData: Article[] = [
     },
     readingTimeMinutes: 4,
     publishedDate: '2026-09-12',
+    updatedDate: '2026-10-20',
+    updatedAt: '2026-10-20T10:00:00Z',
+    slugs: {
+      ar: 'hollywood-smile-istanbul-steps-cost-benefits',
+      en: 'hollywood-smile-istanbul-steps-cost-benefits',
+      fr: 'hollywood-smile-istanbul-etapes-tarifs-garanties',
+    },
     sourceHospital: {
       ar: 'مركز أفيسينا لطب وجراحة الأسنان الرقمية',
       en: 'Avicenna Digital Dental Hospital',
@@ -364,6 +484,11 @@ export const articlesData: Article[] = [
     author: {
       name: { ar: 'د. سيدا أرسلان', en: 'Dr. Dt. Seda Arslan', fr: 'Dr. Dt. Seda Arslan' },
       role: { ar: 'استشارية تجميل الأسنان الرقمي', en: 'Cosmetic Prosthodontist', fr: 'Chirurgien-Dentiste Esthétique' },
+    },
+    medicalReviewer: {
+      doctorId: 'doc-3',
+      name: { ar: 'أ. د. سردار تورهال', en: 'Prof. Dr. Serdar Turhal', fr: 'Prof. Dr. Serdar Turhal' },
+      role: { ar: 'رئيس المجلس الاستشاري الطبي في أفيسينا', en: 'Medical Advisory Board Chair', fr: 'Président du Conseil Médical' },
     },
   },
 ];

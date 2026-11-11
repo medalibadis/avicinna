@@ -31,6 +31,7 @@ import {
   Stethoscope,
   Video,
   Upload,
+  Globe,
 } from 'lucide-react';
 import { uploadImageFile } from '@/lib/supabase';
 import { ImageUploadField } from '@/components/admin/ImageUploadField';
@@ -40,6 +41,9 @@ import { ModalPortal } from '@/components/admin/ModalPortal';
 import { SmartTranslatableField } from '@/components/admin/SingleInputAutoTranslator';
 import { useConfirmDialog } from '@/context/ConfirmDialogContext';
 import { ContextualSectionTip } from '@/components/admin/AdminOnboardingGuide';
+import { EntitySeoPanel } from '@/components/admin/EntitySeoPanel';
+import { slugifyText } from '@/lib/i18nRoutes';
+import type { LocalizedSeo, LocalizedSlugs } from '@/types/cms';
 
 const hospitalsDict = {
   ar: {
@@ -296,7 +300,9 @@ function HospitalsContent() {
   // Hospital Modal state
   const [hospitalModalOpen, setHospitalModalOpen] = useState(false);
   const [editingHospital, setEditingHospital] = useState<HospitalPartner | null>(null);
-  const [activeTab, setActiveTab] = useState<'info' | 'images' | 'capacities' | 'doctors'>('info');
+  const [activeTab, setActiveTab] = useState<'info' | 'images' | 'capacities' | 'doctors' | 'seo'>('info');
+  const [slugs, setSlugs] = useState<LocalizedSlugs>({ ar: '', fr: '', en: '' });
+  const [seo, setSeo] = useState<LocalizedSeo>({ ar: {}, fr: {}, en: {} });
 
   // Hospital Form fields
   const [nameAr, setNameAr] = useState('');
@@ -398,11 +404,13 @@ function HospitalsContent() {
     setEstablishedYear(2016);
     setTechnologiesRaw('روبوت دافنشي Xi الجراحي, رنين مغناطيسي 3 تسلا, غرف عمليات هجينة ذكية');
     setSelectedSpecialties(['cardiac-surgery', 'oncology', 'neurosurgery', 'orthopedics', 'organ-transplant']);
+    setSlugs({ ar: '', fr: '', en: '' });
+    setSeo({ ar: {}, fr: {}, en: {} });
     setHospitalModalOpen(true);
   };
 
   // Open Edit Hospital
-  const openEditModal = (hosp: HospitalPartner, initialTab: 'info' | 'images' | 'capacities' | 'doctors' = 'info') => {
+  const openEditModal = (hosp: HospitalPartner, initialTab: 'info' | 'images' | 'capacities' | 'doctors' | 'seo' = 'info') => {
     setEditingHospital(hosp);
     setActiveTab(initialTab);
     setNameAr(hosp.name.ar);
@@ -432,6 +440,16 @@ function HospitalsContent() {
     setEstablishedYear(hosp.establishedYear || 2015);
     setTechnologiesRaw((hosp.technologies?.ar || []).join(', ') || 'روبوت دافنشي الجراحي, رنين مغناطيسي 3 تسلا');
     setSelectedSpecialties(hosp.specialties || ['cardiac-surgery', 'oncology']);
+    setSlugs({
+      ar: hosp.slugs?.ar || hosp.slug,
+      fr: hosp.slugs?.fr || hosp.slug,
+      en: hosp.slugs?.en || hosp.slug,
+    });
+    setSeo({
+      ar: hosp.seo?.ar || {},
+      fr: hosp.seo?.fr || {},
+      en: hosp.seo?.en || {},
+    });
     setHospitalModalOpen(true);
   };
 
@@ -462,9 +480,18 @@ function HospitalsContent() {
     const parsedTechs = technologiesRaw.split(',').map((s) => s.trim()).filter(Boolean);
     const finalGallery = gallery.length > 0 ? gallery : [image];
 
+    const baseSlug = editingHospital?.slug || slugs.en || slugs.fr || slugs.ar || slugifyText(finalNameEn) || `hosp-${Date.now()}`;
+
     const payload: HospitalPartner = {
       id: editingHospital ? editingHospital.id : `hosp-${Date.now()}`,
-      slug: editingHospital?.slug || (finalNameEn || 'hospital').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+      slug: baseSlug,
+      slugs: {
+        ar: (slugs.ar || '').trim() || baseSlug,
+        fr: (slugs.fr || '').trim() || baseSlug,
+        en: (slugs.en || '').trim() || baseSlug,
+      },
+      seo,
+      updatedAt: new Date().toISOString(),
       name: {
         ar: finalNameAr,
         en: finalNameEn,
@@ -1040,6 +1067,19 @@ function HospitalsContent() {
                 <Users className="w-3.5 h-3.5" />
                 <span>{d.tabDoctors}</span>
               </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab('seo')}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
+                  activeTab === 'seo'
+                    ? 'bg-[#0097FB] text-white shadow-xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                <Globe className="w-3.5 h-3.5" />
+                <span>SEO & URLs</span>
+              </button>
             </div>
 
             {/* Modal Body / Tab Content */}
@@ -1297,6 +1337,22 @@ function HospitalsContent() {
                         </div>
                       ))}
                   </div>
+                </div>
+              )}
+
+              {activeTab === 'seo' && (
+                <div className="animate-in fade-in duration-150">
+                  <EntitySeoPanel
+                    key={editingHospital?.id || 'new-hospital'}
+                    sectionPrefix="hospitals"
+                    baseSlug={editingHospital?.slug || slugifyText(nameEn || nameFr || nameAr) || 'new-hospital'}
+                    slugs={slugs}
+                    seo={seo}
+                    fallbackTitle={{ ar: nameAr, en: nameEn, fr: nameFr }}
+                    fallbackDesc={{ ar: descAr, en: descEn, fr: descFr }}
+                    onChangeSlugs={setSlugs}
+                    onChangeSeo={setSeo}
+                  />
                 </div>
               )}
               </div>

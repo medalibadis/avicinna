@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useData } from '@/context/DataContext';
@@ -33,6 +33,11 @@ import {
   X,
   Target,
   Keyboard,
+  Activity,
+  BellRing,
+  Send,
+  Loader2,
+  Users,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAdminGuideStatus } from '@/components/admin/AdminOnboardingGuide';
@@ -52,6 +57,8 @@ const settingsDict = {
       guide: 'المساعد والجولات',
       appearance: 'السمات والمظهر (Fernly)',
       whatsapp: 'قنوات التواصل وواتساب',
+      tracking: 'التتبع والإحصائيات (GA4 / Pixel)',
+      notifications: 'إشعارات الطلبات الفورية',
       database: 'قاعدة البيانات والمزامنة',
       sections: 'رؤية أقسام الموقع',
       security: 'الأمان وحماية الجلسة',
@@ -148,8 +155,8 @@ const settingsDict = {
       sub: 'مستوى حماية لوحة التحكم والإجراءات الأمنية المطبقة ضد محاولات الاختراق.',
       bruteForceTitle: 'حماية هجمات التخمين (Brute-Force)',
       bruteForceDesc: 'مفعل تلقائياً مع تحديد عدد محاولات الدخول (بحد أقصى 5 محاولات) وحظر IP تلقائياً لمدة 15 دقيقة عند التكرار.',
-      pinTitle: 'رمز الحماية الإضافي (PIN Security)',
-      pinDesc: 'يطلب النظام رمز تأكيد أمان إضافي عند تسجيل الدخول لمنع الوصول غير المصرح به حتى مع معرفة كلمة المرور.',
+      pinTitle: 'التحقق الثنائي TOTP وحسابات الفريق',
+      pinDesc: 'مصادقة ثنائية حقيقية عبر تطبيق Google Authenticator وحسابات منفصلة بصلاحيات (Admin / Editor / Coordinator).',
       cookieTitle: 'جلسة مشفرة (HTTP-Only Secure Cookie)',
       cookieDesc: 'كوكي الجلسة مشفر برمجياً ومرتبط بالخادم مع حظر وصول جافاسكريبت للكوكي لحمايته من ثغرات XSS.',
       auditBadge: 'تم اجتياز كافة الفحوصات الأمنية بنجاح',
@@ -166,6 +173,8 @@ const settingsDict = {
       guide: 'Interactive Guide',
       appearance: 'Appearance & Accent (Fernly)',
       whatsapp: 'WhatsApp & Channels',
+      tracking: 'Tracking & Analytics (GA4 / Meta)',
+      notifications: 'Instant Lead Alerts',
       database: 'Database & Sync',
       sections: 'Sections Visibility',
       security: 'Security & Access',
@@ -262,8 +271,8 @@ const settingsDict = {
       sub: 'Dashboard protection protocols and defenses implemented against malicious intrusion attempts.',
       bruteForceTitle: 'Brute-Force Rate Limiting',
       bruteForceDesc: 'Automatically enforced with a strict 5-attempt threshold and 15-minute temporary IP ban upon failure.',
-      pinTitle: 'PIN Security Verification',
-      pinDesc: 'Secondary authorization code required during administrative login to prevent unauthorized access.',
+      pinTitle: 'Authenticator TOTP 2FA & Team RBAC',
+      pinDesc: 'RFC 6238 two-factor verification via Authenticator app plus individual role-scoped staff accounts and activity auditing.',
       cookieTitle: 'Encrypted HTTP-Only Sessions',
       cookieDesc: 'Server-bound cryptographic cookie with client-side script access strictly blocked against XSS.',
       auditBadge: 'All Security Audits Passed',
@@ -280,6 +289,8 @@ const settingsDict = {
       guide: 'Guide & Assistance',
       appearance: 'Apparence & Thèmes (Fernly)',
       whatsapp: 'WhatsApp & Canaux',
+      tracking: 'Tracking & Pixels (GA4 / Meta)',
+      notifications: 'Alertes Leads Instantanées',
       database: 'Base de Données & Sync',
       sections: 'Visibilité des Sections',
       security: 'Sécurité & Accès',
@@ -376,8 +387,8 @@ const settingsDict = {
       sub: 'Protocoles de sécurité et mesures défensives contre les intrusions et attaques.',
       bruteForceTitle: 'Protection Anti Brute-Force',
       bruteForceDesc: 'Limite stricte à 5 tentatives de connexion avant blocage temporaire d’IP pendant 15 minutes.',
-      pinTitle: 'Code de Sécurité PIN Obligatoire',
-      pinDesc: 'Code de vérification additionnel requis lors de la connexion pour sécuriser l’accès.',
+      pinTitle: '2FA TOTP Authenticator & Comptes Équipe',
+      pinDesc: 'Double authentification via Google Authenticator et comptes individuels par rôle (Admin / Éditeur / Coordinateur).',
       cookieTitle: 'Session Chiffrée HTTP-Only',
       cookieDesc: 'Cookie d’authentification chiffré et protégé contre les attaques de script XSS.',
       auditBadge: 'Tous les audits de sécurité validés',
@@ -393,6 +404,8 @@ export default function AdminSettingsPage() {
     articles,
     stories,
     inquiries,
+    settings: ctxSettings,
+    updateSettings,
     isSupabaseConnected,
     syncStatus,
     refreshFromSupabase,
@@ -404,28 +417,56 @@ export default function AdminSettingsPage() {
   const d = settingsDict[locale] || settingsDict.en;
   const { accent, setAccent, accentOption } = useAccent();
 
-  const [activeTab, setActiveTab] = useState<'general' | 'guide' | 'appearance' | 'whatsapp' | 'database' | 'sections' | 'security'>('general');
+  const [activeTab, setActiveTab] = useState<
+    'general' | 'guide' | 'appearance' | 'whatsapp' | 'tracking' | 'notifications' | 'database' | 'sections' | 'security'
+  >('general');
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [isTestingNotify, setIsTestingNotify] = useState(false);
+  const [notifyTestResults, setNotifyTestResults] = useState<Array<{ channel: string; status: string; detail?: string }> | null>(null);
 
   const { isEnabled: guideEnabled, setGuideEnabled } = useAdminGuideStatus();
   const { confirm } = useConfirmDialog();
 
-  // Settings State initialized from initialSiteConfig + localStorage
-  const [settings, setSettings] = useState<SiteConfig>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem(SETTINGS_STORAGE_KEY);
-      if (saved) {
-        try {
-          return { ...initialSiteConfig, ...JSON.parse(saved) };
-        } catch {
-          // fallback
-        }
-      }
-    }
-    return initialSiteConfig;
-  });
+  const defaultTracking = {
+    enableTracking: false,
+    ga4MeasurementId: '',
+    metaPixelId: '',
+    metaCapiAccessToken: '',
+    metaTestEventCode: '',
+  };
+  const defaultNotifications = {
+    emailEnabled: false,
+    emailTo: '',
+    emailFrom: '',
+    resendApiKey: '',
+    telegramEnabled: false,
+    telegramBotToken: '',
+    telegramChatId: '',
+    whatsappWebhookEnabled: false,
+    whatsappWebhookUrl: '',
+    whatsappCloudToken: '',
+    whatsappPhoneNumberId: '',
+    whatsappNotifyNumber: '',
+  };
+
+  // Settings State synced from DataContext (/api/cms) + initialSiteConfig
+  const [settings, setSettings] = useState<SiteConfig>(() => ({
+    ...initialSiteConfig,
+    ...ctxSettings,
+    tracking: { ...defaultTracking, ...(initialSiteConfig.tracking || {}), ...(ctxSettings?.tracking || {}) },
+    notifications: { ...defaultNotifications, ...(initialSiteConfig.notifications || {}), ...(ctxSettings?.notifications || {}) },
+  }));
+
+  useEffect(() => {
+    setSettings({
+      ...initialSiteConfig,
+      ...ctxSettings,
+      tracking: { ...defaultTracking, ...(initialSiteConfig.tracking || {}), ...(ctxSettings?.tracking || {}) },
+      notifications: { ...defaultNotifications, ...(initialSiteConfig.notifications || {}), ...(ctxSettings?.notifications || {}) },
+    });
+  }, [ctxSettings]);
 
   const handleToggleGuide = () => {
     const currentStatus = typeof settings.adminGuideEnabled === 'boolean'
@@ -441,7 +482,7 @@ export default function AdminSettingsPage() {
     toast.success(nextVal ? d.guideSetting.activatedToast : d.guideSetting.deactivatedToast);
   };
 
-  const handleSave = (e?: React.FormEvent) => {
+  const handleSave = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (typeof window !== 'undefined') {
       localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
@@ -449,9 +490,40 @@ export default function AdminSettingsPage() {
         setGuideEnabled(settings.adminGuideEnabled);
       }
     }
+    await updateSettings(settings);
     setSavedSuccess(true);
     toast.success(d.saveSuccess);
     setTimeout(() => setSavedSuccess(false), 3000);
+  };
+
+  const handleSendTestNotification = async () => {
+    setIsTestingNotify(true);
+    setNotifyTestResults(null);
+    try {
+      await updateSettings(settings);
+      const res = await fetch('/api/notifications/test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notifications: settings.notifications }),
+      });
+      const data = await res.json();
+      if (res.ok && data.results) {
+        setNotifyTestResults(data.results);
+        toast.success(
+          locale === 'fr'
+            ? 'Test de notification exécuté'
+            : locale === 'en'
+            ? 'Notification test executed'
+            : 'تم تنفيذ اختبار الإشعارات الفورية'
+        );
+      } else {
+        toast.error(data.error || 'Failed to test notifications');
+      }
+    } catch {
+      toast.error('Network error testing notifications');
+    } finally {
+      setIsTestingNotify(false);
+    }
   };
 
   const handleExportBackup = () => {
@@ -574,6 +646,8 @@ export default function AdminSettingsPage() {
           { id: 'guide', label: d.tabs.guide, icon: Compass },
           { id: 'appearance', label: d.tabs.appearance, icon: Sparkles },
           { id: 'whatsapp', label: d.tabs.whatsapp, icon: MessageCircle },
+          { id: 'tracking', label: d.tabs.tracking, icon: Activity },
+          { id: 'notifications', label: d.tabs.notifications, icon: BellRing },
           { id: 'database', label: d.tabs.database, icon: Database },
           { id: 'sections', label: d.tabs.sections, icon: Sliders },
           { id: 'security', label: d.tabs.security, icon: ShieldCheck },
@@ -1285,6 +1359,429 @@ export default function AdminSettingsPage() {
         </div>
       )}
 
+      {/* Tracking & Analytics Tab (GA4 + Meta Pixel + Meta CAPI) */}
+      {activeTab === 'tracking' && (
+        <div className="bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-4">
+            <div>
+              <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <Activity className="w-5 h-5 text-sky-600 dark:text-sky-400" />
+                <span>
+                  {locale === 'fr'
+                    ? 'Google Analytics 4 (GA4), Meta Pixel & Conversions API'
+                    : locale === 'en'
+                    ? 'Google Analytics 4 (GA4), Meta Pixel & Conversions API (CAPI)'
+                    : 'إعدادات التتبع والتحليل (GA4 + Meta Pixel + CAPI)'}
+                </span>
+              </h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                {locale === 'fr'
+                  ? 'Suit automatiquement les conversions de formulaires (Lead / generate_lead) et les clics WhatsApp.'
+                  : locale === 'en'
+                  ? 'Automatically tracks form submissions (generate_lead / Lead) and WhatsApp clicks across all 3 languages.'
+                  : 'يتتبع إرسالات الاستمارات (Lead) ونقرات واتساب تلقائياً في اللغات الثلاث ويرسلها لخوادم Meta.'}
+              </p>
+            </div>
+
+            <label className="inline-flex items-center gap-2.5 cursor-pointer bg-slate-50 dark:bg-slate-800 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700">
+              <input
+                type="checkbox"
+                checked={Boolean(settings.tracking?.enableTracking)}
+                onChange={(e) =>
+                  setSettings((prev) => ({
+                    ...prev,
+                    tracking: { ...(prev.tracking || defaultTracking), enableTracking: e.target.checked },
+                  }))
+                }
+                className="w-4 h-4 accent-sky-600 cursor-pointer"
+              />
+              <span className="text-xs font-bold text-slate-800 dark:text-white">
+                {locale === 'fr' ? 'Activer le suivi' : locale === 'en' ? 'Enable Tracking' : 'تفعيل التتبع'}
+              </span>
+            </label>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                GA4 Measurement ID
+              </label>
+              <input
+                type="text"
+                dir="ltr"
+                value={settings.tracking?.ga4MeasurementId || ''}
+                onChange={(e) =>
+                  setSettings((prev) => ({
+                    ...prev,
+                    tracking: { ...(prev.tracking || defaultTracking), ga4MeasurementId: e.target.value.trim() },
+                  }))
+                }
+                placeholder="G-XXXXXXXXXX"
+                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-xs font-mono text-slate-900 dark:text-white outline-none focus:border-sky-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                Meta Pixel ID
+              </label>
+              <input
+                type="text"
+                dir="ltr"
+                value={settings.tracking?.metaPixelId || ''}
+                onChange={(e) =>
+                  setSettings((prev) => ({
+                    ...prev,
+                    tracking: { ...(prev.tracking || defaultTracking), metaPixelId: e.target.value.trim() },
+                  }))
+                }
+                placeholder="123456789012345"
+                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-xs font-mono text-slate-900 dark:text-white outline-none focus:border-sky-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                Meta Conversions API Access Token (Server-Side CAPI)
+              </label>
+              <input
+                type="password"
+                dir="ltr"
+                value={settings.tracking?.metaCapiAccessToken || ''}
+                onChange={(e) =>
+                  setSettings((prev) => ({
+                    ...prev,
+                    tracking: { ...(prev.tracking || defaultTracking), metaCapiAccessToken: e.target.value.trim() },
+                  }))
+                }
+                placeholder="EAA..."
+                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-xs font-mono text-slate-900 dark:text-white outline-none focus:border-sky-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                Meta CAPI Test Event Code (Optional)
+              </label>
+              <input
+                type="text"
+                dir="ltr"
+                value={settings.tracking?.metaTestEventCode || ''}
+                onChange={(e) =>
+                  setSettings((prev) => ({
+                    ...prev,
+                    tracking: { ...(prev.tracking || defaultTracking), metaTestEventCode: e.target.value.trim() },
+                  }))
+                }
+                placeholder="TEST12345"
+                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-xs font-mono text-slate-900 dark:text-white outline-none focus:border-sky-500"
+              />
+            </div>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-sky-50/70 dark:bg-sky-950/30 border border-sky-200/80 dark:border-sky-800/60 text-xs text-slate-700 dark:text-slate-300 flex flex-wrap items-center justify-between gap-3">
+            <span>
+              {locale === 'fr'
+                ? 'Événements actifs : generate_lead / Lead (soumission formulaire) + whatsapp_click / Contact (clic bouton ou lien WhatsApp) avec déduplication event_id.'
+                : locale === 'en'
+                ? 'Tracked events: generate_lead / Lead (consultation forms) + whatsapp_click / Contact (WhatsApp buttons/links) with server-side CAPI deduplication.'
+                : 'الأحداث المفعّلة: إرسال الاستمارات (generate_lead / Lead) ونقرات واتساب (whatsapp_click / Contact) مع مطابقة event_id.'}
+            </span>
+            <button
+              type="button"
+              onClick={() => handleSave()}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold cursor-pointer"
+            >
+              <Save className="w-3.5 h-3.5" />
+              <span>{d.saveBtn}</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Instant Lead Notifications Tab (Email / Telegram / WhatsApp) */}
+      {activeTab === 'notifications' && (
+        <div className="bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-4">
+            <div>
+              <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <BellRing className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                <span>
+                  {locale === 'fr'
+                    ? 'Alertes Instantanées des Nouveaux Leads (Email + Telegram + WhatsApp)'
+                    : locale === 'en'
+                    ? 'Instant Lead Alerts (Email + Telegram + WhatsApp)'
+                    : 'الإشعارات الفورية للطلبات الجديدة (البريد + تيليجرام + واتساب)'}
+                </span>
+              </h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                {locale === 'fr'
+                  ? 'Envoie une alerte immédiate dès qu’un patient soumet une demande en AR, FR ou EN.'
+                  : locale === 'en'
+                  ? 'Dispatches immediate alerts whenever a consultation form is submitted in Arabic, French, or English.'
+                  : 'إرسال تنبيه فوري للمنسقين عند وصول أي استشارة طبية جديدة بأي لغة.'}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              disabled={isTestingNotify}
+              onClick={handleSendTestNotification}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold cursor-pointer disabled:opacity-50"
+            >
+              {isTestingNotify ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+              <span>
+                {locale === 'fr' ? 'Tester les Alertes' : locale === 'en' ? 'Send Test Notification' : 'إرسال إشعار تجريبي'}
+              </span>
+            </button>
+          </div>
+
+          {notifyTestResults && (
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 flex flex-wrap gap-2">
+              {notifyTestResults.map((r, i) => (
+                <span
+                  key={i}
+                  className={`px-3 py-1 rounded-xl text-xs font-bold border ${
+                    r.status === 'sent'
+                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                      : r.status === 'failed'
+                      ? 'bg-rose-50 text-rose-700 border-rose-200'
+                      : 'bg-white text-slate-600 border-slate-200'
+                  }`}
+                >
+                  {r.channel.toUpperCase()}: {r.status} {r.detail ? `(${r.detail})` : ''}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Email Channel */}
+          <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3">
+            <label className="inline-flex items-center gap-2 cursor-pointer font-bold text-xs text-slate-900 dark:text-white">
+              <input
+                type="checkbox"
+                checked={Boolean(settings.notifications?.emailEnabled)}
+                onChange={(e) =>
+                  setSettings((prev) => ({
+                    ...prev,
+                    notifications: { ...(prev.notifications || defaultNotifications), emailEnabled: e.target.checked },
+                  }))
+                }
+                className="w-4 h-4 accent-sky-600 cursor-pointer"
+              />
+              <span>Email Instant Alerts (Resend API)</span>
+            </label>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div>
+                <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+                  Recipient Email(s)
+                </label>
+                <input
+                  type="text"
+                  dir="ltr"
+                  value={settings.notifications?.emailTo || ''}
+                  onChange={(e) =>
+                    setSettings((prev) => ({
+                      ...prev,
+                      notifications: { ...(prev.notifications || defaultNotifications), emailTo: e.target.value },
+                    }))
+                  }
+                  placeholder="leads@avicinna.com"
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+                  From Address
+                </label>
+                <input
+                  type="text"
+                  dir="ltr"
+                  value={settings.notifications?.emailFrom || ''}
+                  onChange={(e) =>
+                    setSettings((prev) => ({
+                      ...prev,
+                      notifications: { ...(prev.notifications || defaultNotifications), emailFrom: e.target.value },
+                    }))
+                  }
+                  placeholder="AVICINNA Leads <noreply@avicinna.com>"
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+                  Resend API Key
+                </label>
+                <input
+                  type="password"
+                  dir="ltr"
+                  value={settings.notifications?.resendApiKey || ''}
+                  onChange={(e) =>
+                    setSettings((prev) => ({
+                      ...prev,
+                      notifications: { ...(prev.notifications || defaultNotifications), resendApiKey: e.target.value },
+                    }))
+                  }
+                  placeholder="re_..."
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-slate-900 dark:text-white outline-none"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Telegram Bot Channel */}
+          <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3">
+            <label className="inline-flex items-center gap-2 cursor-pointer font-bold text-xs text-slate-900 dark:text-white">
+              <input
+                type="checkbox"
+                checked={Boolean(settings.notifications?.telegramEnabled)}
+                onChange={(e) =>
+                  setSettings((prev) => ({
+                    ...prev,
+                    notifications: { ...(prev.notifications || defaultNotifications), telegramEnabled: e.target.checked },
+                  }))
+                }
+                className="w-4 h-4 accent-sky-600 cursor-pointer"
+              />
+              <span>Telegram Bot Instant Group Alerts</span>
+            </label>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+                  Telegram Bot Token
+                </label>
+                <input
+                  type="password"
+                  dir="ltr"
+                  value={settings.notifications?.telegramBotToken || ''}
+                  onChange={(e) =>
+                    setSettings((prev) => ({
+                      ...prev,
+                      notifications: { ...(prev.notifications || defaultNotifications), telegramBotToken: e.target.value },
+                    }))
+                  }
+                  placeholder="123456:ABC-DEF..."
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-slate-900 dark:text-white outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+                  Telegram Chat ID
+                </label>
+                <input
+                  type="text"
+                  dir="ltr"
+                  value={settings.notifications?.telegramChatId || ''}
+                  onChange={(e) =>
+                    setSettings((prev) => ({
+                      ...prev,
+                      notifications: { ...(prev.notifications || defaultNotifications), telegramChatId: e.target.value },
+                    }))
+                  }
+                  placeholder="-100123456789"
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-slate-900 dark:text-white outline-none"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* WhatsApp Cloud / Webhook Channel */}
+          <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3">
+            <label className="inline-flex items-center gap-2 cursor-pointer font-bold text-xs text-slate-900 dark:text-white">
+              <input
+                type="checkbox"
+                checked={Boolean(settings.notifications?.whatsappWebhookEnabled)}
+                onChange={(e) =>
+                  setSettings((prev) => ({
+                    ...prev,
+                    notifications: { ...(prev.notifications || defaultNotifications), whatsappWebhookEnabled: e.target.checked },
+                  }))
+                }
+                className="w-4 h-4 accent-emerald-600 cursor-pointer"
+              />
+              <span>WhatsApp Cloud API / Automation Webhook</span>
+            </label>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+                  Coordinator WhatsApp Number (E.164 digits)
+                </label>
+                <input
+                  type="text"
+                  dir="ltr"
+                  value={settings.notifications?.whatsappNotifyNumber || ''}
+                  onChange={(e) =>
+                    setSettings((prev) => ({
+                      ...prev,
+                      notifications: { ...(prev.notifications || defaultNotifications), whatsappNotifyNumber: e.target.value },
+                    }))
+                  }
+                  placeholder="905442822769"
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-slate-900 dark:text-white outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+                  Meta WhatsApp Phone Number ID
+                </label>
+                <input
+                  type="text"
+                  dir="ltr"
+                  value={settings.notifications?.whatsappPhoneNumberId || ''}
+                  onChange={(e) =>
+                    setSettings((prev) => ({
+                      ...prev,
+                      notifications: { ...(prev.notifications || defaultNotifications), whatsappPhoneNumberId: e.target.value },
+                    }))
+                  }
+                  placeholder="Optional for Cloud API"
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-slate-900 dark:text-white outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+                  WhatsApp Cloud Bearer Token
+                </label>
+                <input
+                  type="password"
+                  dir="ltr"
+                  value={settings.notifications?.whatsappCloudToken || ''}
+                  onChange={(e) =>
+                    setSettings((prev) => ({
+                      ...prev,
+                      notifications: { ...(prev.notifications || defaultNotifications), whatsappCloudToken: e.target.value },
+                    }))
+                  }
+                  placeholder="Optional for Cloud API"
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-slate-900 dark:text-white outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+                  Custom Webhook URL (Make / Zapier / n8n)
+                </label>
+                <input
+                  type="url"
+                  dir="ltr"
+                  value={settings.notifications?.whatsappWebhookUrl || ''}
+                  onChange={(e) =>
+                    setSettings((prev) => ({
+                      ...prev,
+                      notifications: { ...(prev.notifications || defaultNotifications), whatsappWebhookUrl: e.target.value },
+                    }))
+                  }
+                  placeholder="https://hook.eu1.make.com/..."
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-slate-900 dark:text-white outline-none"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Tab 5: Security & Session */}
       {activeTab === 'security' && (
         <div className="bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xs">
@@ -1330,12 +1827,23 @@ export default function AdminSettingsPage() {
             </div>
           </div>
 
-          <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-            <span>AVICINNA Security Protocol v3.0 (Hardened)</span>
-            <span className="text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-              <span>{d.security.auditBadge}</span>
-            </span>
+          <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400">
+            <span>AVICINNA Security Protocol v4.0 (RBAC + TOTP 2FA + Audit Log)</span>
+            <div className="flex items-center gap-3">
+              <Link
+                href="/admin/security"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 dark:bg-sky-600 hover:bg-slate-800 text-white text-xs font-bold transition-colors"
+              >
+                <Users className="w-3.5 h-3.5" />
+                <span>
+                  {locale === 'fr'
+                    ? 'Gérer Utilisateurs, 2FA TOTP & Journal d’Activité'
+                    : locale === 'en'
+                    ? 'Manage Team Accounts, Password, 2FA & Activity Log'
+                    : 'إدارة حسابات الفريق، تغيير كلمة المرور، 2FA، وسجل النشاط'}
+                </span>
+              </Link>
+            </div>
           </div>
         </div>
       )}

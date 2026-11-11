@@ -1,3 +1,5 @@
+import type { LocalizedSlugs, LocalizedSeo } from '@/types/cms';
+
 export interface DoctorVideo {
   id: string;
   title: {
@@ -92,6 +94,9 @@ export interface Doctor {
     en: string;
     fr: string;
   };
+  slugs?: LocalizedSlugs;
+  seo?: LocalizedSeo;
+  updatedAt?: string;
 }
 
 export const doctorsData: Doctor[] = [

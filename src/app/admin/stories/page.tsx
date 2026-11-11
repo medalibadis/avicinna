@@ -23,6 +23,9 @@ import confetti from 'canvas-confetti';
 import { ImageUploadField } from '@/components/admin/ImageUploadField';
 import { CustomSelect } from '@/components/admin/CustomSelect';
 import { ModalPortal } from '@/components/admin/ModalPortal';
+import { EntitySeoPanel } from '@/components/admin/EntitySeoPanel';
+import { slugifyText } from '@/lib/i18nRoutes';
+import type { LocalizedSeo, LocalizedSlugs } from '@/types/cms';
 import { useConfirmDialog } from '@/context/ConfirmDialogContext';
 import { toast } from 'sonner';
 
@@ -169,6 +172,8 @@ export default function AdminStoriesPage() {
   const [titles, setTitles] = useState<Record<Lang, string>>({ ar: '', en: '', fr: '' });
   const [shortStories, setShortStories] = useState<Record<Lang, string>>({ ar: '', en: '', fr: '' });
   const [fullExperiences, setFullExperiences] = useState<Record<Lang, string>>({ ar: '', en: '', fr: '' });
+  const [slugs, setSlugs] = useState<LocalizedSlugs>({ ar: '', fr: '', en: '' });
+  const [seo, setSeo] = useState<LocalizedSeo>({ ar: {}, fr: {}, en: {} });
 
   const openAddModal = () => {
     setEditingStory(null);
@@ -215,6 +220,8 @@ export default function AdminStoriesPage() {
       fr: 'Mon parcours a débuté par l’envoi de mes bilans à l’équipe AVICINNA.\nJ’ai été accueilli à l’aéroport d’Istanbul avec un transfert VIP jusqu’à l’hôtel.\nLes examens et l’intervention chirurgicale se sont déroulés avec un succès total et un interprète médical dédié.\nUn grand merci aux praticiens pour leur humanité.',
     });
 
+    setSlugs({ ar: '', fr: '', en: '' });
+    setSeo({ ar: {}, fr: {}, en: {} });
     setModalOpen(true);
   };
 
@@ -261,6 +268,16 @@ export default function AdminStoriesPage() {
       ar: (s.fullExperience.ar || []).join('\n'),
       en: (s.fullExperience.en || s.fullExperience.ar || []).join('\n'),
       fr: (s.fullExperience.fr || s.fullExperience.en || s.fullExperience.ar || []).join('\n'),
+    });
+    setSlugs({
+      ar: s.slugs?.ar || s.slug,
+      fr: s.slugs?.fr || s.slug,
+      en: s.slugs?.en || s.slug,
+    });
+    setSeo({
+      ar: s.seo?.ar || {},
+      fr: s.seo?.fr || {},
+      en: s.seo?.en || {},
     });
 
     setModalOpen(true);
@@ -345,11 +362,20 @@ export default function AdminStoriesPage() {
     const paragraphsEn = (fullExperiences.en || fullExperiences[editorTab]).split('\n').map((p) => p.trim()).filter(Boolean);
     const paragraphsFr = (fullExperiences.fr || fullExperiences[editorTab]).split('\n').map((p) => p.trim()).filter(Boolean);
 
+    const baseSlug = editingStory
+      ? editingStory.slug
+      : slugs.en || slugs.fr || slugs.ar || `${slugifyText(patientName) || 'story'}-${Date.now()}`;
+
     const payload: PatientStory = {
       id: editingStory ? editingStory.id : `story-${Date.now()}`,
-      slug: editingStory
-        ? editingStory.slug
-        : `${patientName.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${Date.now()}`,
+      slug: baseSlug,
+      slugs: {
+        ar: (slugs.ar || '').trim() || baseSlug,
+        fr: (slugs.fr || '').trim() || baseSlug,
+        en: (slugs.en || '').trim() || baseSlug,
+      },
+      seo,
+      updatedAt: new Date().toISOString(),
       patientName: editingStory && typeof editingStory.patientName === 'object' ? {
         ...editingStory.patientName,
         [editorTab]: patientName,
@@ -813,6 +839,18 @@ export default function AdminStoriesPage() {
                   ))}
                 </div>
               </div>
+
+              <EntitySeoPanel
+                key={editingStory?.id || 'new-story'}
+                sectionPrefix="patient-stories"
+                baseSlug={editingStory?.slug || slugifyText(patientName || titles.en || titles.fr) || 'new-story'}
+                slugs={slugs}
+                seo={seo}
+                fallbackTitle={titles}
+                fallbackDesc={shortStories}
+                onChangeSlugs={setSlugs}
+                onChangeSeo={setSeo}
+              />
 
               </div>
 

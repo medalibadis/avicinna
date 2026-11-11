@@ -12,31 +12,35 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguageState] = useState<Language>('ar');
+export function LanguageProvider({
+  children,
+  initialLanguage = 'ar',
+}: {
+  children: React.ReactNode;
+  initialLanguage?: Language;
+}) {
+  const [language, setLanguageState] = useState<Language>(initialLanguage);
 
+  // Sync whenever route-level initialLanguage changes (e.g., navigating from / to /fr or /en)
   useEffect(() => {
-    // Check localStorage or browser language
-    const saved = localStorage.getItem('avicinna_lang') as Language;
-    if (saved && (saved === 'ar' || saved === 'en' || saved === 'fr')) {
-      setLanguageState(saved);
-    }
-  }, []);
+    setLanguageState(initialLanguage);
+    document.documentElement.lang = initialLanguage;
+    document.documentElement.dir = initialLanguage === 'ar' ? 'rtl' : 'ltr';
+  }, [initialLanguage]);
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
-    localStorage.setItem('avicinna_lang', lang);
+    try {
+      localStorage.setItem('avicinna_lang', lang);
+    } catch {
+      // ignore storage quota errors
+    }
     document.documentElement.lang = lang;
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
   };
 
-  useEffect(() => {
-    document.documentElement.lang = language;
-    document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
-  }, [language]);
-
   const direction = language === 'ar' ? 'rtl' : 'ltr';
-  const t = translations[language];
+  const t = translations[language] || translations.ar;
 
   return (
     <LanguageContext.Provider value={{ language, direction, setLanguage, t }}>

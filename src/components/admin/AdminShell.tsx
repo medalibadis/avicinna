@@ -18,6 +18,10 @@ import {
   Inbox,
   Settings,
   Video,
+  FileText,
+  Image as ImageIcon,
+  ArrowRightLeft,
+  ShieldCheck,
   ChevronLeft,
   ChevronRight,
   PanelLeftClose,
@@ -38,6 +42,8 @@ import { useTheme } from '@/context/ThemeContext';
 import { useAccent, ACCENT_OPTIONS } from '@/context/AccentContext';
 import { CelestialThemeSwitch } from '@/components/ui/CelestialThemeSwitch';
 import { InteractiveAdminGuide } from '@/components/admin/AdminOnboardingGuide';
+import type { AdminRole } from '@/types/cms';
+import type { AdminSessionPayload } from '@/lib/auth';
 
 export type Locale = 'en' | 'fr' | 'ar';
 
@@ -48,6 +54,7 @@ interface NavItem {
   icon: React.ElementType;
   category: 'main' | 'cms' | 'comms' | 'system';
   shortcut: string;
+  roles: AdminRole[];
 }
 
 export const NAV_ITEMS: NavItem[] = [
@@ -58,6 +65,7 @@ export const NAV_ITEMS: NavItem[] = [
     icon: LayoutGrid,
     category: 'main',
     shortcut: 'G D',
+    roles: ['admin', 'editor', 'coordinator'],
   },
   {
     id: 'sections',
@@ -66,6 +74,7 @@ export const NAV_ITEMS: NavItem[] = [
     icon: Layers,
     category: 'cms',
     shortcut: 'G S',
+    roles: ['admin', 'editor'],
   },
   {
     id: 'hospitals',
@@ -74,6 +83,7 @@ export const NAV_ITEMS: NavItem[] = [
     icon: Building2,
     category: 'cms',
     shortcut: 'G H',
+    roles: ['admin', 'editor'],
   },
   {
     id: 'doctors',
@@ -82,6 +92,7 @@ export const NAV_ITEMS: NavItem[] = [
     icon: Stethoscope,
     category: 'cms',
     shortcut: 'G M',
+    roles: ['admin', 'editor'],
   },
   {
     id: 'treatments',
@@ -90,6 +101,7 @@ export const NAV_ITEMS: NavItem[] = [
     icon: HeartPulse,
     category: 'cms',
     shortcut: 'G T',
+    roles: ['admin', 'editor'],
   },
   {
     id: 'stories',
@@ -98,6 +110,7 @@ export const NAV_ITEMS: NavItem[] = [
     icon: MessageSquareHeart,
     category: 'cms',
     shortcut: 'G P',
+    roles: ['admin', 'editor'],
   },
   {
     id: 'articles',
@@ -106,6 +119,34 @@ export const NAV_ITEMS: NavItem[] = [
     icon: BookOpen,
     category: 'cms',
     shortcut: 'G B',
+    roles: ['admin', 'editor'],
+  },
+  {
+    id: 'pages',
+    path: '/admin/pages',
+    label: { en: 'Pages & Legal', fr: 'Pages & Mentions', ar: 'الصفحات القانونية والعامة' },
+    icon: FileText,
+    category: 'cms',
+    shortcut: 'G L',
+    roles: ['admin', 'editor'],
+  },
+  {
+    id: 'media',
+    path: '/admin/media',
+    label: { en: 'Media Library', fr: 'Médiathèque', ar: 'مكتبة الوسائط' },
+    icon: ImageIcon,
+    category: 'cms',
+    shortcut: 'G U',
+    roles: ['admin', 'editor'],
+  },
+  {
+    id: 'redirects',
+    path: '/admin/redirects',
+    label: { en: '301 Redirects', fr: 'Redirections 301', ar: 'إدارة التحويلات' },
+    icon: ArrowRightLeft,
+    category: 'cms',
+    shortcut: 'G R',
+    roles: ['admin', 'editor'],
   },
   {
     id: 'social-videos',
@@ -114,22 +155,34 @@ export const NAV_ITEMS: NavItem[] = [
     icon: Video,
     category: 'cms',
     shortcut: 'G V',
+    roles: ['admin', 'editor'],
   },
   {
     id: 'inquiries',
     path: '/admin/inquiries',
-    label: { en: 'Consultation Inquiries', fr: 'Demandes de Soins', ar: 'طلبات الاستشارة' },
+    label: { en: 'Consultation Leads', fr: 'Demandes & Leads', ar: 'المرضى والطلبات' },
     icon: Inbox,
     category: 'comms',
     shortcut: 'G I',
+    roles: ['admin', 'coordinator'],
+  },
+  {
+    id: 'security',
+    path: '/admin/security',
+    label: { en: 'Team, 2FA & Audit Log', fr: 'Équipe, 2FA & Logs', ar: 'الأمان، المستخدمين والسجل' },
+    icon: ShieldCheck,
+    category: 'system',
+    shortcut: 'G A',
+    roles: ['admin', 'editor', 'coordinator'],
   },
   {
     id: 'settings',
     path: '/admin/settings',
-    label: { en: 'Platform Settings', fr: 'Paramètres Plateforme', ar: 'إعدادات المنصة' },
+    label: { en: 'Settings & Tracking', fr: 'Paramètres & Tracking', ar: 'الإعدادات والتتبع' },
     icon: Settings,
     category: 'system',
     shortcut: 'G ,',
+    roles: ['admin'],
   },
 ];
 
@@ -193,6 +246,7 @@ export function AdminShell({
   onClearCache,
   onLogout,
   pendingInquiriesCount = 0,
+  session,
   children,
 }: {
   activeRoute: string;
@@ -203,6 +257,7 @@ export function AdminShell({
   onClearCache?: () => void;
   onLogout?: () => void;
   pendingInquiriesCount?: number;
+  session?: AdminSessionPayload | null;
   children: React.ReactNode;
 }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -212,11 +267,14 @@ export function AdminShell({
   const isRTL = locale === 'ar';
   const t = UI_STRINGS[locale];
   const { theme, toggleTheme } = useTheme();
-  const { accent, setAccent, accentOption } = useAccent();
-  
-  // Find current nav item by path or ID
+  const { accentOption } = useAccent();
+
+  const currentRole: AdminRole = session?.role || 'admin';
+  const visibleNavItems = NAV_ITEMS.filter((item) => item.roles.includes(currentRole));
+
   const currentNav =
-    NAV_ITEMS.find((n) => n.path === activeRoute || n.id === activeRoute) ||
+    visibleNavItems.find((n) => n.path === activeRoute || n.id === activeRoute) ||
+    visibleNavItems[0] ||
     NAV_ITEMS[0];
 
   // Keyboard shortcut Cmd+B (sidebar) and Cmd+D (theme)
@@ -356,18 +414,23 @@ export function AdminShell({
 
         {/* Navigation Links with Magnetic Hover & Liquid Pill (layoutId) */}
         <nav className="my-4 flex-1 space-y-1 overflow-y-auto overflow-x-hidden px-1 no-scrollbar">
-          {NAV_ITEMS.map((item, idx) => {
+          {visibleNavItems.map((item, idx) => {
             const Icon = item.icon;
             const isActive = activeRoute === item.path || (item.path !== '/admin' && activeRoute.startsWith(item.path));
-            const showCategoryHeader =
-              !isCollapsed &&
-              (idx === 1 || idx === 7 || idx === 8);
+            const prevCategory = idx > 0 ? visibleNavItems[idx - 1].category : 'main';
+            const showCategoryHeader = !isCollapsed && item.category !== 'main' && item.category !== prevCategory;
+            const headerText =
+              item.category === 'cms'
+                ? t.cmsHeader
+                : item.category === 'comms'
+                ? t.commsHeader
+                : t.sysHeader;
 
             return (
               <React.Fragment key={item.id}>
                 {showCategoryHeader && (
                   <div className="px-3 pt-4 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 select-none">
-                    {idx === 1 ? t.cmsHeader : idx === 7 ? t.commsHeader : t.sysHeader}
+                    {headerText}
                   </div>
                 )}
 
@@ -485,8 +548,19 @@ export function AdminShell({
           })}
         </nav>
 
-        {/* Sidebar Footer (Cleanly spaced, never overlaps dev indicator) */}
+        {/* Sidebar Footer */}
         <div className="space-y-2 border-t border-slate-200/80 dark:border-slate-800 pt-3 pb-10">
+          {!isCollapsed && session && (
+            <div className="px-2.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/70 dark:border-slate-700/70 flex items-center justify-between gap-2 text-xs">
+              <div className="min-w-0">
+                <div className="font-bold text-slate-900 dark:text-white truncate">{session.fullName || session.username}</div>
+                <div className="text-[10px] text-slate-400 truncate">@{session.username}</div>
+              </div>
+              <span className="shrink-0 text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-700 dark:text-sky-300 border border-sky-500/20">
+                {session.role}
+              </span>
+            </div>
+          )}
           <a
             href="/"
             target="_blank"
@@ -579,7 +653,7 @@ export function AdminShell({
               </div>
 
               <div className="my-4 flex-1 space-y-1 overflow-y-auto">
-                {NAV_ITEMS.map((item) => {
+                {visibleNavItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = activeRoute === item.path || (item.path !== '/admin' && activeRoute.startsWith(item.path));
                   return (

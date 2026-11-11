@@ -39,6 +39,9 @@ import { CustomSelect } from '@/components/admin/CustomSelect';
 import { ModalPortal } from '@/components/admin/ModalPortal';
 import { SmartTranslatableField } from '@/components/admin/SingleInputAutoTranslator';
 import { ContextualSectionTip } from '@/components/admin/AdminOnboardingGuide';
+import { EntitySeoPanel } from '@/components/admin/EntitySeoPanel';
+import { slugifyText } from '@/lib/i18nRoutes';
+import type { LocalizedSeo, LocalizedSlugs } from '@/types/cms';
 import { useConfirmDialog } from '@/context/ConfirmDialogContext';
 
 const DEFAULT_LANGUAGES_MAP: Record<'ar' | 'en' | 'fr', string[]> = {
@@ -359,8 +362,10 @@ function DoctorsContent() {
   const [specialtyFilter, setSpecialtyFilter] = useState<string>('all');
   const [modalOpen, setModalOpen] = useState(false);
   const [editingDoctor, setEditingDoctor] = useState<Doctor | null>(null);
-  const [activeTab, setActiveTab] = useState<'basic' | 'bio' | 'career' | 'expertise' | 'education' | 'video'>('basic');
+  const [activeTab, setActiveTab] = useState<'basic' | 'bio' | 'career' | 'expertise' | 'education' | 'video' | 'seo'>('basic');
   const [notification, setNotification] = useState<string | null>(null);
+  const [slugs, setSlugs] = useState<LocalizedSlugs>({ ar: '', fr: '', en: '' });
+  const [seo, setSeo] = useState<LocalizedSeo>({ ar: {}, fr: {}, en: {} });
 
   // Form State
   const [nameAr, setNameAr] = useState('');
@@ -499,6 +504,8 @@ function DoctorsContent() {
     setVideoUrl('');
     setVideoTitleAr('');
     setVideoTitleEn('');
+    setSlugs({ ar: '', fr: '', en: '' });
+    setSeo({ ar: {}, fr: {}, en: {} });
 
     setModalOpen(true);
   };
@@ -581,6 +588,16 @@ function DoctorsContent() {
     const rawVTitle = (doc.videoTitle?.ar || (doc.videos && doc.videos[0]?.title?.ar) || '').trim();
     setVideoTitleAr(cleanVUrl ? rawVTitle : '');
     setVideoTitleEn(cleanVUrl ? (doc.videoTitle?.en || (doc.videos && doc.videos[0]?.title?.en) || '') : '');
+    setSlugs({
+      ar: doc.slugs?.ar || doc.slug,
+      fr: doc.slugs?.fr || doc.slug,
+      en: doc.slugs?.en || doc.slug,
+    });
+    setSeo({
+      ar: doc.seo?.ar || {},
+      fr: doc.seo?.fr || {},
+      en: doc.seo?.en || {},
+    });
 
     setModalOpen(true);
   };
@@ -784,9 +801,20 @@ function DoctorsContent() {
         ]
       : [];
 
+    const baseSlug = editingDoctor
+      ? editingDoctor.slug
+      : slugs.en || slugs.fr || slugs.ar || slugifyText(finalNameEn) || `doctor-${Date.now()}`;
+
     const docPayload: Doctor = {
       id: editingDoctor ? editingDoctor.id : `doc-${Date.now()}`,
-      slug: editingDoctor ? editingDoctor.slug : (finalNameEn || 'doctor').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, ''),
+      slug: baseSlug,
+      slugs: {
+        ar: (slugs.ar || '').trim() || baseSlug,
+        fr: (slugs.fr || '').trim() || baseSlug,
+        en: (slugs.en || '').trim() || baseSlug,
+      },
+      seo,
+      updatedAt: new Date().toISOString(),
       name: {
         ar: finalNameAr,
         en: finalNameEn,
@@ -1368,6 +1396,19 @@ function DoctorsContent() {
                 <Video className="w-3.5 h-3.5" />
                 <span>{d.tabVideo}</span>
                 {videoUrl && <span className="w-2 h-2 rounded-full bg-emerald-400" />}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab('seo')}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
+                  activeTab === 'seo'
+                    ? 'bg-[#0097FB] text-white shadow-xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                <Globe className="w-3.5 h-3.5" />
+                <span>SEO & URLs</span>
               </button>
             </div>
 
@@ -2009,6 +2050,23 @@ function DoctorsContent() {
                 </div>
               )}
 
+              {/* TAB 7: SEO & LOCALIZED URL SLUGS */}
+              {activeTab === 'seo' && (
+                <div className="animate-in fade-in duration-150">
+                  <EntitySeoPanel
+                    key={editingDoctor?.id || 'new-doctor'}
+                    sectionPrefix="doctors"
+                    baseSlug={editingDoctor?.slug || slugifyText(nameEn || nameFr || nameAr) || 'new-doctor'}
+                    slugs={slugs}
+                    seo={seo}
+                    fallbackTitle={{ ar: nameAr, en: nameEn, fr: nameFr }}
+                    fallbackDesc={{ ar: bioAr, en: bioEn, fr: bioFr }}
+                    onChangeSlugs={setSlugs}
+                    onChangeSeo={setSeo}
+                  />
+                </div>
+              )}
+
               </div>
 
               {/* Modal Footer Controls - Sticky & Always Visible */}
@@ -2020,6 +2078,7 @@ function DoctorsContent() {
                   {activeTab === 'expertise' && d.stepIndicator(4)}
                   {activeTab === 'education' && d.stepIndicator(5)}
                   {activeTab === 'video' && d.stepIndicator(6)}
+                  {activeTab === 'seo' && 'SEO & URLs (AR / FR / EN)'}
                 </div>
 
                 <div className="flex items-center gap-2">

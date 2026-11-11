@@ -1,3 +1,5 @@
+import type { LocalizedSlugs, LocalizedSeo } from '@/types/cms';
+
 export interface HospitalPartner {
   id: string;
   slug: string;
@@ -45,6 +47,9 @@ export interface HospitalPartner {
   specialties: string[]; // Specialty slugs matching treatments/doctors
   rating: number;
   reviewsCount: number;
+  slugs?: LocalizedSlugs;
+  seo?: LocalizedSeo;
+  updatedAt?: string;
 }
 
 export const hospitalsData: HospitalPartner[] = [

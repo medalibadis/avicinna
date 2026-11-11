@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/context/LanguageContext';
+import { getLocalizedPath } from '@/lib/i18nRoutes';
 import { ShieldCheck, HeartHandshake, ArrowRight, ArrowLeft } from 'lucide-react';
 import { AboutVideoMedallion } from '@/components/public/BrandLogoMotion';
 
@@ -16,13 +17,7 @@ export const AboutSection: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Visual Column with Badge */}
-          <motion.div
-            initial={{ opacity: 0, x: isRtl ? 25 : -25 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ type: 'spring', stiffness: 350, damping: 28 }}
-            className="relative order-2 lg:order-1"
-          >
+          <div className="relative order-2 lg:order-1">
             <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-slate-100 dark:border-slate-800">
               <img
                 src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=1200&auto=format&fit=crop"
@@ -36,16 +31,10 @@ export const AboutSection: React.FC = () => {
             <div className={`absolute -bottom-6 z-20 ${isRtl ? 'right-2 sm:right-6' : 'left-2 sm:left-6'}`}>
               <AboutVideoMedallion locale={language as any} />
             </div>
-          </motion.div>
+          </div>
 
           {/* Text Content Column */}
-          <motion.div
-            initial={{ opacity: 0, x: isRtl ? -25 : 25 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ type: 'spring', stiffness: 350, damping: 28 }}
-            className="order-1 lg:order-2 space-y-6"
-          >
+          <div className="order-1 lg:order-2 space-y-6">
             <div className="inline-flex items-center gap-2 bg-[#EAF6FF] dark:bg-sky-950/60 text-[#0097FB] dark:text-sky-400 text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-full border border-[#0097FB]/20 dark:border-sky-500/30">
               {t.about.badge}
             </div>
@@ -100,14 +89,14 @@ export const AboutSection: React.FC = () => {
             {/* CTA */}
             <div className="pt-4">
               <Link
-                href="/about"
+                href={getLocalizedPath('/about', language)}
                 className="inline-flex items-center gap-2 bg-[#032654] hover:bg-[#163B63] dark:bg-sky-600 dark:hover:bg-sky-500 text-white font-semibold text-sm px-7 py-3.5 rounded-full shadow-md shadow-[#032654]/20 transition-all duration-200 cursor-pointer"
               >
                 <span>{t.about.cta}</span>
                 {isRtl ? <ArrowLeft className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}
               </Link>
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>

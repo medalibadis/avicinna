@@ -1,182 +1,176 @@
 import { MetadataRoute } from 'next';
-import { supabase, isSupabaseConfigured } from '@/lib/supabase';
-import { fetchWordPressPosts } from '@/lib/wordpress';
-import { articlesData } from '@/data/articles';
-import { doctorsData } from '@/data/doctors';
-import { treatmentsData } from '@/data/treatments';
-import { patientStoriesData } from '@/data/stories';
-import { hospitalsData } from '@/data/hospitals';
+import { readCmsStore } from '@/lib/cmsStore';
+import {
+  DEFAULT_ENTITY_UPDATED_AT,
+  SUPPORTED_LOCALES,
+  getLocalizedEntityPath,
+  getLocalizedPath,
+  getPublicBaseUrl,
+  parseRealDate,
+} from '@/lib/i18nRoutes';
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('localhost'))
-    ? process.env.NEXT_PUBLIC_SITE_URL
-    : 'https://avicinna.com';
+export const dynamic = 'force-dynamic';
 
-  const staticRoutes: MetadataRoute.Sitemap = [
-    {
-      url: `${baseUrl}`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 1.0,
-    },
-    {
-      url: `${baseUrl}/about`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/contact`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/doctors`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/treatments`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/hospitals`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/patient-stories`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/blog`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.85,
-    },
+export default function sitemap(): MetadataRoute.Sitemap {
+  const baseUrl = getPublicBaseUrl();
+  const store = readCmsStore();
+  const routes: MetadataRoute.Sitemap = [];
+
+  const staticPaths: Array<{ path: string; changeFrequency: 'weekly' | 'monthly'; priority: number }> = [
+    { path: '/', changeFrequency: 'weekly', priority: 1.0 },
+    { path: '/treatments', changeFrequency: 'weekly', priority: 0.9 },
+    { path: '/doctors', changeFrequency: 'weekly', priority: 0.9 },
+    { path: '/hospitals', changeFrequency: 'weekly', priority: 0.85 },
+    { path: '/patient-stories', changeFrequency: 'weekly', priority: 0.85 },
+    { path: '/blog', changeFrequency: 'weekly', priority: 0.85 },
+    { path: '/about', changeFrequency: 'monthly', priority: 0.7 },
+    { path: '/contact', changeFrequency: 'monthly', priority: 0.8 },
   ];
 
-  // 1. Fetch published articles from WordPress Headless CMS
-  const seenArticleSlugs = new Set<string>();
-  const articleRoutes: MetadataRoute.Sitemap = [];
+  const staticLastMod = parseRealDate(DEFAULT_ENTITY_UPDATED_AT);
 
-  try {
-    const wpRes = await fetchWordPressPosts({ perPage: 100 });
-    wpRes.posts.forEach((post) => {
-      seenArticleSlugs.add(post.slug);
-      articleRoutes.push({
-        url: `${baseUrl}/blog/${post.slug}`,
-        lastModified: post.publishedDate ? new Date(post.publishedDate) : new Date(),
+  // 1. Static localized pages across AR (root), FR (/fr/...), EN (/en/...)
+  for (const item of staticPaths) {
+    const languages = {
+      ar: `${baseUrl}${getLocalizedPath(item.path, 'ar')}`,
+      fr: `${baseUrl}${getLocalizedPath(item.path, 'fr')}`,
+      en: `${baseUrl}${getLocalizedPath(item.path, 'en')}`,
+      'x-default': `${baseUrl}${getLocalizedPath(item.path, 'ar')}`,
+    };
+    for (const locale of SUPPORTED_LOCALES) {
+      routes.push({
+        url: languages[locale],
+        lastModified: staticLastMod,
+        changeFrequency: item.changeFrequency,
+        priority: locale === 'ar' ? item.priority : Math.max(0.5, item.priority - 0.05),
+        alternates: { languages },
+      });
+    }
+  }
+
+  // 2. Treatments
+  for (const t of store.treatments) {
+    const languages = {
+      ar: `${baseUrl}${getLocalizedEntityPath('treatments', t, 'ar')}`,
+      fr: `${baseUrl}${getLocalizedEntityPath('treatments', t, 'fr')}`,
+      en: `${baseUrl}${getLocalizedEntityPath('treatments', t, 'en')}`,
+      'x-default': `${baseUrl}${getLocalizedEntityPath('treatments', t, 'ar')}`,
+    };
+    const lastMod = parseRealDate(t.updatedAt, DEFAULT_ENTITY_UPDATED_AT);
+    for (const locale of SUPPORTED_LOCALES) {
+      routes.push({
+        url: languages[locale],
+        lastModified: lastMod,
+        changeFrequency: 'weekly',
+        priority: 0.85,
+        alternates: { languages },
+      });
+    }
+  }
+
+  // 3. Doctors
+  for (const d of store.doctors) {
+    const languages = {
+      ar: `${baseUrl}${getLocalizedEntityPath('doctors', d, 'ar')}`,
+      fr: `${baseUrl}${getLocalizedEntityPath('doctors', d, 'fr')}`,
+      en: `${baseUrl}${getLocalizedEntityPath('doctors', d, 'en')}`,
+      'x-default': `${baseUrl}${getLocalizedEntityPath('doctors', d, 'ar')}`,
+    };
+    const lastMod = parseRealDate(d.updatedAt, DEFAULT_ENTITY_UPDATED_AT);
+    for (const locale of SUPPORTED_LOCALES) {
+      routes.push({
+        url: languages[locale],
+        lastModified: lastMod,
+        changeFrequency: 'monthly',
+        priority: 0.8,
+        alternates: { languages },
+      });
+    }
+  }
+
+  // 4. Hospitals
+  for (const h of store.hospitals) {
+    const languages = {
+      ar: `${baseUrl}${getLocalizedEntityPath('hospitals', h, 'ar')}`,
+      fr: `${baseUrl}${getLocalizedEntityPath('hospitals', h, 'fr')}`,
+      en: `${baseUrl}${getLocalizedEntityPath('hospitals', h, 'en')}`,
+      'x-default': `${baseUrl}${getLocalizedEntityPath('hospitals', h, 'ar')}`,
+    };
+    const lastMod = parseRealDate(h.updatedAt, DEFAULT_ENTITY_UPDATED_AT);
+    for (const locale of SUPPORTED_LOCALES) {
+      routes.push({
+        url: languages[locale],
+        lastModified: lastMod,
+        changeFrequency: 'monthly',
+        priority: 0.8,
+        alternates: { languages },
+      });
+    }
+  }
+
+  // 5. Patient Stories
+  for (const s of store.stories) {
+    const languages = {
+      ar: `${baseUrl}${getLocalizedEntityPath('patient-stories', s, 'ar')}`,
+      fr: `${baseUrl}${getLocalizedEntityPath('patient-stories', s, 'fr')}`,
+      en: `${baseUrl}${getLocalizedEntityPath('patient-stories', s, 'en')}`,
+      'x-default': `${baseUrl}${getLocalizedEntityPath('patient-stories', s, 'ar')}`,
+    };
+    const lastMod = parseRealDate(s.updatedAt, DEFAULT_ENTITY_UPDATED_AT);
+    for (const locale of SUPPORTED_LOCALES) {
+      routes.push({
+        url: languages[locale],
+        lastModified: lastMod,
+        changeFrequency: 'monthly',
+        priority: 0.75,
+        alternates: { languages },
+      });
+    }
+  }
+
+  // 6. Medical Blog Articles (real updatedDate / updatedAt / publishedDate)
+  for (const art of store.articles) {
+    const languages = {
+      ar: `${baseUrl}${getLocalizedEntityPath('blog', art, 'ar')}`,
+      fr: `${baseUrl}${getLocalizedEntityPath('blog', art, 'fr')}`,
+      en: `${baseUrl}${getLocalizedEntityPath('blog', art, 'en')}`,
+      'x-default': `${baseUrl}${getLocalizedEntityPath('blog', art, 'ar')}`,
+    };
+    const lastMod = parseRealDate(
+      art.updatedAt || art.updatedDate || art.publishedDate,
+      DEFAULT_ENTITY_UPDATED_AT
+    );
+    for (const locale of SUPPORTED_LOCALES) {
+      routes.push({
+        url: languages[locale],
+        lastModified: lastMod,
         changeFrequency: 'weekly',
         priority: 0.8,
+        alternates: { languages },
       });
-    });
-  } catch {
-    // continue
+    }
   }
 
-  // 2. Fetch doctors, treatments, stories from Supabase if configured, else use seed data
-  let doctorRoutes: MetadataRoute.Sitemap = [];
-  let treatmentRoutes: MetadataRoute.Sitemap = [];
-  let storyRoutes: MetadataRoute.Sitemap = [];
-
-  if (isSupabaseConfigured && supabase) {
-    const [doctorsRes, treatmentsRes, storiesRes, articlesRes] = await Promise.all([
-      supabase.from('doctors').select('slug').order('created_at', { ascending: false }),
-      supabase.from('treatments').select('slug').order('created_at', { ascending: false }),
-      supabase.from('stories').select('slug').order('created_at', { ascending: false }),
-      supabase.from('articles').select('slug, published_date').order('published_date', { ascending: false }),
-    ]);
-
-    doctorRoutes = (doctorsRes.data ?? []).map((doc) => ({
-      url: `${baseUrl}/doctors/${doc.slug}`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.85,
-    }));
-
-    treatmentRoutes = (treatmentsRes.data ?? []).map((treat) => ({
-      url: `${baseUrl}/treatments/${treat.slug}`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.85,
-    }));
-
-    storyRoutes = (storiesRes.data ?? []).map((story) => ({
-      url: `${baseUrl}/patient-stories/${story.slug}`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.75,
-    }));
-
-    (articlesRes.data ?? []).forEach((art) => {
-      if (!seenArticleSlugs.has(art.slug)) {
-        seenArticleSlugs.add(art.slug);
-        articleRoutes.push({
-          url: `${baseUrl}/blog/${art.slug}`,
-          lastModified: art.published_date ? new Date(art.published_date) : new Date(),
-          changeFrequency: 'weekly',
-          priority: 0.8,
-        });
-      }
-    });
-  } else {
-    // Seed fallback
-    doctorRoutes = doctorsData.map((doc) => ({
-      url: `${baseUrl}/doctors/${doc.slug}`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.85,
-    }));
-
-    treatmentRoutes = treatmentsData.map((treat) => ({
-      url: `${baseUrl}/treatments/${treat.slug}`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.85,
-    }));
-
-    storyRoutes = patientStoriesData.map((story) => ({
-      url: `${baseUrl}/patient-stories/${story.slug}`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.75,
-    }));
-
-    articlesData.forEach((art) => {
-      if (!seenArticleSlugs.has(art.slug)) {
-        seenArticleSlugs.add(art.slug);
-        articleRoutes.push({
-          url: `${baseUrl}/blog/${art.slug}`,
-          lastModified: art.publishedDate ? new Date(art.publishedDate) : new Date(),
-          changeFrequency: 'weekly',
-          priority: 0.8,
-        });
-      }
-    });
+  // 7. Standalone CMS Pages (/privacy, /terms, custom published pages)
+  for (const page of store.pages.filter((p) => p.status === 'published')) {
+    const getPageSlug = (loc: 'ar' | 'fr' | 'en') => page.slugs?.[loc]?.trim() || page.slug;
+    const languages = {
+      ar: `${baseUrl}${getLocalizedPath(`/${getPageSlug('ar')}`, 'ar')}`,
+      fr: `${baseUrl}${getLocalizedPath(`/${getPageSlug('fr')}`, 'fr')}`,
+      en: `${baseUrl}${getLocalizedPath(`/${getPageSlug('en')}`, 'en')}`,
+      'x-default': `${baseUrl}${getLocalizedPath(`/${getPageSlug('ar')}`, 'ar')}`,
+    };
+    const lastMod = parseRealDate(page.updatedAt || page.createdAt, DEFAULT_ENTITY_UPDATED_AT);
+    for (const locale of SUPPORTED_LOCALES) {
+      routes.push({
+        url: languages[locale],
+        lastModified: lastMod,
+        changeFrequency: 'monthly',
+        priority: 0.5,
+        alternates: { languages },
+      });
+    }
   }
 
-  // Hospital Partner Detail routes
-  const hospitalRoutes: MetadataRoute.Sitemap = hospitalsData.map((hosp) => ({
-    url: `${baseUrl}/hospitals/${hosp.id}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly' as const,
-    priority: 0.85,
-  }));
-
-  return [
-    ...staticRoutes,
-    ...hospitalRoutes,
-    ...treatmentRoutes,
-    ...doctorRoutes,
-    ...storyRoutes,
-    ...articleRoutes,
-  ];
+  return routes;
 }

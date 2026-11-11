@@ -1,4 +1,7 @@
 import { Article, articlesData } from '@/data/articles';
+import { readCmsStore } from '@/lib/cmsStore';
+import { findEntityByAnySlug, getEntitySlug } from '@/lib/i18nRoutes';
+import type { FaqItem, Locale, LocalizedSeo, LocalizedSlugs, MedicalReviewerInfo } from '@/types/cms';
 
 export interface WordPressRawPost {
   id: number;
@@ -49,24 +52,32 @@ export interface WordPressArticle {
     fr: string;
   };
   htmlContent: string;
+  htmlContentMap?: { ar: string; en: string; fr: string };
   paragraphs: string[];
   content?: {
     ar: string[];
     en: string[];
     fr: string[];
   };
+  slugs?: LocalizedSlugs;
+  localizedSeo?: LocalizedSeo;
+  faqs?: FaqItem[];
   readingTimeMinutes: number;
   publishedDate: string;
+  updatedDate?: string;
+  updatedAt?: string;
   sourceHospital: {
     ar: string;
     en: string;
     fr: string;
   };
   image: string;
+  authorDoctorId?: string;
   author: {
     name: { ar: string; en: string; fr: string };
     role: { ar: string; en: string; fr: string };
   };
+  medicalReviewer?: MedicalReviewerInfo;
   seo: {
     title: string;
     description: string;
@@ -77,11 +88,11 @@ export interface WordPressArticle {
 }
 
 export function getWordPressUrl(): string {
-  return (
-    process.env.WORDPRESS_URL ||
-    process.env.NEXT_PUBLIC_WORDPRESS_URL ||
-    'http://localhost:8080'
-  ).replace(/\/+$/, '');
+  const raw = (process.env.WORDPRESS_URL || process.env.NEXT_PUBLIC_WORDPRESS_URL || '').trim();
+  if (!raw || raw.toLowerCase() === 'none' || raw.toLowerCase() === 'disabled') {
+    return '';
+  }
+  return raw.replace(/\/+$/, '');
 }
 
 export function getPublicSiteUrl(): string {
@@ -185,31 +196,46 @@ export function normalizeWordPressPost(raw: WordPressRawPost): WordPressArticle 
 /**
  * Convert standard Article object to WordPressArticle format
  */
-export function convertLocalArticleToWP(art: Article): WordPressArticle {
+export function convertLocalArticleToWP(art: Article, lang: Locale = 'ar'): WordPressArticle {
   const publicBaseUrl = getPublicSiteUrl();
   const arParagraphs = art.content?.ar || (art as any).paragraphs || [];
-  const htmlContent = arParagraphs.map((p: string) => `<p>${p}</p>`).join('');
+  const paragraphsForLang = art.content?.[lang] || arParagraphs;
+  const htmlForLang =
+    art.htmlContent?.[lang]?.trim() ||
+    art.htmlContent?.ar?.trim() ||
+    paragraphsForLang.map((p: string) => `<p>${p}</p>`).join('');
+
+  const effectiveSlug = getEntitySlug(art, lang);
+  const langSeo = art.seo?.[lang];
 
   return {
     id: art.id,
     slug: art.slug,
+    slugs: art.slugs,
+    localizedSeo: art.seo,
+    faqs: art.faqs,
     categorySlug: art.categorySlug,
     categoryName: art.categoryName,
     title: art.title,
     excerpt: art.excerpt,
-    htmlContent,
-    paragraphs: arParagraphs,
+    htmlContent: htmlForLang,
+    htmlContentMap: art.htmlContent,
+    paragraphs: paragraphsForLang,
     content: art.content,
     readingTimeMinutes: art.readingTimeMinutes,
     publishedDate: art.publishedDate,
+    updatedDate: art.updatedDate || art.publishedDate,
+    updatedAt: art.updatedAt || (art.updatedDate ? `${art.updatedDate}T10:00:00.000Z` : undefined),
     sourceHospital: art.sourceHospital,
     image: art.image,
+    authorDoctorId: art.authorDoctorId,
     author: art.author,
+    medicalReviewer: art.medicalReviewer,
     seo: {
-      title: `${art.title?.ar || art.title?.en} | AVICINNA`,
-      description: art.excerpt?.ar || art.excerpt?.en,
-      focusKeyword: art.title?.ar || art.title?.en,
-      canonical: `${publicBaseUrl}/blog/${art.slug}`,
+      title: langSeo?.title || `${art.title?.[lang] || art.title?.ar || art.title?.en} | AVICINNA`,
+      description: langSeo?.description || art.excerpt?.[lang] || art.excerpt?.ar || art.excerpt?.en,
+      focusKeyword: langSeo?.focusKeyword || art.title?.[lang] || art.title?.ar || art.title?.en,
+      canonical: `${publicBaseUrl}${lang === 'ar' ? '' : `/${lang}`}/blog/${effectiveSlug}`,
     },
     isFromWordPress: false,
   };
@@ -234,31 +260,40 @@ export async function fetchWordPressPosts(options?: {
   }
   if (options?.search) queryParams.set('search', options.search);
 
-  try {
-    const res = await fetch(`${wpUrl}/wp-json/wp/v2/posts?${queryParams.toString()}`, {
-      next: { tags: ['wordpress-blog'], revalidate: 60 },
-      headers: { Accept: 'application/json' },
-    });
+  if (wpUrl) {
+    try {
+      const res = await fetch(`${wpUrl}/wp-json/wp/v2/posts?${queryParams.toString()}`, {
+        next: { tags: ['wordpress-blog'], revalidate: 60 },
+        headers: { Accept: 'application/json' },
+        signal: AbortSignal.timeout(2000),
+      });
 
-    if (res.ok) {
-      const total = parseInt(res.headers.get('X-WP-Total') || '0', 10);
-      const totalPages = parseInt(res.headers.get('X-WP-TotalPages') || '1', 10);
-      const data: WordPressRawPost[] = await res.json();
-      const normalized = data.map(normalizeWordPressPost);
+      if (res.ok) {
+        const total = parseInt(res.headers.get('X-WP-Total') || '0', 10);
+        const totalPages = parseInt(res.headers.get('X-WP-TotalPages') || '1', 10);
+        const data: WordPressRawPost[] = await res.json();
+        const normalized = data.map(normalizeWordPressPost);
 
-      return {
-        posts: normalized,
-        total: total || normalized.length,
-        totalPages: totalPages || 1,
-        isLiveWp: true,
-      };
+        return {
+          posts: normalized,
+          total: total || normalized.length,
+          totalPages: totalPages || 1,
+          isLiveWp: true,
+        };
+      }
+    } catch {
+      // WordPress server may be offline or not used, fall back instantaneously to CMS store
     }
-  } catch (err) {
-    // WordPress server may be offline or starting up, fall back gracefully
   }
 
-  // Fallback to local articles data
-  let localList = articlesData.map(convertLocalArticleToWP);
+  // Fallback to CMS store / local articles data
+  let sourceArticles = articlesData;
+  try {
+    sourceArticles = readCmsStore().articles;
+  } catch {
+    sourceArticles = articlesData;
+  }
+  let localList = sourceArticles.map((art) => convertLocalArticleToWP(art, 'ar'));
 
   if (options?.categorySlug && options.categorySlug !== 'all') {
     localList = localList.filter((a) => a.categorySlug === options.categorySlug);
@@ -293,29 +328,38 @@ export async function fetchWordPressPosts(options?: {
  */
 export async function fetchWordPressPostBySlug(
   slug: string,
-  isDraft = false
+  _isDraft = false
 ): Promise<WordPressArticle | null> {
   const wpUrl = getWordPressUrl();
-  try {
-    const res = await fetch(`${wpUrl}/wp-json/wp/v2/posts?slug=${encodeURIComponent(slug)}`, {
-      next: { tags: [`wordpress-post-${slug}`], revalidate: 60 },
-      headers: { Accept: 'application/json' },
-    });
+  if (wpUrl) {
+    try {
+      const res = await fetch(`${wpUrl}/wp-json/wp/v2/posts?slug=${encodeURIComponent(slug)}`, {
+        next: { tags: [`wordpress-post-${slug}`], revalidate: 60 },
+        headers: { Accept: 'application/json' },
+        signal: AbortSignal.timeout(2000),
+      });
 
-    if (res.ok) {
-      const data: WordPressRawPost[] = await res.json();
-      if (data && data.length > 0) {
-        return normalizeWordPressPost(data[0]);
+      if (res.ok) {
+        const data: WordPressRawPost[] = await res.json();
+        if (data && data.length > 0) {
+          return normalizeWordPressPost(data[0]);
+        }
       }
+    } catch {
+      // Fall back to CMS store
     }
-  } catch (err) {
-    // Fall back to local
   }
 
-  // Fallback to local articles data
-  const localFound = articlesData.find((a) => a.slug === slug);
+  // Fallback to CMS store / local articles data (matching any localized slug)
+  let sourceArticles = articlesData;
+  try {
+    sourceArticles = readCmsStore().articles;
+  } catch {
+    sourceArticles = articlesData;
+  }
+  const localFound = findEntityByAnySlug(sourceArticles, slug);
   if (localFound) {
-    return convertLocalArticleToWP(localFound);
+    return convertLocalArticleToWP(localFound, 'ar');
   }
 
   return null;
@@ -403,13 +447,19 @@ export async function syncArticleToWordPress(payload: {
  */
 export async function checkWordPressStatus(): Promise<{ online: boolean; totalArticles?: number; url: string }> {
   const wpUrl = getWordPressUrl();
+  if (!wpUrl) {
+    return { online: false, url: '' };
+  }
   try {
-    const res = await fetch(`${wpUrl}/health`, { cache: 'no-store' });
+    const res = await fetch(`${wpUrl}/health`, {
+      cache: 'no-store',
+      signal: AbortSignal.timeout(1500),
+    });
     if (res.ok) {
       const json = await res.json();
       return { online: true, totalArticles: json.totalArticles, url: wpUrl };
     }
-  } catch (e) {
+  } catch {
     // offline
   }
   return { online: false, url: wpUrl };

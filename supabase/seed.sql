@@ -213,9 +213,5 @@ ON CONFLICT (id) DO UPDATE SET
   education = EXCLUDED.education,
   updated_at = now();
 
--- 4. SEED SAMPLE CONSULTATION INQUIRIES
-INSERT INTO public.consultation_inquiries (id, tracking_id, full_name, phone, email, country, specialty, notes, status, created_at) VALUES
-('inq-1', 'AVIC-7821', 'خالد عبد الله العتيبي', '+966 50 123 4567', 'khaled.alotaibi@example.com', 'المملكة العربية السعودية', 'cardiac-surgery', 'استفسار بخصوص عملية ترميم الصمام الميترالي بالمنظار لوالدي (65 سنة).', 'contacted', '2026-09-12T14:30:00Z'),
-('inq-2', 'AVIC-7822', 'Jean-Marc Dubois', '+33 6 12 34 56 78', 'jm.dubois@example.fr', 'France', 'hair-transplant', 'Demande de devis pour greffe de cheveux DHI (environ 4000 greffons).', 'new', '2026-09-13T09:15:00Z'),
-('inq-3', 'AVIC-7823', 'مريم الكواري', '+974 55 987 654', 'maryam.k@example.com', 'قطر', 'dentistry', 'حجز موعد لابتسامة هوليوود (عدسات إيماكس لكلا الفكين) خلال شهر أكتوبر.', 'in_review', '2026-09-14T08:00:00Z')
-ON CONFLICT (id) DO NOTHING;
+-- 4. PRODUCTION CLEAN INQUIRIES TABLE (NO DEMO OR TEST LEADS)
+DELETE FROM public.consultation_inquiries WHERE id IN ('inq-1', 'inq-2', 'inq-3');

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { useData } from '@/context/DataContext';
+import { getLocalizedEntityPath, getLocalizedPath } from '@/lib/i18nRoutes';
 import {
   Search,
   Calendar,
@@ -130,6 +131,13 @@ export const HeroSection: React.FC = () => {
       : rawHighlight;
 
   const subtitle = heroData.subtitle[language] || t.hero.subtitle;
+  const heroBgConfigured =
+    heroData.backgroundImage?.trim() || '/images/hospitals/memorial-bahcelievler.jpg';
+  const [heroBgSrc, setHeroBgSrc] = useState(heroBgConfigured);
+
+  useEffect(() => {
+    setHeroBgSrc(heroBgConfigured);
+  }, [heroBgConfigured]);
 
   // Click outside listener to dismiss dropdown
   useEffect(() => {
@@ -205,117 +213,81 @@ export const HeroSection: React.FC = () => {
 
     // If there is a single clear doctor match, navigate to doctor profile directly
     if (suggestions.matchingDoctors.length === 1 && suggestions.matchingHospitals.length === 0) {
-      router.push(`/doctors/${suggestions.matchingDoctors[0].slug}`);
+      router.push(getLocalizedEntityPath('doctors', suggestions.matchingDoctors[0], langKey));
       return;
     }
 
     // If there is a single clear hospital match, navigate to hospital detail directly
     if (suggestions.matchingHospitals.length === 1 && suggestions.matchingDoctors.length === 0) {
-      router.push(`/hospitals/${suggestions.matchingHospitals[0].id}`);
+      router.push(getLocalizedEntityPath('hospitals', suggestions.matchingHospitals[0], langKey));
       return;
     }
 
     // If doctors matched, go to doctors search
     if (suggestions.matchingDoctors.length > 0 && suggestions.matchingHospitals.length === 0 && suggestions.matchingTreatments.length === 0) {
-      router.push(`/doctors?search=${encodeURIComponent(q)}`);
+      router.push(`${getLocalizedPath('/doctors', langKey)}?search=${encodeURIComponent(q)}`);
       return;
     }
 
     // If hospitals matched, go to hospitals search
     if (suggestions.matchingHospitals.length > 0 && suggestions.matchingDoctors.length === 0 && suggestions.matchingTreatments.length === 0) {
-      router.push(`/hospitals?search=${encodeURIComponent(q)}`);
+      router.push(`${getLocalizedPath('/hospitals', langKey)}?search=${encodeURIComponent(q)}`);
       return;
     }
 
     // Fallback: search treatments/procedures
-    router.push(`/treatments?search=${encodeURIComponent(q)}`);
+    router.push(`${getLocalizedPath('/treatments', langKey)}?search=${encodeURIComponent(q)}`);
   };
 
   return (
     <section className="relative z-30 min-h-0 md:min-h-[85vh] flex items-center justify-center pt-20 sm:pt-24 md:pt-28 pb-10 sm:pb-14 md:pb-20 bg-[#032654] w-full max-w-full overflow-x-clip">
-      {/* 1A. DESKTOP & TABLET: AUTO-PLAYING AMBIENT MEDICAL VIDEO BACKGROUND (>= 768px) */}
-      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden hidden md:block">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          poster="https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?q=80&w=2000&auto=format&fit=crop"
-          className="h-full w-full scale-105 object-cover opacity-40 filter saturate-125 transition-opacity duration-1000"
-        >
-          <source
-            src="https://assets.mixkit.co/videos/preview/mixkit-doctors-walking-in-a-modern-hospital-corridor-41446-large.mp4"
-            type="video/mp4"
-          />
-        </video>
-
-        {/* Dynamic Multi-Layer Vignette Scrim for 100% Typographic Legibility */}
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/85 via-[#021838]/80 to-[#021838]/95 dark:from-[#050B14]/90 dark:via-[#09172B]/85 dark:to-[#050B14]" />
-        <div className="absolute -top-32 left-1/2 h-[500px] w-[900px] -translate-x-1/2 rounded-full bg-sky-500/20 blur-[140px] pointer-events-none" />
-        <div className="absolute -bottom-24 right-1/4 h-72 w-72 rounded-full bg-teal-500/15 blur-[120px] pointer-events-none" />
-      </div>
-
-      {/* 1B. MOBILE: MEMORIAL BAHÇELİEVLER HOSPITAL FULL-BLEED STATIC BACKGROUND (< 768px) */}
-      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden block md:hidden">
+      {/* 1. UNIFIED RESPONSIVE HERO BACKGROUND PHOTO (CMS-EDITABLE ON DESKTOP & MOBILE) */}
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
         <img
-          src="/images/hospitals/memorial-bahcelievler.jpg"
-          alt="Memorial Bahçelievler Hospital"
-          className="h-full w-full object-cover object-center"
+          src={heroBgSrc}
+          alt={
+            language === 'ar'
+              ? 'مستشفيات أفيسينا المعتمدة في تركيا'
+              : language === 'fr'
+              ? 'Hôpitaux Partenaires AVICINNA en Turquie'
+              : 'AVICINNA Partner Hospitals in Turkey'
+          }
+          loading="eager"
+          fetchPriority="high"
+          onError={() => {
+            if (heroBgSrc !== '/images/hospitals/memorial-bahcelievler.jpg') {
+              setHeroBgSrc('/images/hospitals/memorial-bahcelievler.jpg');
+            }
+          }}
+          className="h-full w-full object-cover object-center scale-[1.01]"
         />
-        {/* Optimized Contrast Overlay for Mobile Typography */}
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/90 via-[#021838]/88 to-[#032654]/95" />
-        <div className="absolute -top-20 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-sky-500/25 blur-3xl pointer-events-none" />
+
+        {/* Balanced Architectural Vignette: Keeps hospital/patient background clearly visible on both mobile and desktop */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#021838]/70 via-[#032654]/42 to-[#021838]/82 dark:from-[#040B18]/78 dark:via-[#071832]/52 dark:to-[#040B18]/88" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(2,24,56,0.38)_0%,transparent_72%)]" />
+        <div className="hidden md:block absolute -top-32 left-1/2 h-[420px] w-[780px] -translate-x-1/2 rounded-full bg-sky-400/15 blur-[130px] pointer-events-none" />
       </div>
 
       <div className="relative z-10 w-full max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 text-center text-white">
-        {/* ─── DESKTOP HERO TEXT (>= 768px) ─── */}
-        <div className="hidden md:block">
-          {/* Trust Eyebrow Badge */}
-          <div className="inline-flex items-center gap-2 bg-[#0097FB]/15 border border-[#00BFFF]/30 backdrop-blur-md px-4 py-1.5 rounded-full mb-5 shadow-xs">
-            <Sparkles className="w-3.5 h-3.5 text-[#00BFFF]" />
-            <span className="text-sm font-semibold text-[#00BFFF] tracking-wide">
-              {eyebrow}
-            </span>
-          </div>
-
-          {/* Main Headline */}
-          <h1 className="text-3xl lg:text-5xl font-black tracking-tight leading-tight lg:leading-[1.2] mb-5 max-w-3xl mx-auto">
-            <span>{cleanPart1}</span>{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0097FB] via-[#00BFFF] to-[#0097FB] inline">
-              {cleanHighlight}
-            </span>
-            {cleanPart2 && <span> {cleanPart2}</span>}
-          </h1>
-
-          {/* Supporting Subtitle */}
-          <p className="text-base lg:text-lg text-slate-200/90 max-w-2xl mx-auto leading-relaxed mb-8 font-normal">
-            {subtitle}
-          </p>
+        {/* Single Semantic H1 Hero Text (Responsive typography for Mobile & Desktop) */}
+        <div className="inline-flex items-center gap-1.5 sm:gap-2 bg-[#0097FB]/15 border border-[#00BFFF]/30 backdrop-blur-md px-3 sm:px-4 py-1 sm:py-1.5 rounded-full mb-3 md:mb-5 shadow-xs">
+          <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#00BFFF]" />
+          <span className="text-[11px] sm:text-sm font-semibold text-[#00BFFF] tracking-wide">
+            {eyebrow}
+          </span>
         </div>
 
-        {/* ─── MOBILE HERO TEXT (< 768px) - High-Impact & Concise ─── */}
-        <div className="block md:hidden">
-          {/* Mobile Eyebrow Badge */}
-          <div className="inline-flex items-center gap-1.5 bg-[#0097FB]/15 border border-[#00BFFF]/30 backdrop-blur-md px-3 py-1 rounded-full mb-3 shadow-xs">
-            <Sparkles className="w-3 h-3 text-[#00BFFF]" />
-            <span className="text-[11px] font-semibold text-[#00BFFF] tracking-wide">
-              {mobileHeroText[langKey].eyebrow}
-            </span>
-          </div>
+        <h1 className="text-2xl sm:text-3xl lg:text-5xl font-black tracking-tight leading-snug lg:leading-[1.2] mb-2.5 md:mb-5 max-w-md md:max-w-3xl mx-auto drop-shadow-[0_2px_12px_rgba(2,24,56,0.75)]">
+          <span>{cleanPart1}</span>{' '}
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#38bdf8] via-[#7dd3fc] to-[#00BFFF] inline">
+            {cleanHighlight}
+          </span>
+          {cleanPart2 && <span> {cleanPart2}</span>}
+        </h1>
 
-          {/* Mobile Main Headline */}
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight leading-snug mb-2 max-w-md mx-auto">
-            <span>{mobileHeroText[langKey].headlinePart1}</span>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0097FB] via-[#00BFFF] to-[#0097FB] inline">
-              {mobileHeroText[langKey].headlineHighlight}
-            </span>
-          </h1>
-
-          {/* Mobile Subtitle (1-2 lines max, clean & punchy) */}
-          <p className="text-sm leading-relaxed text-slate-200/90 max-w-sm sm:max-w-md mx-auto mb-4 font-normal line-clamp-2">
-            {mobileHeroText[langKey].subtitle}
-          </p>
-        </div>
+        <p className="text-sm sm:text-base lg:text-lg text-slate-100/95 max-w-sm sm:max-w-md md:max-w-2xl mx-auto leading-relaxed mb-4 md:mb-8 font-normal line-clamp-2 md:line-clamp-none drop-shadow-[0_1px_8px_rgba(2,24,56,0.7)]">
+          {subtitle}
+        </p>
 
         {/* ─── Search / Consultation Entry Component with Live Autocomplete ─── */}
         <div ref={containerRef} className="w-full max-w-2xl mx-auto mb-5 sm:mb-8 relative z-30">
@@ -388,7 +360,7 @@ export const HeroSection: React.FC = () => {
                             return (
                               <Link
                                 key={doc.id}
-                                href={`/doctors/${doc.slug}`}
+                                href={getLocalizedEntityPath('doctors', doc, langKey)}
                                 onClick={() => setIsDropdownOpen(false)}
                                 className="flex items-center justify-between p-2.5 rounded-xl hover:bg-white/10 transition-colors group cursor-pointer border border-transparent hover:border-white/10"
                               >
@@ -433,7 +405,7 @@ export const HeroSection: React.FC = () => {
                             return (
                               <Link
                                 key={hosp.id}
-                                href={`/hospitals/${hosp.id}`}
+                                href={getLocalizedEntityPath('hospitals', hosp, langKey)}
                                 onClick={() => setIsDropdownOpen(false)}
                                 className="flex items-center justify-between p-2.5 rounded-xl hover:bg-white/10 transition-colors group cursor-pointer border border-transparent hover:border-white/10"
                               >
@@ -475,7 +447,7 @@ export const HeroSection: React.FC = () => {
                             return (
                               <Link
                                 key={tr.id}
-                                href={`/treatments/${tr.slug}`}
+                                href={getLocalizedEntityPath('treatments', tr, langKey)}
                                 onClick={() => setIsDropdownOpen(false)}
                                 className="flex items-center justify-between p-2.5 rounded-xl hover:bg-white/10 transition-colors group cursor-pointer border border-transparent hover:border-white/10"
                               >
@@ -536,7 +508,7 @@ export const HeroSection: React.FC = () => {
           </div>
 
           {/* Quick-Filter Popular Specialty Chips */}
-          <div className="mt-3 flex items-center sm:justify-center gap-1.5 sm:gap-2 overflow-x-auto sm:flex-wrap no-scrollbar px-2 sm:px-0 py-1 relative z-10 w-full max-w-full -mx-1 sm:mx-0 scroll-smooth">
+          <div className="mt-3 flex items-center sm:justify-center gap-1.5 sm:gap-2 overflow-x-auto sm:flex-wrap [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden px-2 sm:px-0 py-1 relative z-10 w-full max-w-full -mx-1 sm:mx-0 scroll-smooth">
             {[
               language === 'ar' ? 'جراحة الأورام' : language === 'fr' ? 'Oncologie' : 'Oncology',
               language === 'ar' ? 'جراحة القلب' : language === 'fr' ? 'Chirurgie Cardiaque' : 'Heart Surgery',
@@ -569,13 +541,13 @@ export const HeroSection: React.FC = () => {
             <span>{t.hero.primaryCta}</span>
           </a>
 
-          <a
-            href="/treatments"
+          <Link
+            href={getLocalizedPath('/treatments', langKey)}
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 border border-white/25 text-white font-semibold text-sm sm:text-base px-6 sm:px-8 py-3.5 sm:py-4 rounded-full backdrop-blur-md transition-all duration-200"
           >
             <span>{t.hero.secondaryCta}</span>
             {isRtl ? <ArrowLeft className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}
-          </a>
+          </Link>
         </div>
       </div>
 

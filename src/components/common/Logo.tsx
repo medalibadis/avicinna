@@ -3,6 +3,8 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useLanguage } from '@/context/LanguageContext';
+import { getLocalizedPath } from '@/lib/i18nRoutes';
 
 interface LogoProps {
   variant?: 'header' | 'footer' | 'dark' | 'light' | 'iconOnly' | 'full' | 'full-white';
@@ -15,13 +17,15 @@ export const Logo: React.FC<LogoProps> = ({
   className = '',
   size = 'md',
 }) => {
+  const { language } = useLanguage();
+  const homeHref = getLocalizedPath('/', language);
   const isDark = variant === 'dark' || variant === 'footer' || variant === 'full-white';
 
   if (variant === 'iconOnly') {
     const dim = size === 'sm' ? 32 : size === 'lg' ? 48 : 40;
     return (
       <Link
-        href="/"
+        href={homeHref}
         className={`inline-flex items-center justify-center focus:outline-none ${className}`}
         aria-label="AVICINNA"
       >
@@ -37,13 +41,12 @@ export const Logo: React.FC<LogoProps> = ({
     );
   }
 
-  // Full Stacked Official Logo (for Login page, central cards)
   if (variant === 'full' || variant === 'full-white') {
     const w = size === 'sm' ? 140 : size === 'lg' ? 220 : 180;
     const h = Math.round(w * (469 / 638));
     return (
       <Link
-        href="/"
+        href={homeHref}
         className={`inline-flex items-center justify-center focus:outline-none ${className}`}
         aria-label="AVICINNA - International Healthcare Platform"
       >
@@ -59,18 +62,13 @@ export const Logo: React.FC<LogoProps> = ({
     );
   }
 
-  // Official Horizontal Lockup (Emblem + AVICINNA + Arabic calligraphy)
-  const heights = {
-    sm: 34,
-    md: 42,
-    lg: 52,
-  };
+  const heights = { sm: 34, md: 42, lg: 52 };
   const h = heights[size];
   const w = Math.round(h * (641 / 120));
 
   return (
     <Link
-      href="/"
+      href={homeHref}
       className={`inline-flex items-center focus:outline-none ${className}`}
       aria-label="AVICINNA - International Healthcare Platform"
     >

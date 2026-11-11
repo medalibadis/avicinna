@@ -19,6 +19,9 @@ import {
 } from 'lucide-react';
 import { ImageUploadField } from '@/components/admin/ImageUploadField';
 import { ModalPortal } from '@/components/admin/ModalPortal';
+import { EntitySeoPanel } from '@/components/admin/EntitySeoPanel';
+import { slugifyText } from '@/lib/i18nRoutes';
+import type { LocalizedSeo, LocalizedSlugs } from '@/types/cms';
 import { useConfirmDialog } from '@/context/ConfirmDialogContext';
 import { toast } from 'sonner';
 
@@ -152,6 +155,8 @@ function AdminTreatmentsContent() {
   );
   const [conditionsRaw, setConditionsRaw] = useState('');
   const [whyTurkeyRaw, setWhyTurkeyRaw] = useState('');
+  const [slugs, setSlugs] = useState<LocalizedSlugs>({ ar: '', fr: '', en: '' });
+  const [seo, setSeo] = useState<LocalizedSeo>({ ar: {}, fr: {}, en: {} });
 
   // Deep-linking from search bar
   const targetEditId = searchParams.get('edit') || searchParams.get('id');
@@ -189,6 +194,8 @@ function AdminTreatmentsContent() {
     setImageUrl('https://images.unsplash.com/photo-1579684385127-1ef15d508118?q=80&w=1200&auto=format&fit=crop');
     setConditionsRaw('الحالات المتقدمة, التشخيص الدقيق, الرعاية المتكاملة');
     setWhyTurkeyRaw('نسب نجاح تفوق 98%, توفير مالي يصل إلى 60%, مستشفيات معتمدة دولياً JCI');
+    setSlugs({ ar: '', fr: '', en: '' });
+    setSeo({ ar: {}, fr: {}, en: {} });
     setModalOpen(true);
   };
 
@@ -206,6 +213,16 @@ function AdminTreatmentsContent() {
     setImageUrl(t.image);
     setConditionsRaw(t.conditionsTreated?.ar?.join(', ') || '');
     setWhyTurkeyRaw(t.whyTurkey?.ar?.join(', ') || '');
+    setSlugs({
+      ar: t.slugs?.ar || t.slug,
+      fr: t.slugs?.fr || t.slug,
+      en: t.slugs?.en || t.slug,
+    });
+    setSeo({
+      ar: t.seo?.ar || {},
+      fr: t.seo?.fr || {},
+      en: t.seo?.en || {},
+    });
     setModalOpen(true);
   };
 
@@ -215,12 +232,20 @@ function AdminTreatmentsContent() {
 
     const parsedConditions = conditionsRaw.split(',').map((s) => s.trim()).filter(Boolean);
     const parsedWhy = whyTurkeyRaw.split(',').map((s) => s.trim()).filter(Boolean);
+    const baseSlug = editingTreatment
+      ? editingTreatment.slug
+      : slugs.en || slugs.fr || slugs.ar || slugifyText(titleEn) || `treat-${Date.now()}`;
 
     const payload: Treatment = {
       id: editingTreatment ? editingTreatment.id : `treat-${Date.now()}`,
-      slug: editingTreatment
-        ? editingTreatment.slug
-        : titleEn.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+      slug: baseSlug,
+      slugs: {
+        ar: (slugs.ar || '').trim() || baseSlug,
+        fr: (slugs.fr || '').trim() || baseSlug,
+        en: (slugs.en || '').trim() || baseSlug,
+      },
+      seo,
+      updatedAt: new Date().toISOString(),
       title: {
         ar: titleAr,
         en: titleEn,
@@ -610,6 +635,18 @@ function AdminTreatmentsContent() {
                   className="w-full bg-slate-50/70 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 focus:bg-white dark:focus:bg-slate-800 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 rounded-xl px-4 py-2 text-xs text-slate-900 dark:text-white outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
+
+              <EntitySeoPanel
+                key={editingTreatment?.id || 'new-treatment'}
+                sectionPrefix="treatments"
+                baseSlug={editingTreatment?.slug || slugifyText(titleEn || titleFr || titleAr) || 'new-treatment'}
+                slugs={slugs}
+                seo={seo}
+                fallbackTitle={{ ar: titleAr, en: titleEn, fr: titleFr }}
+                fallbackDesc={{ ar: shortDescAr, en: shortDescEn, fr: shortDescFr }}
+                onChangeSlugs={setSlugs}
+                onChangeSeo={setSeo}
+              />
 
               </div>
 

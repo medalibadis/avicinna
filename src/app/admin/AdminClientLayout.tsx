@@ -8,8 +8,15 @@ import { AdminShell, Locale } from '@/components/admin/AdminShell';
 import { CommandMenu } from '@/components/admin/CommandMenu';
 import { Toaster } from 'sonner';
 import { ConfirmDialogProvider, useConfirmDialog } from '@/context/ConfirmDialogContext';
+import type { AdminSessionPayload } from '@/lib/auth';
 
-function AdminClientLayoutInner({ children }: { children: React.ReactNode }) {
+function AdminClientLayoutInner({
+  children,
+  session,
+}: {
+  children: React.ReactNode;
+  session?: AdminSessionPayload | null;
+}) {
   const pathname = usePathname();
   const router = useRouter();
   const { language, setLanguage } = useLanguage();
@@ -59,6 +66,7 @@ function AdminClientLayoutInner({ children }: { children: React.ReactNode }) {
         onClearCache={clearLocalCache}
         onLogout={handleLogout}
         pendingInquiriesCount={pendingInquiriesCount}
+        session={session}
       >
         {children}
       </AdminShell>
@@ -76,10 +84,16 @@ function AdminClientLayoutInner({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function AdminClientLayout({ children }: { children: React.ReactNode }) {
+export default function AdminClientLayout({
+  children,
+  session,
+}: {
+  children: React.ReactNode;
+  session?: AdminSessionPayload | null;
+}) {
   return (
     <ConfirmDialogProvider>
-      <AdminClientLayoutInner>{children}</AdminClientLayoutInner>
+      <AdminClientLayoutInner session={session}>{children}</AdminClientLayoutInner>
     </ConfirmDialogProvider>
   );
 }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { syncArticleToWordPress, checkWordPressStatus } from '@/lib/wordpress';
+import { requireApiAuth } from '@/lib/serverAuth';
 
 export async function GET() {
   try {
@@ -17,6 +18,9 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  const auth = await requireApiAuth(req, ['admin', 'editor']);
+  if (!auth.ok) return auth.response;
+
   try {
     const raw = await req.text();
     // 200KB max payload

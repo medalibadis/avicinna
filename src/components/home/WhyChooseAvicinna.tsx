@@ -19,28 +19,40 @@ export const WhyChooseAvicinna: React.FC = () => {
   const message = encodeURIComponent(defaultMsg[language] || defaultMsg.en);
   const whatsappUrl = `https://wa.me/${phoneRaw}?text=${message}`;
 
-  const features = [
-    {
-      icon: FileText,
-      title: t.whyChoose.card1Title,
-      desc: t.whyChoose.card1Desc,
-    },
-    {
-      icon: Building,
-      title: t.whyChoose.card2Title,
-      desc: t.whyChoose.card2Desc,
-    },
-    {
-      icon: HeartPulse,
-      title: t.whyChoose.card3Title,
-      desc: t.whyChoose.card3Desc,
-    },
-    {
-      icon: MessageSquare,
-      title: t.whyChoose.card4Title,
-      desc: t.whyChoose.card4Desc,
-    },
+  const defaultCards = [
+    { icon: FileText, title: t.whyChoose.card1Title, desc: t.whyChoose.card1Desc },
+    { icon: Building, title: t.whyChoose.card2Title, desc: t.whyChoose.card2Desc },
+    { icon: HeartPulse, title: t.whyChoose.card3Title, desc: t.whyChoose.card3Desc },
+    { icon: MessageSquare, title: t.whyChoose.card4Title, desc: t.whyChoose.card4Desc },
   ];
+
+  const cmsCards = sections.whyChoose.cards || [];
+  const features = defaultCards.map((fallback, idx) => ({
+    icon: fallback.icon,
+    title: cmsCards[idx]?.title?.[language] || fallback.title,
+    desc: cmsCards[idx]?.desc?.[language] || fallback.desc,
+  }));
+
+  const sectionBadge = sections.whyChoose.badge?.[language] || t.whyChoose.badge;
+  const sectionTitle = sections.whyChoose.title?.[language] || t.whyChoose.title;
+  const sectionSubtitle = sections.whyChoose.subtitle?.[language] || t.whyChoose.subtitle;
+  const visualImage =
+    sections.whyChoose.visualImage?.trim() ||
+    'https://images.unsplash.com/photo-1622253692010-333f2da6031d?q=80&w=1000&auto=format&fit=crop';
+  const visualTitle =
+    sections.whyChoose.visualTitle?.[language] ||
+    (language === 'ar'
+      ? 'فريق طبي متعدد اللغات'
+      : language === 'fr'
+      ? 'Équipe Médicale Polyglotte'
+      : 'Multilingual Medical Board');
+  const visualDesc =
+    sections.whyChoose.visualDesc?.[language] ||
+    (language === 'ar'
+      ? 'نرافقك باللغات العربية، الإنجليزية والفرنسية في كل خطوة.'
+      : language === 'fr'
+      ? 'Interprètes médicaux dédiés vous accompagnant en français, arabe et anglais à chaque étape.'
+      : 'Personal medical translators supporting you in Arabic, English, and French.');
 
   return (
     <section className="py-20 bg-white dark:bg-[#080E1A]">
@@ -49,15 +61,15 @@ export const WhyChooseAvicinna: React.FC = () => {
           {/* Content Column (7 cols) */}
           <div className="lg:col-span-7 space-y-6">
             <div className="inline-flex items-center gap-2 bg-[#EAF6FF] dark:bg-sky-950/60 text-[#0097FB] dark:text-sky-400 text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-full border border-[#0097FB]/20 dark:border-sky-500/30">
-              {t.whyChoose.badge}
+              {sectionBadge}
             </div>
 
             <h2 className="text-2xl sm:text-4xl font-extrabold text-[#032654] dark:text-white tracking-tight leading-tight">
-              {t.whyChoose.title}
+              {sectionTitle}
             </h2>
 
             <p className="text-sm sm:text-base text-[#64748B] dark:text-slate-300 leading-relaxed">
-              {t.whyChoose.subtitle}
+              {sectionSubtitle}
             </p>
 
             {/* 4 Feature Cards Grid */}
@@ -67,15 +79,6 @@ export const WhyChooseAvicinna: React.FC = () => {
                 return (
                   <motion.div
                     key={idx}
-                    initial={{ opacity: 0, y: 16 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: '-40px' }}
-                    transition={{
-                      type: 'spring',
-                      stiffness: 350,
-                      damping: 26,
-                      delay: idx * 0.08,
-                    }}
                     whileHover={{ y: -4, transition: { duration: 0.18 } }}
                     className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-xs hover:border-[#0097FB]/30 dark:hover:border-sky-500/40 transition-colors duration-300 hover:bg-[#EAF6FF]/30 dark:hover:bg-slate-800/60 cursor-pointer"
                   >
@@ -107,36 +110,41 @@ export const WhyChooseAvicinna: React.FC = () => {
             </div>
           </div>
 
-          {/* Visual Column (5 cols) */}
+          {/* Visual Column (5 cols) — Entire photo card links directly to WhatsApp for easy tapping */}
           <div className="lg:col-span-5 relative">
-            <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-slate-100 dark:border-slate-800">
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-wa-source="why-choose-image-card"
+              aria-label={t.whyChoose.whatsappCta}
+              className="group relative block rounded-3xl overflow-hidden shadow-2xl border border-slate-100 dark:border-slate-800 hover:border-emerald-400/70 transition-all duration-300 cursor-pointer"
+            >
               <img
-                src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?q=80&w=1000&auto=format&fit=crop"
-                alt="AVICINNA Medical Coordinator and Doctor"
-                className="w-full h-[520px] object-cover"
+                src={visualImage}
+                alt={visualTitle}
+                className="w-full h-[520px] object-cover group-hover:scale-[1.03] transition-transform duration-500"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#032654]/80 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#032654]/85 via-transparent to-transparent" />
 
-              <div className="absolute bottom-6 left-6 right-6 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md p-5 rounded-2xl shadow-lg border border-white/40 dark:border-slate-700/60">
+              {/* Clear WhatsApp tap indicator badge */}
+              <div className="absolute top-4 end-4 inline-flex items-center gap-1.5 rounded-full bg-emerald-500/95 group-hover:bg-emerald-400 text-white px-3.5 py-1.5 text-xs font-bold shadow-lg shadow-emerald-600/30 backdrop-blur-sm transition-transform group-hover:scale-105">
+                <MessageCircle className="w-3.5 h-3.5 fill-current" />
+                <span>
+                  {language === 'ar' ? 'تواصل واتساب مباشر' : language === 'fr' ? 'WhatsApp Direct' : 'Direct WhatsApp'}
+                </span>
+              </div>
+
+              <div className="absolute bottom-6 left-6 right-6 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md p-5 rounded-2xl shadow-lg border border-white/40 dark:border-slate-700/60 group-hover:shadow-xl transition-shadow">
                 <div className="flex items-center gap-2 text-[#0097FB] dark:text-sky-400 font-bold text-sm mb-1">
-                  <CheckCircle className="w-4 h-4 text-emerald-500" />
-                  <span>
-                    {language === 'ar'
-                      ? 'فريق طبي متعدد اللغات'
-                      : language === 'fr'
-                      ? 'Équipe Médicale Polyglotte'
-                      : 'Multilingual Medical Board'}
-                  </span>
+                  <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <span>{visualTitle}</span>
                 </div>
                 <p className="text-xs text-[#64748B] dark:text-slate-300 leading-relaxed">
-                  {language === 'ar'
-                    ? 'نرافقك باللغات العربية، الإنجليزية والفرنسية في كل خطوة.'
-                    : language === 'fr'
-                    ? 'Interprètes médicaux dédiés vous accompagnant en français, arabe et anglais à chaque étape.'
-                    : 'Personal medical translators supporting you in Arabic, English, and French.'}
+                  {visualDesc}
                 </p>
               </div>
-            </div>
+            </a>
           </div>
         </div>
       </div>

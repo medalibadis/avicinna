@@ -29,9 +29,32 @@ import { CustomSelect } from '@/components/admin/CustomSelect';
 import { ModalPortal } from '@/components/admin/ModalPortal';
 import { ArticleSeoStudio } from '@/components/admin/ArticleSeoStudio';
 import { AdminSeoGuideModal } from '@/components/admin/AdminSeoGuideModal';
+import { RichTextEditor } from '@/components/admin/RichTextEditor';
+import { EntitySeoPanel } from '@/components/admin/EntitySeoPanel';
 import { analyzeArticleSeo } from '@/lib/seoAnalyzer';
+import { getLocalizedEntityPath, slugifyText } from '@/lib/i18nRoutes';
+import type { FaqItem, LocalizedSeo, LocalizedSlugs, MedicalReviewerInfo } from '@/types/cms';
 import { useConfirmDialog } from '@/context/ConfirmDialogContext';
 import { toast } from 'sonner';
+
+function stripHtmlToParagraphs(html: string): string[] {
+  if (!html) return [];
+  return html
+    .replace(/<\/(p|h1|h2|h3|h4|li|tr|blockquote|div)>/gi, '\n')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .split('\n')
+    .map((p) => p.replace(/\s+/g, ' ').trim())
+    .filter(Boolean);
+}
+
+function paragraphsToHtml(paragraphs: string[] = []): string {
+  return paragraphs.filter(Boolean).map((p) => `<p>${p}</p>`).join('\n');
+}
 
 type Lang = 'ar' | 'en' | 'fr';
 
@@ -39,7 +62,7 @@ const blogDict = {
   ar: {
     badge: 'المدونة الطبية وإدارة المحتوى',
     wpOnline: (n: number) => `ووردبريس متصل (${n} مقال)`,
-    wpLocalReady: 'جسر ووردبريس المحلي جاهز',
+    wpLocalReady: 'نظام إدارة المقالات المدمج نشط',
     pageTitle: 'إدارة المدونة والمقالات',
     pageSubtitle: 'إنشاء مقالات طبية جديدة ومزامنتها لحظياً مع منظومة Headless WordPress ومحركات البحث.',
     btnAddArticle: 'إضافة مقال جديد',
@@ -61,7 +84,7 @@ const blogDict = {
     writeInOneTab: 'اكتب في أي لغة، وسيترجم النظام الطبي اللغات الأخرى تلقائياً',
     fieldTitle: 'عنوان المقال',
     fieldExcerpt: 'الملخص السريري / المقتطف',
-    fieldBody: 'المحتوى الطبي الكامل (فقرة في كل سطر)',
+    fieldBody: 'محرر المحتوى الطبي الاحترافي (Rich Text)',
     fieldCategory: 'تصنيف المقال *',
     fieldReadingTime: 'مدة القراءة التقديرية (دقائق) *',
     fieldAuthorName: 'اسم الطبيب الكاتب *',
@@ -80,7 +103,7 @@ const blogDict = {
   en: {
     badge: 'Medical Blog & CMS Studio',
     wpOnline: (n: number) => `WordPress Connected (${n} posts)`,
-    wpLocalReady: 'Local WordPress Bridge Ready',
+    wpLocalReady: 'Built-in Rich-Text CMS Active',
     pageTitle: 'Blog & Clinical Articles Management',
     pageSubtitle: 'Publish medical articles synchronized with Headless WordPress and search engines.',
     btnAddArticle: 'Add New Article',
@@ -102,7 +125,7 @@ const blogDict = {
     writeInOneTab: 'Write in any language tab; AI accurately translates medical terminology across all 3 languages.',
     fieldTitle: 'Article Title',
     fieldExcerpt: 'Clinical Summary / Excerpt',
-    fieldBody: 'Full Medical Article Body (One paragraph per line)',
+    fieldBody: 'Rich-Text Clinical Article Body (H2/H3, Links, Tables, Images)',
     fieldCategory: 'Article Category *',
     fieldReadingTime: 'Estimated Reading Time (Minutes) *',
     fieldAuthorName: 'Author / Physician Name *',
@@ -121,7 +144,7 @@ const blogDict = {
   fr: {
     badge: 'Blog Médical & Gestion de Contenu',
     wpOnline: (n: number) => `WordPress Connecté (${n} articles)`,
-    wpLocalReady: 'Passerelle WordPress Locale Prête',
+    wpLocalReady: 'CMS Intégré & Éditeur Enrichi Actifs',
     pageTitle: 'Gestion du Blog & Articles Médicaux',
     pageSubtitle: 'Publiez des articles médicaux synchronisés en temps réel avec Headless WordPress et les moteurs de recherche.',
     btnAddArticle: 'Ajouter un Article',
@@ -143,7 +166,7 @@ const blogDict = {
     writeInOneTab: 'Rédigez dans la langue de votre choix, l’IA traduit fidèlement les autres langues.',
     fieldTitle: 'Titre de l’article',
     fieldExcerpt: 'Résumé clinique / Extrait',
-    fieldBody: 'Corps complet de l’article médical (un paragraphe par ligne)',
+    fieldBody: 'Éditeur de Contenu Médical Enrichi (Titres H2/H3, Liens, Tableaux, Images)',
     fieldCategory: 'Catégorie de l’article *',
     fieldReadingTime: 'Temps de lecture estimé (minutes) *',
     fieldAuthorName: 'Nom du médecin ou auteur *',
@@ -162,7 +185,7 @@ const blogDict = {
 };
 
 export default function AdminBlogPage() {
-  const { articles, addArticle, updateArticle, deleteArticle } = useData();
+  const { articles, doctors, addArticle, updateArticle, deleteArticle } = useData();
   const { language, direction } = useLanguage();
   const langKey = (language === 'fr' || language === 'en' || language === 'ar' ? language : 'ar') as Lang;
   const t = blogDict[langKey];
@@ -177,7 +200,7 @@ export default function AdminBlogPage() {
   });
   const [syncingWp, setSyncingWp] = useState(false);
   const [syncMessage, setSyncMessage] = useState<string | null>(null);
-  const [publishToWordPress, setPublishToWordPress] = useState(true);
+  const [publishToWordPress, setPublishToWordPress] = useState(false);
 
   // Write-Once Multi-Language Form State
   const [editorTab, setEditorTab] = useState<Lang>(langKey);
@@ -189,6 +212,7 @@ export default function AdminBlogPage() {
 
   const [categorySlug, setCategorySlug] = useState('oncology');
   const [readingTime, setReadingTime] = useState(5);
+  const [authorDoctorId, setAuthorDoctorId] = useState('');
   const [authorName, setAuthorName] = useState({
     ar: 'أ. د. سردار تورهال',
     en: 'Prof. Dr. Serdar Turhal',
@@ -199,6 +223,10 @@ export default function AdminBlogPage() {
     en: 'Consultant Clinical Oncologist',
     fr: 'Professeur d’Oncologie Médicale',
   });
+  const [reviewerDoctorId, setReviewerDoctorId] = useState('');
+  const [reviewerName, setReviewerName] = useState({ ar: '', en: '', fr: '' });
+  const [reviewerRole, setReviewerRole] = useState({ ar: '', en: '', fr: '' });
+  const [updatedDate, setUpdatedDate] = useState(new Date().toISOString().split('T')[0]);
   const [hospitalName, setHospitalName] = useState({
     ar: 'مستشفى أجيبادم للأورام والمركز المعتمد بتركيا',
     en: 'Acibadem Oncology Hospital Istanbul',
@@ -208,11 +236,57 @@ export default function AdminBlogPage() {
     'https://images.unsplash.com/photo-1579154204601-01588f351e67?q=80&w=1200&auto=format&fit=crop'
   );
 
-  // SEO Rank Math / Yoast fields & Guide Modal State
-  const [focusKeyword, setFocusKeyword] = useState('');
-  const [seoTitle, setSeoTitle] = useState('');
-  const [seoDescription, setSeoDescription] = useState('');
+  // SEO per-language metadata, slugs, and FAQ block state
+  const [slugs, setSlugs] = useState<LocalizedSlugs>({ ar: '', fr: '', en: '' });
+  const [seo, setSeo] = useState<LocalizedSeo>({ ar: {}, fr: {}, en: {} });
+  const [faqs, setFaqs] = useState<FaqItem[]>([]);
   const [seoGuideModalOpen, setSeoGuideModalOpen] = useState(false);
+
+  const activeSeo = seo[editorTab] || {};
+  const focusKeyword = activeSeo.focusKeyword || '';
+  const seoTitle = activeSeo.title || '';
+  const seoDescription = activeSeo.description || '';
+
+  const setFocusKeyword = (val: string) =>
+    setSeo((prev) => ({ ...prev, [editorTab]: { ...prev[editorTab], focusKeyword: val } }));
+  const setSeoTitle = (val: string) =>
+    setSeo((prev) => ({ ...prev, [editorTab]: { ...prev[editorTab], title: val } }));
+  const setSeoDescription = (val: string) =>
+    setSeo((prev) => ({ ...prev, [editorTab]: { ...prev[editorTab], description: val } }));
+
+  const applyAuthorDoctor = (docId: string) => {
+    setAuthorDoctorId(docId);
+    const doc = doctors.find((d) => d.id === docId);
+    if (doc) {
+      setAuthorName({
+        ar: doc.name.ar || doc.name.en,
+        en: doc.name.en || doc.name.ar,
+        fr: doc.name.fr || doc.name.en,
+      });
+      setAuthorRole({
+        ar: doc.title.ar || doc.specialtyName?.ar || doc.title.en,
+        en: doc.title.en || doc.specialtyName?.en || doc.title.ar,
+        fr: doc.title.fr || doc.specialtyName?.fr || doc.title.en,
+      });
+    }
+  };
+
+  const applyReviewerDoctor = (docId: string) => {
+    setReviewerDoctorId(docId);
+    const doc = doctors.find((d) => d.id === docId);
+    if (doc) {
+      setReviewerName({
+        ar: doc.name.ar || doc.name.en,
+        en: doc.name.en || doc.name.ar,
+        fr: doc.name.fr || doc.name.en,
+      });
+      setReviewerRole({
+        ar: doc.title.ar || doc.specialtyName?.ar || doc.title.en,
+        en: doc.title.en || doc.specialtyName?.en || doc.title.ar,
+        fr: doc.title.fr || doc.specialtyName?.fr || doc.title.en,
+      });
+    }
+  };
 
   // Check WordPress bridge status on load
   const verifyWpBridge = async () => {
@@ -232,30 +306,40 @@ export default function AdminBlogPage() {
   }, []);
 
   const openAddModal = () => {
+    const today = new Date().toISOString().split('T')[0];
     setEditingArticle(null);
     setEditorTab(langKey);
-    setTitles({
-      ar: '',
-      en: '',
-      fr: '',
-    });
+    setTitles({ ar: '', en: '', fr: '' });
     setExcerpts({
       ar: 'دليل شامل يوضح أحدث خيارات العلاج في إسطنبول والفروق في التكلفة ونسب النجاح.',
-      en: 'A comprehensive clinical guide to the latest oncology therapies and outcomes in Istanbul.',
-      fr: 'Guide médical complet sur les thérapies oncologiques de pointe et les résultats à Istanbul.',
+      en: 'A comprehensive clinical guide to the latest therapies and outcomes in Istanbul.',
+      fr: 'Guide médical complet sur les thérapies de pointe et les résultats à Istanbul.',
     });
     setBodies({
-      ar: 'أصبحت تركيا إحدى الوجهات العالمية المفضلة للعلاج الطبي بفضل استثماراتها الكبرى في البنية التحتية.\nتعتمد مشافينا على أحدث التقنيات الجراحية والمجالس الاستشارية متعددة التخصصات لضمان أعلى درجات الأمان.',
-      en: 'Turkey has become a leading international destination for medical travel due to advanced infrastructure.\nOur accredited partner hospitals utilize state-of-the-art surgical robotics and multidisciplinary tumor boards.',
-      fr: 'La Turquie est devenue une destination majeure du tourisme médical grâce à des investissements massifs.\nNos hôpitaux partenaires agréés s’appuient sur une robotique chirurgicale de pointe et des comités pluridisciplinaires.',
+      ar: '<h2>مقدمة طبية شاملة</h2>\n<p>تعتمد مشافينا الشريكة على أحدث التقنيات الجراحية والمجالس الاستشارية متعددة التخصصات لضمان أعلى درجات الأمان السريري.</p>',
+      en: '<h2>Clinical Overview</h2>\n<p>Our accredited partner hospitals utilize state-of-the-art surgical robotics and multidisciplinary tumor boards to ensure optimal patient outcomes.</p>',
+      fr: '<h2>Présentation Clinique</h2>\n<p>Nos hôpitaux partenaires agréés s’appuient sur des technologies de pointe et des comités pluridisciplinaires pour garantir votre sécurité médicale.</p>',
     });
     setCategorySlug('oncology');
     setReadingTime(5);
+    setAuthorDoctorId('');
+    setReviewerDoctorId('');
+    setReviewerName({ ar: '', en: '', fr: '' });
+    setReviewerRole({ ar: '', en: '', fr: '' });
+    setUpdatedDate(today);
+    setFaqs([]);
+    setSlugs({ ar: '', fr: '', en: '' });
     setImageUrl('https://images.unsplash.com/photo-1579154204601-01588f351e67?q=80&w=1200&auto=format&fit=crop');
-    setFocusKeyword('علاج السرطان في تركيا');
-    setSeoTitle('علاج السرطان في تركيا | التكلفة ونسب النجاح - AVICINNA');
-    setSeoDescription('دليل شامل حول أفضل مستشفيات علاج الأورام في إسطنبول وأحدث بروتوكولات العلاج المناعي.');
-    setPublishToWordPress(true);
+    setSeo({
+      ar: {
+        focusKeyword: 'علاج السرطان في تركيا',
+        title: 'علاج السرطان في تركيا | التكلفة ونسب النجاح - AVICINNA',
+        description: 'دليل شامل حول أفضل مستشفيات علاج الأورام في إسطنبول وأحدث بروتوكولات العلاج المناعي.',
+      },
+      en: {},
+      fr: {},
+    });
+    setPublishToWordPress(wpStatus.online);
     setSyncMessage(null);
     setModalOpen(true);
   };
@@ -274,12 +358,13 @@ export default function AdminBlogPage() {
       fr: art.excerpt.fr || art.excerpt.en || art.excerpt.ar || '',
     });
     setBodies({
-      ar: (art.content.ar || []).join('\n'),
-      en: (art.content.en || art.content.ar || []).join('\n'),
-      fr: (art.content.fr || art.content.en || art.content.ar || []).join('\n'),
+      ar: art.htmlContent?.ar || paragraphsToHtml(art.content.ar || []),
+      en: art.htmlContent?.en || paragraphsToHtml(art.content.en || art.content.ar || []),
+      fr: art.htmlContent?.fr || paragraphsToHtml(art.content.fr || art.content.en || art.content.ar || []),
     });
     setCategorySlug(art.categorySlug);
     setReadingTime(art.readingTimeMinutes);
+    setAuthorDoctorId(art.authorDoctorId || '');
     setAuthorName({
       ar: art.author.name.ar || 'أ. د. سردار تورهال',
       en: art.author.name.en || 'Prof. Dr. Serdar Turhal',
@@ -290,16 +375,48 @@ export default function AdminBlogPage() {
       en: art.author.role.en || 'Consultant Oncologist',
       fr: art.author.role.fr || 'Oncologue Médical',
     });
+    setReviewerDoctorId(art.medicalReviewer?.doctorId || '');
+    setReviewerName({
+      ar: art.medicalReviewer?.name?.ar || '',
+      en: art.medicalReviewer?.name?.en || '',
+      fr: art.medicalReviewer?.name?.fr || '',
+    });
+    setReviewerRole({
+      ar: art.medicalReviewer?.role?.ar || '',
+      en: art.medicalReviewer?.role?.en || '',
+      fr: art.medicalReviewer?.role?.fr || '',
+    });
+    setUpdatedDate(art.updatedDate || art.updatedAt?.split('T')[0] || art.publishedDate || new Date().toISOString().split('T')[0]);
     setHospitalName({
       ar: art.sourceHospital.ar || 'مستشفى أجيبادم',
       en: art.sourceHospital.en || 'Acibadem Hospital',
       fr: art.sourceHospital.fr || 'Hôpital Acibadem',
     });
     setImageUrl(art.image);
-    setFocusKeyword(art.title[langKey] || art.title.ar);
-    setSeoTitle(`${art.title[langKey] || art.title.ar} - AVICINNA`);
-    setSeoDescription(art.excerpt[langKey] || art.excerpt.ar);
-    setPublishToWordPress(true);
+    setSlugs({
+      ar: art.slugs?.ar || art.slug,
+      fr: art.slugs?.fr || art.slug,
+      en: art.slugs?.en || art.slug,
+    });
+    setSeo({
+      ar: {
+        focusKeyword: art.seo?.ar?.focusKeyword || art.title.ar,
+        title: art.seo?.ar?.title || `${art.title.ar} - AVICINNA`,
+        description: art.seo?.ar?.description || art.excerpt.ar,
+      },
+      fr: {
+        focusKeyword: art.seo?.fr?.focusKeyword || art.title.fr,
+        title: art.seo?.fr?.title || `${art.title.fr} - AVICINNA`,
+        description: art.seo?.fr?.description || art.excerpt.fr,
+      },
+      en: {
+        focusKeyword: art.seo?.en?.focusKeyword || art.title.en,
+        title: art.seo?.en?.title || `${art.title.en} - AVICINNA`,
+        description: art.seo?.en?.description || art.excerpt.en,
+      },
+    });
+    setFaqs(art.faqs || []);
+    setPublishToWordPress(wpStatus.online);
     setSyncMessage(null);
     setModalOpen(true);
   };
@@ -308,7 +425,7 @@ export default function AdminBlogPage() {
   const handleAutoTranslate = async () => {
     const currentTitle = titles[editorTab].trim();
     const currentExcerpt = excerpts[editorTab].trim();
-    const currentBody = bodies[editorTab].trim();
+    const currentBody = stripHtmlToParagraphs(bodies[editorTab]).join('\n') || bodies[editorTab].trim();
 
     if (!currentTitle) {
       toast.error(langKey === 'ar' ? 'يرجى إدخال عنوان المقال أولاً قبل بدء الترجمة' : 'Please enter at least a title before auto-translating.');
@@ -350,12 +467,17 @@ export default function AdminBlogPage() {
         }));
         setBodies((prev) => ({
           ...prev,
-          ar: data.translations.ar?.body || prev.ar,
-          en: data.translations.en?.body || prev.en,
-          fr: data.translations.fr?.body || prev.fr,
+          ar: data.translations.ar?.body
+            ? paragraphsToHtml(String(data.translations.ar.body).split('\n'))
+            : prev.ar,
+          en: data.translations.en?.body
+            ? paragraphsToHtml(String(data.translations.en.body).split('\n'))
+            : prev.en,
+          fr: data.translations.fr?.body
+            ? paragraphsToHtml(String(data.translations.fr.body).split('\n'))
+            : prev.fr,
         }));
 
-        // Celebratory dopamine feedback
         confetti({
           particleCount: 65,
           spread: 70,
@@ -384,18 +506,56 @@ export default function AdminBlogPage() {
       fr: matchedCategory?.name.fr || 'Article Médical',
     };
 
-    const paragraphsAr = (bodies.ar || bodies[editorTab]).split('\n').map((p) => p.trim()).filter(Boolean);
-    const paragraphsEn = (bodies.en || bodies[editorTab]).split('\n').map((p) => p.trim()).filter(Boolean);
-    const paragraphsFr = (bodies.fr || bodies[editorTab]).split('\n').map((p) => p.trim()).filter(Boolean);
+    const htmlAr = bodies.ar || bodies[editorTab];
+    const htmlEn = bodies.en || bodies[editorTab];
+    const htmlFr = bodies.fr || bodies[editorTab];
+
+    const paragraphsAr = stripHtmlToParagraphs(htmlAr);
+    const paragraphsEn = stripHtmlToParagraphs(htmlEn);
+    const paragraphsFr = stripHtmlToParagraphs(htmlFr);
 
     const safeTitleEn = titles.en || titles.fr || titles.ar;
     const generatedSlug = editingArticle
       ? editingArticle.slug
-      : `${safeTitleEn.toLowerCase().replace(/[^a-z0-9\u0621-\u064A]+/g, '-')}-${Date.now()}`;
+      : slugs.en || slugs.fr || slugs.ar || `${slugifyText(safeTitleEn) || 'article'}-${Date.now()}`;
+
+    const cleanSlugs: LocalizedSlugs = {
+      ar: (slugs.ar || '').trim() || generatedSlug,
+      fr: (slugs.fr || '').trim() || generatedSlug,
+      en: (slugs.en || '').trim() || generatedSlug,
+    };
+
+    const cleanFaqs = faqs.filter(
+      (f) => f.question.ar.trim() || f.question.fr.trim() || f.question.en.trim()
+    );
+
+    const hasReviewer = Boolean(
+      reviewerName.ar.trim() || reviewerName.fr.trim() || reviewerName.en.trim()
+    );
+    const medicalReviewer: MedicalReviewerInfo | undefined = hasReviewer
+      ? {
+          doctorId: reviewerDoctorId || undefined,
+          name: {
+            ar: reviewerName.ar || reviewerName.en || reviewerName.fr,
+            en: reviewerName.en || reviewerName.fr || reviewerName.ar,
+            fr: reviewerName.fr || reviewerName.en || reviewerName.ar,
+          },
+          role: {
+            ar: reviewerRole.ar || reviewerRole.en || reviewerRole.fr || 'مراجع طبي',
+            en: reviewerRole.en || reviewerRole.fr || reviewerRole.ar || 'Medical Reviewer',
+            fr: reviewerRole.fr || reviewerRole.en || reviewerRole.ar || 'Réviseur Médical',
+          },
+        }
+      : undefined;
+
+    const nowDate = updatedDate || new Date().toISOString().split('T')[0];
 
     const payload: Article = {
       id: editingArticle ? editingArticle.id : `art-${Date.now()}`,
       slug: generatedSlug,
+      slugs: cleanSlugs,
+      seo,
+      faqs: cleanFaqs,
       categorySlug,
       categoryName,
       title: {
@@ -413,16 +573,25 @@ export default function AdminBlogPage() {
         en: paragraphsEn,
         fr: paragraphsFr,
       },
+      htmlContent: {
+        ar: htmlAr,
+        en: htmlEn,
+        fr: htmlFr,
+      },
       readingTimeMinutes: Number(readingTime),
       publishedDate: editingArticle
         ? editingArticle.publishedDate
-        : new Date().toISOString().split('T')[0],
+        : nowDate,
+      updatedDate: nowDate,
+      updatedAt: new Date().toISOString(),
       sourceHospital: hospitalName,
       image: imageUrl,
+      authorDoctorId: authorDoctorId || undefined,
       author: {
         name: authorName,
         role: authorRole,
       },
+      medicalReviewer,
     };
 
     if (editingArticle) {
@@ -436,7 +605,7 @@ export default function AdminBlogPage() {
         const wpPayload = {
           id: editingArticle?.id,
           title: payload.title[langKey] || payload.title.ar,
-          content: (payload.content[langKey] || payload.content.ar).map((p) => `<p>${p}</p>`).join(''),
+          content: payload.htmlContent?.[langKey] || (payload.content[langKey] || payload.content.ar).map((p) => `<p>${p}</p>`).join(''),
           excerpt: payload.excerpt[langKey] || payload.excerpt.ar,
           slug: generatedSlug,
           image: imageUrl,
@@ -619,17 +788,22 @@ export default function AdminBlogPage() {
           const displayExcerpt = art.excerpt[langKey] || art.excerpt.ar;
           const displayCategory = art.categoryName[langKey] || art.categoryName.ar;
           const displayAuthor = art.author.name[langKey] || art.author.name.ar;
-          const artBody = (art.content[langKey] || art.content.ar || []).join('\n');
+          const artBody =
+            art.htmlContent?.[langKey] ||
+            art.htmlContent?.ar ||
+            (art.content[langKey] || art.content.ar || []).map((p) => `<p>${p}</p>`).join('\n');
 
           // Compute real-time Rank Math SEO Score for card
           const artSeo = analyzeArticleSeo({
             title: displayTitle,
             body: artBody,
             excerpt: displayExcerpt,
-            focusKeyword: displayTitle.split(/[:؛\-\|]/)[0]?.trim() || displayTitle,
-            seoTitle: `${displayTitle} | AVICINNA`,
-            seoDescription: displayExcerpt,
+            focusKeyword: art.seo?.[langKey]?.focusKeyword || displayTitle.split(/[:؛\-\|]/)[0]?.trim() || displayTitle,
+            seoTitle: art.seo?.[langKey]?.title || `${displayTitle} | AVICINNA`,
+            seoDescription: art.seo?.[langKey]?.description || displayExcerpt,
+            slug: art.slugs?.[langKey] || art.slug,
             hasImage: Boolean(art.image),
+            locale: langKey,
           });
 
           return (
@@ -698,7 +872,7 @@ export default function AdminBlogPage() {
                     <span>{t.btnEdit}</span>
                   </button>
                   <Link
-                    href={`/blog/${art.slug}`}
+                    href={getLocalizedEntityPath('blog', art, langKey)}
                     target="_blank"
                     className="p-2 rounded-xl bg-slate-50 hover:bg-sky-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 hover:text-sky-700 dark:text-slate-300 dark:hover:text-sky-300 border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
                     title={t.btnPreview}
@@ -917,39 +1091,167 @@ export default function AdminBlogPage() {
                 />
               </div>
 
-              {/* Author & Hospital */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    {t.fieldAuthorName}
-                  </label>
-                  <input
-                    type="text"
-                    value={authorName[langKey] || authorName.ar}
-                    onChange={(e) =>
-                      setAuthorName({
-                        ...authorName,
-                        [langKey]: e.target.value,
-                      })
-                    }
-                    className="w-full bg-slate-50/70 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 focus:bg-white dark:focus:bg-slate-800 focus:border-blue-500 dark:focus:border-sky-500 focus:ring-2 focus:ring-blue-500/20 rounded-xl px-4 py-2 text-xs text-slate-900 dark:text-white outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
-                  />
+              {/* Author (linked to Doctor Profile), Medical Reviewer & E-E-A-T Dates */}
+              <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-800/40 space-y-4">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-700 pb-2.5">
+                  <span className="text-xs font-extrabold text-slate-800 dark:text-white">
+                    {langKey === 'fr'
+                      ? 'Auteur Médical (E-E-A-T), Réviseur Scientifique & Date de mise à jour'
+                      : langKey === 'en'
+                      ? 'Medical Authorship (E-E-A-T), Clinical Reviewer & Last Updated Date'
+                      : 'التوثيق الطبي (E-E-A-T): الكاتب، المراجع الطبي، وتاريخ آخر تحديث'}
+                  </span>
                 </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    {t.fieldHospital}
-                  </label>
-                  <input
-                    type="text"
-                    value={hospitalName[langKey] || hospitalName.ar}
-                    onChange={(e) =>
-                      setHospitalName({
-                        ...hospitalName,
-                        [langKey]: e.target.value,
-                      })
-                    }
-                    className="w-full bg-slate-50/70 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 focus:bg-white dark:focus:bg-slate-800 focus:border-blue-500 dark:focus:border-sky-500 focus:ring-2 focus:ring-blue-500/20 rounded-xl px-4 py-2 text-xs text-slate-900 dark:text-white outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
-                  />
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+                      {langKey === 'fr' ? 'Lier à un profil médecin' : langKey === 'en' ? 'Link Author to Doctor Profile' : 'ربط الكاتب بملف طبيب'}
+                    </label>
+                    <select
+                      value={authorDoctorId}
+                      onChange={(e) => applyAuthorDoctor(e.target.value)}
+                      className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white outline-none"
+                    >
+                      <option value="">
+                        {langKey === 'fr' ? '— Saisie manuelle —' : langKey === 'en' ? '— Custom Author —' : '— إدخال يدوي —'}
+                      </option>
+                      {doctors.map((doc) => (
+                        <option key={doc.id} value={doc.id}>
+                          {doc.name[langKey] || doc.name.ar}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+                      {t.fieldAuthorName} ({editorTab.toUpperCase()})
+                    </label>
+                    <input
+                      type="text"
+                      dir={editorTab === 'ar' ? 'rtl' : 'ltr'}
+                      value={authorName[editorTab] || ''}
+                      onChange={(e) =>
+                        setAuthorName({
+                          ...authorName,
+                          [editorTab]: e.target.value,
+                        })
+                      }
+                      className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+                      {t.fieldAuthorRole} ({editorTab.toUpperCase()})
+                    </label>
+                    <input
+                      type="text"
+                      dir={editorTab === 'ar' ? 'rtl' : 'ltr'}
+                      value={authorRole[editorTab] || ''}
+                      onChange={(e) =>
+                        setAuthorRole({
+                          ...authorRole,
+                          [editorTab]: e.target.value,
+                        })
+                      }
+                      className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+                      {langKey === 'fr' ? 'Réviseur Médical (Profil)' : langKey === 'en' ? 'Medical Reviewer (Doctor)' : 'المراجع الطبي (اختيار من الأطباء)'}
+                    </label>
+                    <select
+                      value={reviewerDoctorId}
+                      onChange={(e) => applyReviewerDoctor(e.target.value)}
+                      className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white outline-none"
+                    >
+                      <option value="">
+                        {langKey === 'fr' ? '— Aucun / Manuel —' : langKey === 'en' ? '— None / Manual —' : '— بدون / يدوي —'}
+                      </option>
+                      {doctors.map((doc) => (
+                        <option key={doc.id} value={doc.id}>
+                          {doc.name[langKey] || doc.name.ar}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+                      {langKey === 'fr' ? 'Nom du Réviseur Médical' : langKey === 'en' ? 'Medical Reviewer Name' : 'اسم المراجع الطبي'} ({editorTab.toUpperCase()})
+                    </label>
+                    <input
+                      type="text"
+                      dir={editorTab === 'ar' ? 'rtl' : 'ltr'}
+                      value={reviewerName[editorTab] || ''}
+                      onChange={(e) =>
+                        setReviewerName({
+                          ...reviewerName,
+                          [editorTab]: e.target.value,
+                        })
+                      }
+                      placeholder={langKey === 'fr' ? 'Pr Dr ...' : langKey === 'en' ? 'Prof. Dr. ...' : 'أ. د. ...'}
+                      className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+                      {langKey === 'fr' ? 'Dernière mise à jour' : langKey === 'en' ? 'Last Updated Date' : 'تاريخ آخر مراجعة وتحديث'}
+                    </label>
+                    <input
+                      type="date"
+                      dir="ltr"
+                      value={updatedDate}
+                      onChange={(e) => setUpdatedDate(e.target.value)}
+                      className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+                      {langKey === 'fr' ? 'Titre du Réviseur Médical' : langKey === 'en' ? 'Medical Reviewer Title / Board' : 'صفة المراجع الطبي'} ({editorTab.toUpperCase()})
+                    </label>
+                    <input
+                      type="text"
+                      dir={editorTab === 'ar' ? 'rtl' : 'ltr'}
+                      value={reviewerRole[editorTab] || ''}
+                      onChange={(e) =>
+                        setReviewerRole({
+                          ...reviewerRole,
+                          [editorTab]: e.target.value,
+                        })
+                      }
+                      placeholder={langKey === 'fr' ? 'Chef du comité médical' : langKey === 'en' ? 'Head of Medical Review Board' : 'رئيس لجنة المراجعة السريرية'}
+                      className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+                      {t.fieldHospital} ({editorTab.toUpperCase()})
+                    </label>
+                    <input
+                      type="text"
+                      dir={editorTab === 'ar' ? 'rtl' : 'ltr'}
+                      value={hospitalName[editorTab] || ''}
+                      onChange={(e) =>
+                        setHospitalName({
+                          ...hospitalName,
+                          [editorTab]: e.target.value,
+                        })
+                      }
+                      className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white outline-none"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -962,19 +1264,139 @@ export default function AdminBlogPage() {
                 aspectRatio="video"
               />
 
-              {/* Article Content in Active Editor Tab */}
+              {/* Rich-Text Article Content Editor in Active Tab */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  {t.fieldBody} ({editorTab.toUpperCase()})
-                </label>
-                <textarea
-                  rows={6}
+                <RichTextEditor
+                  label={`${t.fieldBody} (${editorTab.toUpperCase()})`}
                   dir={editorTab === 'ar' ? 'rtl' : 'ltr'}
+                  lang={editorTab}
                   value={bodies[editorTab]}
-                  onChange={(e) => setBodies({ ...bodies, [editorTab]: e.target.value })}
-                  className="w-full bg-slate-50/70 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 focus:bg-white dark:focus:bg-slate-800 focus:border-blue-500 dark:focus:border-sky-500 focus:ring-2 focus:ring-blue-500/20 rounded-xl px-4 py-2.5 text-xs text-slate-900 dark:text-white leading-relaxed outline-none transition-all font-sans placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                  onChange={(html) => setBodies((prev) => ({ ...prev, [editorTab]: html }))}
+                  minHeight={300}
                 />
               </div>
+
+              {/* Interactive FAQ Block Builder */}
+              <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-800/40 space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 text-xs font-extrabold text-slate-800 dark:text-white">
+                    <HelpCircle className="w-4 h-4 text-teal-600" />
+                    <span>
+                      {langKey === 'fr'
+                        ? `Bloc FAQ structuré (${editorTab.toUpperCase()}) — Schéma FAQPage Google`
+                        : langKey === 'en'
+                        ? `Structured FAQ Block (${editorTab.toUpperCase()}) — Google FAQPage Schema`
+                        : `كتلة الأسئلة الشائعة (${editorTab.toUpperCase()}) — تدعم مخطط FAQPage في جوجل`}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setFaqs((prev) => [
+                        ...prev,
+                        {
+                          question: { ar: '', en: '', fr: '' },
+                          answer: { ar: '', en: '', fr: '' },
+                        },
+                      ])
+                    }
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-[11px] font-bold cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>{langKey === 'fr' ? 'Ajouter une Q/R' : langKey === 'en' ? 'Add FAQ Item' : 'إضافة سؤال شائع'}</span>
+                  </button>
+                </div>
+
+                {faqs.length === 0 ? (
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    {langKey === 'fr'
+                      ? 'Aucune question fréquente ajoutée. Cliquez sur « Ajouter une Q/R » pour enrichir l’article.'
+                      : langKey === 'en'
+                      ? 'No FAQ items yet. Click "Add FAQ Item" to boost article search visibility and rich results.'
+                      : 'لا توجد أسئلة شائعة بعد. أضف أسئلة وإجابات لتقوية المقال وظهوره في نتائج جوجل.'}
+                  </p>
+                ) : (
+                  <div className="space-y-3">
+                    {faqs.map((faq, idx) => (
+                      <div
+                        key={idx}
+                        className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 space-y-2"
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-[11px] font-bold text-slate-500">FAQ #{idx + 1}</span>
+                          <button
+                            type="button"
+                            onClick={() => setFaqs((prev) => prev.filter((_, i) => i !== idx))}
+                            className="p-1 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-lg cursor-pointer"
+                            title="Remove FAQ"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                        <input
+                          type="text"
+                          dir={editorTab === 'ar' ? 'rtl' : 'ltr'}
+                          value={faq.question[editorTab] || ''}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setFaqs((prev) =>
+                              prev.map((item, i) =>
+                                i === idx
+                                  ? { ...item, question: { ...item.question, [editorTab]: val } }
+                                  : item
+                              )
+                            );
+                          }}
+                          placeholder={
+                            editorTab === 'fr'
+                              ? 'Question fréquente...'
+                              : editorTab === 'en'
+                              ? 'Question...'
+                              : 'السؤال الشائع...'
+                          }
+                          className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-900 dark:text-white outline-none"
+                        />
+                        <textarea
+                          rows={2}
+                          dir={editorTab === 'ar' ? 'rtl' : 'ltr'}
+                          value={faq.answer[editorTab] || ''}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setFaqs((prev) =>
+                              prev.map((item, i) =>
+                                i === idx
+                                  ? { ...item, answer: { ...item.answer, [editorTab]: val } }
+                                  : item
+                              )
+                            );
+                          }}
+                          placeholder={
+                            editorTab === 'fr'
+                              ? 'Réponse médicale claire...'
+                              : editorTab === 'en'
+                              ? 'Clear medical answer...'
+                              : 'الإجابة الطبية المختصرة...'
+                          }
+                          className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-900 dark:text-white outline-none"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Localized URL Slugs, Custom SEO Meta & 301 Redirect Suggestion */}
+              <EntitySeoPanel
+                key={editingArticle?.id || 'new-article'}
+                sectionPrefix="blog"
+                baseSlug={editingArticle?.slug || slugifyText(titles.en || titles.fr || titles.ar) || 'new-article'}
+                slugs={slugs}
+                seo={seo}
+                fallbackTitle={titles}
+                fallbackDesc={excerpts}
+                onChangeSlugs={setSlugs}
+                onChangeSeo={setSeo}
+              />
 
               {/* Enterprise Rank Math / Yoast Medical SEO Studio */}
               <ArticleSeoStudio
@@ -989,12 +1411,12 @@ export default function AdminBlogPage() {
                 excerpt={excerpts[editorTab]}
                 setBody={(val) => setBodies((prev) => ({ ...prev, [editorTab]: val }))}
                 setExcerpt={(val) => setExcerpts((prev) => ({ ...prev, [editorTab]: val }))}
-                slug={editingArticle?.slug || ''}
+                slug={slugs[editorTab] || editingArticle?.slug || ''}
                 categorySlug={categorySlug}
                 imageUrl={imageUrl}
-                authorName={authorName[langKey] || authorName.ar}
-                hospitalName={hospitalName[langKey] || hospitalName.ar}
-                locale={langKey}
+                authorName={authorName[editorTab] || authorName.ar}
+                hospitalName={hospitalName[editorTab] || hospitalName.ar}
+                locale={editorTab}
                 onOpenGuide={() => setSeoGuideModalOpen(true)}
               />
 

@@ -1,13 +1,21 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { Doctor, doctorsData } from '@/data/doctors';
 import { Treatment, treatmentsData } from '@/data/treatments';
 import { PatientStory, patientStoriesData } from '@/data/stories';
 import { Article, articlesData } from '@/data/articles';
 import { HospitalPartner, hospitalsData } from '@/data/hospitals';
-import { initialInquiriesData } from '@/data/inquiries';
+import { initialPagesData } from '@/data/pages';
+import { initialSiteConfig, type SiteConfig } from '@/data/siteConfig';
 import { SocialVideo, initialSocialVideos } from '@/data/socialVideos';
+import {
+  defaultSections,
+  mergeSectionsWithDefaults,
+  type ConsultationInquiry,
+  type SiteSectionsData,
+} from '@/data/defaultSections';
+import type { CmsPage, MediaItem, RedirectRule } from '@/types/cms';
 import {
   isSupabaseConfigured,
   fetchSectionsFromDb,
@@ -28,165 +36,22 @@ import {
   upsertArticleToDb,
   deleteArticleFromDb,
   fetchInquiriesFromDb,
-  insertInquiryToDb,
-  updateInquiryStatusInDb,
   deleteInquiryFromDb,
 } from '@/lib/supabase';
 
-export interface ConsultationInquiry {
-  id: string;
-  trackingId: string;
-  fullName: string;
-  phone: string;
-  email?: string;
-  country?: string;
-  specialty?: string;
-  notes?: string;
-  createdAt: string;
-  status: 'new' | 'in_review' | 'contacted' | 'scheduled';
-}
+export { defaultSections, type ConsultationInquiry, type SiteSectionsData };
 
-export interface SiteSectionsData {
-  hero: {
-    eyebrow: { ar: string; en: string; fr: string };
-    headlinePart1: { ar: string; en: string; fr: string };
-    headlineHighlight: { ar: string; en: string; fr: string };
-    headlinePart2: { ar: string; en: string; fr: string };
-    subtitle: { ar: string; en: string; fr: string };
-  };
-  stats: {
-    patientsCount: string;
-    patientsLabel: { ar: string; en: string; fr: string };
-    hospitalsCount: string;
-    hospitalsLabel: { ar: string; en: string; fr: string };
-    experienceCount: string;
-    experienceLabel: { ar: string; en: string; fr: string };
-    satisfactionRate: string;
-    satisfactionLabel: { ar: string; en: string; fr: string };
-  };
-  about: {
-    badge: { ar: string; en: string; fr: string };
-    heading: { ar: string; en: string; fr: string };
-    lead: { ar: string; en: string; fr: string };
-  };
-  whyChoose: {
-    badge: { ar: string; en: string; fr: string };
-    title: { ar: string; en: string; fr: string };
-    subtitle: { ar: string; en: string; fr: string };
-    whatsappNumber: string;
-  };
-  finalCta: {
-    title: { ar: string; en: string; fr: string };
-    subtitle: { ar: string; en: string; fr: string };
-    phone: string;
-  };
-}
-
-export const defaultSections: SiteSectionsData = {
-  hero: {
-    eyebrow: {
-      ar: 'وجهتكم الأولى للرعاية الصحية المتقدمة في إسطنبول',
-      en: 'Your Premier Destination for Advanced Healthcare in Istanbul',
-      fr: 'Votre Destination d’Excellence Médicale à Istanbul',
-    },
-    headlinePart1: {
-      ar: 'أفضل المستشفيات وأشهر الأطباء في تركيا',
-      en: 'Turkey’s Leading Hospitals & Renowned Specialists',
-      fr: 'Les Meilleurs Hôpitaux et Chirurgiens Réputés de Turquie',
-    },
-    headlineHighlight: {
-      ar: 'لرعايتكم الصحية',
-      en: 'For Your Health & Care',
-      fr: 'Pour Votre Santé',
-    },
-    headlinePart2: {
-      ar: '',
-      en: '',
-      fr: '',
-    },
-    subtitle: {
-      ar: 'نربطكم بأعلى المستشفيات المعتمدة دولياً (JCI) ونخبة الجراحين الاستشاريين في تركيا، مع مرافقة علاجية ولوجستية شاملة واستشارة مجانية فورية.',
-      en: 'Connecting you with JCI-accredited medical facilities and elite board-certified professors in Istanbul, supported by seamless end-to-end concierge services.',
-      fr: 'Nous vous relions aux centres hospitaliers accrédités JCI et aux chirurgiens les plus réputés de Turquie avec un accompagnement complet et une assistance 24/7.',
-    },
-  },
-  stats: {
-    patientsCount: '+2,500',
-    patientsLabel: {
-      ar: 'مريض دولي تلقوا العلاج بنجاح',
-      en: 'International Patients Successfully Treated',
-      fr: 'Patients Internationaux Soignés avec Succès',
-    },
-    hospitalsCount: '+15',
-    hospitalsLabel: {
-      ar: 'مستشفى معتمد دولياً (JCI)',
-      en: 'JCI-Accredited Partner Hospitals',
-      fr: 'Hôpitaux Partenaires Accrédités JCI',
-    },
-    experienceCount: '+10',
-    experienceLabel: {
-      ar: 'سنوات من الريادة في السياحة العلاجية',
-      en: 'Years of Excellence in Medical Tourism',
-      fr: 'Années d’Excellence en Tourisme Médical',
-    },
-    satisfactionRate: '98.4%',
-    satisfactionLabel: {
-      ar: 'نسبة رضا المرضى والنتائج الإيجابية',
-      en: 'Clinical Success & Satisfaction Rate',
-      fr: 'Taux de Satisfaction et Réussite Clinique',
-    },
-  },
-  about: {
-    badge: {
-      ar: 'خبرة تمتد لأكثر من عقد كامل',
-      en: 'Over a Decade of Medical Excellence',
-      fr: 'Plus d’une Décennie d’Excellence Médicale',
-    },
-    heading: {
-      ar: 'ريادة طبية بمعايير عالمية في قلب إسطنبول',
-      en: 'World-Class Healthcare Standards in the Heart of Istanbul',
-      fr: 'Excellence Médicale aux Normes Internationales à Istanbul',
-    },
-    lead: {
-      ar: 'تأسست منصة AVICINNA لتكون الجسر الموثوق الذي يربط المرضى من كافة أنحاء العالم بأفضل الكفاءات الطبية والمستشفيات التخصصية المعتمدة في تركيا.',
-      en: 'AVICINNA was founded as a trusted international healthcare bridge connecting global patients with top-tier accredited medical centers and distinguished specialists in Turkey.',
-      fr: 'AVICINNA est née d’une mission claire : offrir aux patients du monde entier un accès direct et privilégié aux meilleurs spécialistes et hôpitaux de pointe en Turquie.',
-    },
-  },
-  whyChoose: {
-    badge: {
-      ar: 'لماذا يختار المرضى منصة أفيسينا؟',
-      en: 'Why Patients Worldwide Choose AVICINNA',
-      fr: 'Pourquoi Choisir la Plateforme AVICINNA ?',
-    },
-    title: {
-      ar: 'رعاية صحية متكاملة تضع صحتك وراحتك أولاً',
-      en: 'Comprehensive Healthcare Putting Your Wellbeing First',
-      fr: 'Une Prise en Charge Médicale Intégrale Centrée sur Votre Confort',
-    },
-    subtitle: {
-      ar: 'نحن لا نكتفي بحجز موعد، بل ندير كافة تفاصيل رحلتك الطبية من لحظة وصولك المطار حتى الشفاء التام والعودة لوطنك.',
-      en: 'We orchestrate every dimension of your journey—from airport reception to advanced surgical care and post-discharge recovery follow-up.',
-      fr: 'Nous coordonnons l’intégralité de votre séjour médical : accueil aéroport VIP, hébergement de luxe, traduction dédiée et suivi personnalisé.',
-    },
-    whatsappNumber: '+90 544 282 27 69',
-  },
-  finalCta: {
-    title: {
-      ar: 'ابدأ رحلتك نحو الشفاء اليوم مع أفضل أطباء تركيا',
-      en: 'Begin Your Path to Recovery Today with Turkey’s Leading Medical Faculty',
-      fr: 'Commencez Votre Rétablissement Aujourd’hui avec les Meilleurs Spécialistes',
-    },
-    subtitle: {
-      ar: 'فريقنا الطبي جاهز لمراجعة تقاريرك وتقديم استشارة مجانية مع خطة علاجية مخصصة وعرض سعر شامل خلال 24 ساعة.',
-      en: 'Our clinical coordination board is ready to review your medical reports and deliver a comprehensive all-inclusive proposal within 24 hours.',
-      fr: 'Notre équipe médicale étudie vos examens pour vous délivrer un plan de soins personnalisé et un devis complet sous 24 heures.',
-    },
-    phone: '+90 544 282 27 69',
-  },
-};
-
-
+const DEMO_INQUIRY_IDS = new Set([
+  'inq-1',
+  'inq-2',
+  'inq-3',
+  'inq-101',
+  'inq-102',
+  'inq-103',
+  'inq-104',
+  'inq-105',
+  'inq-106',
+]);
 
 export interface DataContextType {
   doctors: Doctor[];
@@ -194,11 +59,16 @@ export interface DataContextType {
   stories: PatientStory[];
   articles: Article[];
   hospitals: HospitalPartner[];
+  pages: CmsPage[];
+  redirects: RedirectRule[];
+  media: MediaItem[];
+  settings: SiteConfig;
   sections: SiteSectionsData;
   inquiries: ConsultationInquiry[];
   isSupabaseConnected: boolean;
   syncStatus: 'idle' | 'syncing' | 'synced' | 'error';
   refreshFromSupabase: () => Promise<void>;
+  refreshFromServer: (includeAdmin?: boolean) => Promise<void>;
   // Doctors
   addDoctor: (doc: Doctor) => Promise<void>;
   updateDoctor: (doc: Doctor) => Promise<void>;
@@ -219,27 +89,51 @@ export interface DataContextType {
   addHospital: (hosp: HospitalPartner) => Promise<void>;
   updateHospital: (hosp: HospitalPartner) => Promise<void>;
   deleteHospital: (id: string) => Promise<void>;
+  // Standalone Pages
+  addPage: (page: CmsPage) => Promise<void>;
+  updatePage: (page: CmsPage) => Promise<void>;
+  deletePage: (id: string) => Promise<void>;
+  // Settings
+  updateSettings: (nextSettings: SiteConfig) => Promise<void>;
   // Sections
-  updateSection: <K extends keyof SiteSectionsData>(section: K, data: SiteSectionsData[K]) => Promise<void>;
+  updateSection: <K extends keyof SiteSectionsData>(
+    section: K,
+    data: SiteSectionsData[K]
+  ) => Promise<void>;
+  updateAllSections: (nextSections: SiteSectionsData) => Promise<boolean>;
   // Inquiries
-  addInquiry: (inquiry: Omit<ConsultationInquiry, 'id' | 'trackingId' | 'createdAt' | 'status'>) => Promise<string>;
+  addInquiry: (
+    inquiry: Omit<ConsultationInquiry, 'id' | 'trackingId' | 'createdAt' | 'status'>
+  ) => Promise<string>;
   updateInquiryStatus: (id: string, status: ConsultationInquiry['status']) => Promise<void>;
+  updateInquiry: (
+    id: string,
+    patch: {
+      status?: ConsultationInquiry['status'];
+      assignedTo?: string | null;
+      assignedName?: string | null;
+      internalNote?: string;
+    }
+  ) => Promise<void>;
   deleteInquiry: (id: string) => Promise<void>;
   // Social Videos / Reels
   socialVideos: SocialVideo[];
   addSocialVideo: (video: SocialVideo) => Promise<void>;
   updateSocialVideo: (video: SocialVideo) => Promise<void>;
   deleteSocialVideo: (id: string) => Promise<void>;
+  // Redirects & Media refreshers
+  setRedirects: React.Dispatch<React.SetStateAction<RedirectRule[]>>;
+  setMedia: React.Dispatch<React.SetStateAction<MediaItem[]>>;
   // Clear local cache
   clearLocalCache: () => void;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
-const LOCAL_STORAGE_KEY = 'avicinna_cms_v9';
+const LOCAL_STORAGE_KEY = 'avicinna_cms_v10';
 
 function sanitizeHospitals(rawList?: HospitalPartner[] | null): HospitalPartner[] {
-  if (!rawList || rawList.length < hospitalsData.length) {
+  if (!rawList || !Array.isArray(rawList) || rawList.length === 0) {
     return hospitalsData;
   }
   return rawList.map((hosp) => {
@@ -252,9 +146,17 @@ function sanitizeHospitals(rawList?: HospitalPartner[] | null): HospitalPartner[
         en: ['Da Vinci Robotic Surgery', '3T MRI'],
         fr: ['Chirurgie Robotique Da Vinci', 'IRM 3T'],
       },
-      specialties: hosp.specialties?.length ? hosp.specialties : (canonical?.specialties || ['cardiac-surgery', 'oncology', 'orthopedics']),
+      specialties: hosp.specialties?.length
+        ? hosp.specialties
+        : canonical?.specialties || ['cardiac-surgery', 'oncology', 'orthopedics'],
       cityCategory: hosp.cityCategory || canonical?.cityCategory || 'istanbul-europe',
-      address: hosp.address || canonical?.address || { ar: hosp.city?.ar || '', en: hosp.city?.en || '', fr: hosp.city?.fr || '' },
+      address:
+        hosp.address ||
+        canonical?.address || {
+          ar: hosp.city?.ar || '',
+          en: hosp.city?.en || '',
+          fr: hosp.city?.fr || '',
+        },
       accreditationBadge: hosp.accreditationBadge || canonical?.accreditationBadge || 'JCI',
       bedsCount: hosp.bedsCount || canonical?.bedsCount || 250,
       icuBedsCount: hosp.icuBedsCount || canonical?.icuBedsCount || 50,
@@ -267,12 +169,11 @@ function sanitizeHospitals(rawList?: HospitalPartner[] | null): HospitalPartner[
 }
 
 function sanitizeDoctors(rawList?: Doctor[] | null): Doctor[] {
-  if (!rawList || rawList.length < doctorsData.length) {
+  if (!rawList || !Array.isArray(rawList) || rawList.length === 0) {
     return doctorsData;
   }
   return rawList.map((doc) => {
     const canonical = doctorsData.find((d) => d.id === doc.id);
-
     const isPlaceholderVideo = (url?: string) =>
       Boolean(
         url &&
@@ -281,9 +182,7 @@ function sanitizeDoctors(rawList?: Doctor[] | null): Doctor[] {
             url.toLowerCase().includes('wildlife'))
       );
 
-    const cleanVideos = (doc.videos || []).filter(
-      (v) => v?.url && !isPlaceholderVideo(v.url)
-    );
+    const cleanVideos = (doc.videos || []).filter((v) => v?.url && !isPlaceholderVideo(v.url));
     const hasValidDocVideo =
       doc.videoUrl && !isPlaceholderVideo(doc.videoUrl) && doc.videoUrl.trim().length > 0;
     const cleanVideoUrl = hasValidDocVideo ? doc.videoUrl!.trim() : undefined;
@@ -294,14 +193,15 @@ function sanitizeDoctors(rawList?: Doctor[] | null): Doctor[] {
       ...doc,
       hospitalId: doc.hospitalId || canonical?.hospitalId || 'acibadem-altunizade',
       procedures: doc.procedures || canonical?.procedures || { ar: [], en: [], fr: [] },
-      areasOfExpertise: doc.areasOfExpertise || canonical?.areasOfExpertise || { ar: [], en: [], fr: [] },
+      areasOfExpertise:
+        doc.areasOfExpertise || canonical?.areasOfExpertise || { ar: [], en: [], fr: [] },
       education: doc.education || canonical?.education || { ar: [], en: [], fr: [] },
       careerHistory: doc.careerHistory || canonical?.careerHistory || [],
       memberships: doc.memberships || canonical?.memberships || { ar: [], en: [], fr: [] },
       technologies: doc.technologies || canonical?.technologies || { ar: [], en: [], fr: [] },
       languages: doc.languages?.length
         ? doc.languages
-        : (canonical?.languages || ['العربية (مترجم)', 'English', 'Türkçe']),
+        : canonical?.languages || ['العربية (مترجم)', 'English', 'Türkçe'],
       videos: cleanVideos,
       videoUrl: cleanVideoUrl,
       videoTitle: cleanVideoTitle,
@@ -312,16 +212,22 @@ function sanitizeDoctors(rawList?: Doctor[] | null): Doctor[] {
 }
 
 function sanitizeStories(rawList?: PatientStory[] | null): PatientStory[] {
-  if (!rawList || rawList.length < patientStoriesData.length) {
+  if (!rawList || !Array.isArray(rawList) || rawList.length === 0) {
     return patientStoriesData;
   }
   return rawList.map((story) => {
-    const canonical = patientStoriesData.find((s) => s.id === story.id || s.slug === story.slug);
+    const canonical = patientStoriesData.find(
+      (s) => s.id === story.id || s.slug === story.slug
+    );
     const resolvedName =
       canonical?.patientName ||
       (typeof story.patientName === 'object' && story.patientName !== null
         ? story.patientName
-        : { ar: String(story.patientName || ''), en: String(story.patientName || ''), fr: String(story.patientName || '') });
+        : {
+            ar: String(story.patientName || ''),
+            en: String(story.patientName || ''),
+            fr: String(story.patientName || ''),
+          });
 
     return {
       ...canonical,
@@ -331,21 +237,88 @@ function sanitizeStories(rawList?: PatientStory[] | null): PatientStory[] {
   });
 }
 
-export function DataProvider({ children }: { children: React.ReactNode }) {
+async function persistCmsEntity(entityType: string, data: unknown): Promise<boolean> {
+  try {
+    const res = await fetch('/api/cms', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ entityType, data }),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
+export function DataProvider({
+  children,
+  initialSections,
+}: {
+  children: React.ReactNode;
+  initialSections?: SiteSectionsData;
+}) {
   const [doctors, setDoctors] = useState<Doctor[]>(doctorsData);
   const [treatments, setTreatments] = useState<Treatment[]>(treatmentsData);
   const [stories, setStories] = useState<PatientStory[]>(patientStoriesData);
   const [articles, setArticles] = useState<Article[]>(articlesData);
   const [hospitals, setHospitals] = useState<HospitalPartner[]>(hospitalsData);
-  const [sections, setSections] = useState<SiteSectionsData>(defaultSections);
-  const [inquiries, setInquiries] = useState<ConsultationInquiry[]>(initialInquiriesData);
+  const [pages, setPages] = useState<CmsPage[]>(initialPagesData);
+  const [redirects, setRedirects] = useState<RedirectRule[]>([]);
+  const [media, setMedia] = useState<MediaItem[]>([]);
+  const [settings, setSettings] = useState<SiteConfig>(initialSiteConfig);
+  const [sections, setSections] = useState<SiteSectionsData>(() =>
+    mergeSectionsWithDefaults(initialSections)
+  );
+  const sectionsRef = useRef<SiteSectionsData>(sections);
+  sectionsRef.current = sections;
+  const [inquiries, setInquiries] = useState<ConsultationInquiry[]>([]);
   const [socialVideos, setSocialVideos] = useState<SocialVideo[]>(initialSocialVideos);
   const [isLoaded, setIsLoaded] = useState(false);
   const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'synced' | 'error'>('idle');
 
-  // Helper to fetch from Supabase
+  const refreshFromServer = useCallback(async (includeAdmin = false) => {
+    try {
+      const endpoint = includeAdmin ? '/api/cms?admin=true' : '/api/cms';
+      const res = await fetch(endpoint, { cache: 'no-store' });
+      if (!res.ok) return;
+      const payload = await res.json();
+
+      if (payload.doctors) setDoctors(sanitizeDoctors(payload.doctors));
+      if (payload.hospitals) setHospitals(sanitizeHospitals(payload.hospitals));
+      if (payload.treatments) setTreatments(payload.treatments);
+      if (payload.stories) setStories(sanitizeStories(payload.stories));
+      if (payload.articles) setArticles(payload.articles);
+      if (payload.pages) setPages(payload.pages);
+      if (payload.sections) setSections(mergeSectionsWithDefaults(payload.sections));
+      if (payload.socialVideos) setSocialVideos(payload.socialVideos);
+
+      if (includeAdmin) {
+        if (payload.settings) setSettings(payload.settings);
+        if (Array.isArray(payload.redirects)) setRedirects(payload.redirects);
+        if (Array.isArray(payload.media)) setMedia(payload.media);
+        if (Array.isArray(payload.inquiries)) {
+          setInquiries(payload.inquiries.filter((i: ConsultationInquiry) => !DEMO_INQUIRY_IDS.has(i.id)));
+        }
+      } else if (payload.publicSettings) {
+        setSettings((prev) => ({
+          ...prev,
+          contact: payload.publicSettings.contact || prev.contact,
+          sectionsVisibility: payload.publicSettings.sectionsVisibility || prev.sectionsVisibility,
+          tracking: payload.publicSettings.tracking
+            ? { ...prev.tracking!, ...payload.publicSettings.tracking }
+            : prev.tracking,
+        }));
+      }
+    } catch {
+      // ignore background sync failures cleanly
+    }
+  }, []);
+
   const refreshFromSupabase = useCallback(async () => {
-    if (!isSupabaseConfigured) return;
+    if (!isSupabaseConfigured) {
+      await refreshFromServer(false);
+      return;
+    }
     setSyncStatus('syncing');
     try {
       const [secRes, hospRes, docRes, treatRes, storyRes, artRes, inqRes] = await Promise.all([
@@ -358,325 +331,371 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         fetchInquiriesFromDb(),
       ]);
 
-      if (secRes) {
-        setSections((prev) => ({ ...prev, ...secRes }));
-      }
+      if (secRes) setSections((prev) => mergeSectionsWithDefaults({ ...prev, ...secRes }));
       setHospitals(sanitizeHospitals(hospRes));
       setDoctors(sanitizeDoctors(docRes));
       setTreatments(treatRes ?? treatmentsData);
       setStories(sanitizeStories(storyRes ?? patientStoriesData));
       setArticles(artRes ?? articlesData);
-      setInquiries(inqRes && inqRes.length > 0 ? inqRes : initialInquiriesData);
-
+      setInquiries((inqRes || []).filter((i) => !DEMO_INQUIRY_IDS.has(i.id)));
       setSyncStatus('synced');
     } catch (err) {
       console.error('Error refreshing from Supabase:', err);
       setSyncStatus('error');
     }
-  }, []);
+  }, [refreshFromServer]);
 
-  // Load initial data from localStorage first, then sync with Supabase
+  // Initial client hydration
   useEffect(() => {
     try {
-      // Clear legacy localStorage keys to prevent stale hospitals or placeholder videos
-      localStorage.removeItem('avicinna_cms_v1');
-      localStorage.removeItem('avicinna_cms_v2');
-      localStorage.removeItem('avicinna_cms_v3');
-      localStorage.removeItem('avicinna_cms_v4');
-      localStorage.removeItem('avicinna_cms_v8');
+      [
+        'avicinna_cms_v1',
+        'avicinna_cms_v2',
+        'avicinna_cms_v3',
+        'avicinna_cms_v4',
+        'avicinna_cms_v8',
+        'avicinna_cms_v9',
+      ].forEach((k) => localStorage.removeItem(k));
 
       const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        setDoctors(sanitizeDoctors(parsed.doctors));
-        setTreatments(parsed.treatments?.length ? parsed.treatments : treatmentsData);
-        setStories(sanitizeStories(parsed.stories));
-        setArticles(parsed.articles?.length ? parsed.articles : articlesData);
-        setHospitals(sanitizeHospitals(parsed.hospitals));
-        if (parsed.sections) {
-          const parsedHero = parsed.sections.hero || {};
-          const isLegacy = (txt?: string) =>
-            !txt || ['voyage', 'journey', 'لرعايتكم'].includes(txt.trim().toLowerCase());
-
-          setSections({
-            ...defaultSections,
-            ...parsed.sections,
-            hero: {
-              ...defaultSections.hero,
-              ...parsedHero,
-              headlinePart1: {
-                ar: parsedHero.headlinePart1?.ar || defaultSections.hero.headlinePart1.ar,
-                en: (parsedHero.headlinePart1?.en || defaultSections.hero.headlinePart1.en).replace(/\s+for\s+your$/i, ''),
-                fr: (parsedHero.headlinePart1?.fr || defaultSections.hero.headlinePart1.fr).replace(/\s+pour\s+votre$/i, ''),
-              },
-              headlineHighlight: {
-                ar: parsedHero.headlineHighlight?.ar || defaultSections.hero.headlineHighlight.ar,
-                en: parsedHero.headlineHighlight?.en || defaultSections.hero.headlineHighlight.en,
-                fr: parsedHero.headlineHighlight?.fr || defaultSections.hero.headlineHighlight.fr,
-              },
-              headlinePart2: {
-                ar: isLegacy(parsedHero.headlinePart2?.ar) ? '' : parsedHero.headlinePart2.ar,
-                en: isLegacy(parsedHero.headlinePart2?.en) ? '' : parsedHero.headlinePart2.en,
-                fr: isLegacy(parsedHero.headlinePart2?.fr) ? '' : parsedHero.headlinePart2.fr,
-              },
-            },
-          });
-        }
-        setInquiries(parsed.inquiries?.length ? parsed.inquiries : initialInquiriesData);
-      } else {
-        setDoctors(doctorsData);
-        setTreatments(treatmentsData);
-        setStories(patientStoriesData);
-        setArticles(articlesData);
-        setHospitals(hospitalsData);
-        setInquiries(initialInquiriesData);
-      }
-
-      const savedVideos = localStorage.getItem('avicinna_social_videos');
-      if (savedVideos) {
-        try {
-          const parsedVids = JSON.parse(savedVideos);
-          if (Array.isArray(parsedVids) && parsedVids.length > 0) {
-            setSocialVideos(parsedVids);
-          }
-        } catch {
-          // fallback to initial
+        if (parsed.doctors) setDoctors(sanitizeDoctors(parsed.doctors));
+        if (parsed.treatments?.length) setTreatments(parsed.treatments);
+        if (parsed.stories) setStories(sanitizeStories(parsed.stories));
+        if (parsed.articles?.length) setArticles(parsed.articles);
+        if (parsed.hospitals) setHospitals(sanitizeHospitals(parsed.hospitals));
+        if (parsed.pages?.length) setPages(parsed.pages);
+        if (!initialSections && parsed.sections) {
+          setSections(mergeSectionsWithDefaults(parsed.sections));
         }
       }
-    } catch (e) {
-      console.error('Failed to load CMS data from localStorage:', e);
-      setDoctors(doctorsData);
-      setTreatments(treatmentsData);
-      setStories(patientStoriesData);
-      setArticles(articlesData);
-      setHospitals(hospitalsData);
-      setInquiries(initialInquiriesData);
+    } catch {
+      // use canonical defaults
     }
+
     setIsLoaded(true);
 
-    // If Supabase is configured, fetch live data
+    const isAdminPath =
+      typeof window !== 'undefined' && window.location.pathname.startsWith('/admin');
+    refreshFromServer(isAdminPath);
+
     if (isSupabaseConfigured) {
       refreshFromSupabase();
     }
-  }, [refreshFromSupabase]);
+  }, [refreshFromServer, refreshFromSupabase]);
 
-  // Sync to localStorage whenever data changes
+  // Lightweight local cache mirror (excluding sensitive inquiries & tokens)
   useEffect(() => {
     if (!isLoaded) return;
     try {
-      const payload = {
-        doctors,
-        treatments,
-        stories,
-        articles,
-        hospitals,
-        sections,
-        inquiries,
-      };
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(payload));
+      localStorage.setItem(
+        LOCAL_STORAGE_KEY,
+        JSON.stringify({
+          doctors,
+          treatments,
+          stories,
+          articles,
+          hospitals,
+          pages,
+          sections,
+        })
+      );
       localStorage.setItem('avicinna_social_videos', JSON.stringify(socialVideos));
-    } catch (e) {
-      console.error('Failed to save CMS data to localStorage:', e);
+    } catch {
+      // ignore storage quota errors
     }
-  }, [doctors, treatments, stories, articles, hospitals, sections, inquiries, socialVideos, isLoaded]);
+  }, [doctors, treatments, stories, articles, hospitals, pages, sections, socialVideos, isLoaded]);
 
   // Doctor CRUD
   const addDoctor = async (doc: Doctor) => {
-    setDoctors((prev) => [doc, ...prev]);
-    if (isSupabaseConfigured) {
-      setSyncStatus('syncing');
-      const ok = await upsertDoctorToDb(doc);
-      setSyncStatus(ok ? 'synced' : 'error');
-    }
+    const nextDoc = { ...doc, updatedAt: new Date().toISOString() };
+    const nextList = [nextDoc, ...doctors];
+    setDoctors(nextList);
+    setSyncStatus('syncing');
+    const okServer = await persistCmsEntity('doctors', nextList);
+    const okDb = isSupabaseConfigured ? await upsertDoctorToDb(nextDoc) : true;
+    setSyncStatus(okServer && okDb ? 'synced' : 'error');
   };
 
   const updateDoctor = async (doc: Doctor) => {
-    setDoctors((prev) => prev.map((d) => (d.id === doc.id ? doc : d)));
-    if (isSupabaseConfigured) {
-      setSyncStatus('syncing');
-      const ok = await upsertDoctorToDb(doc);
-      setSyncStatus(ok ? 'synced' : 'error');
-    }
+    const nextDoc = { ...doc, updatedAt: new Date().toISOString() };
+    const nextList = doctors.map((d) => (d.id === nextDoc.id ? nextDoc : d));
+    setDoctors(nextList);
+    setSyncStatus('syncing');
+    const okServer = await persistCmsEntity('doctors', nextList);
+    const okDb = isSupabaseConfigured ? await upsertDoctorToDb(nextDoc) : true;
+    setSyncStatus(okServer && okDb ? 'synced' : 'error');
   };
 
   const deleteDoctor = async (id: string) => {
-    setDoctors((prev) => prev.filter((d) => d.id !== id));
-    if (isSupabaseConfigured) {
-      setSyncStatus('syncing');
-      const ok = await deleteDoctorFromDb(id);
-      setSyncStatus(ok ? 'synced' : 'error');
-    }
+    const nextList = doctors.filter((d) => d.id !== id);
+    setDoctors(nextList);
+    setSyncStatus('syncing');
+    const okServer = await persistCmsEntity('doctors', nextList);
+    const okDb = isSupabaseConfigured ? await deleteDoctorFromDb(id) : true;
+    setSyncStatus(okServer && okDb ? 'synced' : 'error');
   };
 
   // Treatment CRUD
   const addTreatment = async (treat: Treatment) => {
-    setTreatments((prev) => [treat, ...prev]);
-    if (isSupabaseConfigured) {
-      setSyncStatus('syncing');
-      const ok = await upsertTreatmentToDb(treat);
-      setSyncStatus(ok ? 'synced' : 'error');
-    }
+    const nextTreat = { ...treat, updatedAt: new Date().toISOString() };
+    const nextList = [nextTreat, ...treatments];
+    setTreatments(nextList);
+    setSyncStatus('syncing');
+    const okServer = await persistCmsEntity('treatments', nextList);
+    const okDb = isSupabaseConfigured ? await upsertTreatmentToDb(nextTreat) : true;
+    setSyncStatus(okServer && okDb ? 'synced' : 'error');
   };
 
   const updateTreatment = async (treat: Treatment) => {
-    setTreatments((prev) => prev.map((t) => (t.id === treat.id ? treat : t)));
-    if (isSupabaseConfigured) {
-      setSyncStatus('syncing');
-      const ok = await upsertTreatmentToDb(treat);
-      setSyncStatus(ok ? 'synced' : 'error');
-    }
+    const nextTreat = { ...treat, updatedAt: new Date().toISOString() };
+    const nextList = treatments.map((t) => (t.id === nextTreat.id ? nextTreat : t));
+    setTreatments(nextList);
+    setSyncStatus('syncing');
+    const okServer = await persistCmsEntity('treatments', nextList);
+    const okDb = isSupabaseConfigured ? await upsertTreatmentToDb(nextTreat) : true;
+    setSyncStatus(okServer && okDb ? 'synced' : 'error');
   };
 
   const deleteTreatment = async (id: string) => {
-    setTreatments((prev) => prev.filter((t) => t.id !== id));
-    if (isSupabaseConfigured) {
-      setSyncStatus('syncing');
-      const ok = await deleteTreatmentFromDb(id);
-      setSyncStatus(ok ? 'synced' : 'error');
-    }
+    const nextList = treatments.filter((t) => t.id !== id);
+    setTreatments(nextList);
+    setSyncStatus('syncing');
+    const okServer = await persistCmsEntity('treatments', nextList);
+    const okDb = isSupabaseConfigured ? await deleteTreatmentFromDb(id) : true;
+    setSyncStatus(okServer && okDb ? 'synced' : 'error');
   };
 
   // Story CRUD
   const addStory = async (story: PatientStory) => {
-    setStories((prev) => [story, ...prev]);
-    if (isSupabaseConfigured) {
-      setSyncStatus('syncing');
-      const ok = await upsertStoryToDb(story);
-      setSyncStatus(ok ? 'synced' : 'error');
-    }
+    const nextStory = { ...story, updatedAt: new Date().toISOString() };
+    const nextList = [nextStory, ...stories];
+    setStories(nextList);
+    setSyncStatus('syncing');
+    const okServer = await persistCmsEntity('stories', nextList);
+    const okDb = isSupabaseConfigured ? await upsertStoryToDb(nextStory) : true;
+    setSyncStatus(okServer && okDb ? 'synced' : 'error');
   };
 
   const updateStory = async (story: PatientStory) => {
-    setStories((prev) => prev.map((s) => (s.id === story.id ? story : s)));
-    if (isSupabaseConfigured) {
-      setSyncStatus('syncing');
-      const ok = await upsertStoryToDb(story);
-      setSyncStatus(ok ? 'synced' : 'error');
-    }
+    const nextStory = { ...story, updatedAt: new Date().toISOString() };
+    const nextList = stories.map((s) => (s.id === nextStory.id ? nextStory : s));
+    setStories(nextList);
+    setSyncStatus('syncing');
+    const okServer = await persistCmsEntity('stories', nextList);
+    const okDb = isSupabaseConfigured ? await upsertStoryToDb(nextStory) : true;
+    setSyncStatus(okServer && okDb ? 'synced' : 'error');
   };
 
   const deleteStory = async (id: string) => {
-    setStories((prev) => prev.filter((s) => s.id !== id));
-    if (isSupabaseConfigured) {
-      setSyncStatus('syncing');
-      const ok = await deleteStoryFromDb(id);
-      setSyncStatus(ok ? 'synced' : 'error');
-    }
+    const nextList = stories.filter((s) => s.id !== id);
+    setStories(nextList);
+    setSyncStatus('syncing');
+    const okServer = await persistCmsEntity('stories', nextList);
+    const okDb = isSupabaseConfigured ? await deleteStoryFromDb(id) : true;
+    setSyncStatus(okServer && okDb ? 'synced' : 'error');
   };
 
   // Article CRUD
   const addArticle = async (art: Article) => {
-    setArticles((prev) => [art, ...prev]);
-    if (isSupabaseConfigured) {
-      setSyncStatus('syncing');
-      const ok = await upsertArticleToDb(art);
-      setSyncStatus(ok ? 'synced' : 'error');
-    }
+    const nextArt = { ...art, updatedAt: new Date().toISOString() };
+    const nextList = [nextArt, ...articles];
+    setArticles(nextList);
+    setSyncStatus('syncing');
+    const okServer = await persistCmsEntity('articles', nextList);
+    const okDb = isSupabaseConfigured ? await upsertArticleToDb(nextArt) : true;
+    setSyncStatus(okServer && okDb ? 'synced' : 'error');
   };
 
   const updateArticle = async (art: Article) => {
-    setArticles((prev) => prev.map((a) => (a.id === art.id ? art : a)));
-    if (isSupabaseConfigured) {
-      setSyncStatus('syncing');
-      const ok = await upsertArticleToDb(art);
-      setSyncStatus(ok ? 'synced' : 'error');
-    }
+    const nextArt = { ...art, updatedAt: new Date().toISOString() };
+    const nextList = articles.map((a) => (a.id === nextArt.id ? nextArt : a));
+    setArticles(nextList);
+    setSyncStatus('syncing');
+    const okServer = await persistCmsEntity('articles', nextList);
+    const okDb = isSupabaseConfigured ? await upsertArticleToDb(nextArt) : true;
+    setSyncStatus(okServer && okDb ? 'synced' : 'error');
   };
 
   const deleteArticle = async (id: string) => {
-    setArticles((prev) => prev.filter((a) => a.id !== id));
-    if (isSupabaseConfigured) {
-      setSyncStatus('syncing');
-      const ok = await deleteArticleFromDb(id);
-      setSyncStatus(ok ? 'synced' : 'error');
-    }
+    const nextList = articles.filter((a) => a.id !== id);
+    setArticles(nextList);
+    setSyncStatus('syncing');
+    const okServer = await persistCmsEntity('articles', nextList);
+    const okDb = isSupabaseConfigured ? await deleteArticleFromDb(id) : true;
+    setSyncStatus(okServer && okDb ? 'synced' : 'error');
   };
 
   // Hospital CRUD
   const addHospital = async (hosp: HospitalPartner) => {
-    setHospitals((prev) => [hosp, ...prev]);
-    if (isSupabaseConfigured) {
-      setSyncStatus('syncing');
-      const ok = await upsertHospitalToDb(hosp);
-      setSyncStatus(ok ? 'synced' : 'error');
-    }
+    const nextHosp = { ...hosp, updatedAt: new Date().toISOString() };
+    const nextList = [nextHosp, ...hospitals];
+    setHospitals(nextList);
+    setSyncStatus('syncing');
+    const okServer = await persistCmsEntity('hospitals', nextList);
+    const okDb = isSupabaseConfigured ? await upsertHospitalToDb(nextHosp) : true;
+    setSyncStatus(okServer && okDb ? 'synced' : 'error');
   };
 
   const updateHospital = async (hosp: HospitalPartner) => {
-    setHospitals((prev) => prev.map((h) => (h.id === hosp.id ? hosp : h)));
-    if (isSupabaseConfigured) {
-      setSyncStatus('syncing');
-      const ok = await upsertHospitalToDb(hosp);
-      setSyncStatus(ok ? 'synced' : 'error');
-    }
+    const nextHosp = { ...hosp, updatedAt: new Date().toISOString() };
+    const nextList = hospitals.map((h) => (h.id === nextHosp.id ? nextHosp : h));
+    setHospitals(nextList);
+    setSyncStatus('syncing');
+    const okServer = await persistCmsEntity('hospitals', nextList);
+    const okDb = isSupabaseConfigured ? await upsertHospitalToDb(nextHosp) : true;
+    setSyncStatus(okServer && okDb ? 'synced' : 'error');
   };
 
   const deleteHospital = async (id: string) => {
-    setHospitals((prev) => prev.filter((h) => h.id !== id));
-    if (isSupabaseConfigured) {
-      setSyncStatus('syncing');
-      const ok = await deleteHospitalFromDb(id);
-      setSyncStatus(ok ? 'synced' : 'error');
-    }
+    const nextList = hospitals.filter((h) => h.id !== id);
+    setHospitals(nextList);
+    setSyncStatus('syncing');
+    const okServer = await persistCmsEntity('hospitals', nextList);
+    const okDb = isSupabaseConfigured ? await deleteHospitalFromDb(id) : true;
+    setSyncStatus(okServer && okDb ? 'synced' : 'error');
   };
 
-  // Section Update
+  // Standalone Pages CRUD
+  const addPage = async (page: CmsPage) => {
+    const now = new Date().toISOString();
+    const nextPage: CmsPage = { ...page, createdAt: page.createdAt || now, updatedAt: now };
+    const nextList = [nextPage, ...pages];
+    setPages(nextList);
+    setSyncStatus('syncing');
+    const ok = await persistCmsEntity('pages', nextList);
+    setSyncStatus(ok ? 'synced' : 'error');
+  };
+
+  const updatePage = async (page: CmsPage) => {
+    const nextPage: CmsPage = { ...page, updatedAt: new Date().toISOString() };
+    const nextList = pages.map((p) => (p.id === nextPage.id ? nextPage : p));
+    setPages(nextList);
+    setSyncStatus('syncing');
+    const ok = await persistCmsEntity('pages', nextList);
+    setSyncStatus(ok ? 'synced' : 'error');
+  };
+
+  const deletePage = async (id: string) => {
+    const nextList = pages.filter((p) => p.id !== id || p.isSystem);
+    setPages(nextList);
+    setSyncStatus('syncing');
+    const ok = await persistCmsEntity('pages', nextList);
+    setSyncStatus(ok ? 'synced' : 'error');
+  };
+
+  // Site Settings
+  const updateSettings = async (nextSettings: SiteConfig) => {
+    setSettings(nextSettings);
+    setSyncStatus('syncing');
+    const ok = await persistCmsEntity('settings', nextSettings);
+    setSyncStatus(ok ? 'synced' : 'error');
+  };
+
+  // Section Update (uses ref to avoid stale-closure overwrites when updating sequentially)
   const updateSection = async <K extends keyof SiteSectionsData>(
     section: K,
     data: SiteSectionsData[K]
   ) => {
-    setSections((prev) => ({
-      ...prev,
+    const nextSections = {
+      ...sectionsRef.current,
       [section]: data,
-    }));
+    };
+    sectionsRef.current = nextSections;
+    setSections(nextSections);
+    setSyncStatus('syncing');
+    const okServer = await persistCmsEntity('sections', nextSections);
+    const okDb = isSupabaseConfigured ? await upsertSectionToDb(section as string, data) : true;
+    setSyncStatus(okServer && okDb ? 'synced' : 'error');
+  };
+
+  // Atomic Full-Sections Save (used by /admin/sections so all tabs save in a single request)
+  const updateAllSections = async (nextSections: SiteSectionsData): Promise<boolean> => {
+    const merged = mergeSectionsWithDefaults(nextSections);
+    sectionsRef.current = merged;
+    setSections(merged);
+    setSyncStatus('syncing');
+    const okServer = await persistCmsEntity('sections', merged);
+    let okDb = true;
     if (isSupabaseConfigured) {
-      setSyncStatus('syncing');
-      const ok = await upsertSectionToDb(section as string, data);
-      setSyncStatus(ok ? 'synced' : 'error');
+      const results = await Promise.all(
+        (Object.keys(merged) as Array<keyof SiteSectionsData>).map((k) =>
+          upsertSectionToDb(k as string, merged[k])
+        )
+      );
+      okDb = results.every(Boolean);
     }
+    const ok = okServer && okDb;
+    setSyncStatus(ok ? 'synced' : 'error');
+    return ok;
   };
 
   // Inquiries
   const addInquiry = async (
     inquiryData: Omit<ConsultationInquiry, 'id' | 'trackingId' | 'createdAt' | 'status'>
   ): Promise<string> => {
-    const trackingId = `AVIC-${Math.floor(1000 + Math.random() * 9000)}`;
-    const newInq: ConsultationInquiry = {
-      ...inquiryData,
-      id: `inq-${Date.now()}`,
-      trackingId,
-      createdAt: new Date().toISOString(),
-      status: 'new',
-    };
-    setInquiries((prev) => [newInq, ...prev]);
+    const res = await fetch('/api/consultation', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(inquiryData),
+    });
 
-    if (isSupabaseConfigured) {
-      setSyncStatus('syncing');
-      await insertInquiryToDb(newInq);
-      setSyncStatus('synced');
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.error || 'Failed to submit inquiry');
     }
 
-    return trackingId;
+    const data = await res.json();
+    if (data.inquiry) {
+      setInquiries((prev) => [data.inquiry, ...prev]);
+    }
+    return data.trackingId || `AV-${Math.floor(100000 + Math.random() * 899999)}`;
+  };
+
+  const updateInquiry = async (
+    id: string,
+    patch: {
+      status?: ConsultationInquiry['status'];
+      assignedTo?: string | null;
+      assignedName?: string | null;
+      internalNote?: string;
+    }
+  ) => {
+    setSyncStatus('syncing');
+    try {
+      const res = await fetch('/api/consultation', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, ...patch }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.inquiry) {
+          setInquiries((prev) => prev.map((inq) => (inq.id === id ? data.inquiry : inq)));
+        }
+        setSyncStatus('synced');
+      } else {
+        setSyncStatus('error');
+      }
+    } catch {
+      setSyncStatus('error');
+    }
   };
 
   const updateInquiryStatus = async (id: string, status: ConsultationInquiry['status']) => {
-    setInquiries((prev) =>
-      prev.map((inq) => (inq.id === id ? { ...inq, status } : inq))
-    );
-    if (isSupabaseConfigured) {
-      setSyncStatus('syncing');
-      const ok = await updateInquiryStatusInDb(id, status);
-      setSyncStatus(ok ? 'synced' : 'error');
-    }
+    setInquiries((prev) => prev.map((inq) => (inq.id === id ? { ...inq, status } : inq)));
+    await updateInquiry(id, { status });
   };
 
   const deleteInquiry = async (id: string) => {
     setInquiries((prev) => prev.filter((inq) => inq.id !== id));
-    if (isSupabaseConfigured) {
-      setSyncStatus('syncing');
-      const ok = await deleteInquiryFromDb(id);
-      setSyncStatus(ok ? 'synced' : 'error');
-    }
+    setSyncStatus('syncing');
+    const res = await fetch(`/api/consultation?id=${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+    });
+    const okDb = isSupabaseConfigured ? await deleteInquiryFromDb(id) : true;
+    setSyncStatus(res.ok && okDb ? 'synced' : 'error');
   };
 
   const clearLocalCache = () => {
@@ -686,25 +705,30 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     setStories(patientStoriesData);
     setArticles(articlesData);
     setHospitals(hospitalsData);
+    setPages(initialPagesData);
     setSections(defaultSections);
-    setInquiries(initialInquiriesData);
-    // Re-fetch from Supabase to get live data if configured
-    if (isSupabaseConfigured) {
-      refreshFromSupabase();
-    }
+    refreshFromServer(
+      typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')
+    );
   };
 
   // Social Videos CRUD
   const addSocialVideo = async (video: SocialVideo) => {
-    setSocialVideos((prev) => [video, ...prev]);
+    const nextList = [video, ...socialVideos];
+    setSocialVideos(nextList);
+    await persistCmsEntity('socialVideos', nextList);
   };
 
   const updateSocialVideo = async (video: SocialVideo) => {
-    setSocialVideos((prev) => prev.map((v) => (v.id === video.id ? video : v)));
+    const nextList = socialVideos.map((v) => (v.id === video.id ? video : v));
+    setSocialVideos(nextList);
+    await persistCmsEntity('socialVideos', nextList);
   };
 
   const deleteSocialVideo = async (id: string) => {
-    setSocialVideos((prev) => prev.filter((v) => v.id !== id));
+    const nextList = socialVideos.filter((v) => v.id !== id);
+    setSocialVideos(nextList);
+    await persistCmsEntity('socialVideos', nextList);
   };
 
   return (
@@ -715,12 +739,17 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         stories,
         articles,
         hospitals,
+        pages,
+        redirects,
+        media,
+        settings,
         sections,
         inquiries,
         socialVideos,
         isSupabaseConnected: isSupabaseConfigured,
         syncStatus,
         refreshFromSupabase,
+        refreshFromServer,
         addDoctor,
         updateDoctor,
         deleteDoctor,
@@ -736,13 +765,21 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         addHospital,
         updateHospital,
         deleteHospital,
+        addPage,
+        updatePage,
+        deletePage,
+        updateSettings,
         updateSection,
+        updateAllSections,
         addInquiry,
         updateInquiryStatus,
+        updateInquiry,
         deleteInquiry,
         addSocialVideo,
         updateSocialVideo,
         deleteSocialVideo,
+        setRedirects,
+        setMedia,
         clearLocalCache,
       }}
     >

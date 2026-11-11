@@ -4,7 +4,7 @@ import { Treatment } from '@/data/treatments';
 import { PatientStory } from '@/data/stories';
 import { Article } from '@/data/articles';
 import { HospitalPartner } from '@/data/hospitals';
-import { ConsultationInquiry, SiteSectionsData } from '@/context/DataContext';
+import type { ConsultationInquiry, SiteSectionsData } from '@/data/defaultSections';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -45,11 +45,32 @@ export async function uploadImageFile(file: File, folder = 'uploads'): Promise<s
         }
       }
     } catch (e) {
-      console.warn('Storage upload error, falling back to base64:', e);
+      console.warn('Storage upload error, falling back to local media API:', e);
     }
   }
 
-  // Fallback: Read as base64 Data URL so it always works immediately on any device
+  // Persistent local server disk storage via /api/media when Supabase Storage is inactive
+  if (typeof window !== 'undefined' && file.type.startsWith('image/')) {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('folder', folder);
+      const res = await fetch('/api/media', {
+        method: 'POST',
+        body: formData,
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json?.item?.url) {
+          return json.item.url as string;
+        }
+      }
+    } catch (err) {
+      console.warn('Local media API upload fallback error:', err);
+    }
+  }
+
+  // Last-resort fallback: Data URL if offline or non-image upload
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result as string);
@@ -101,6 +122,9 @@ function mapHospitalRowToModel(row: any): HospitalPartner {
   return {
     id: row.id,
     slug: row.slug || row.id,
+    slugs: row.slugs || undefined,
+    seo: row.seo || undefined,
+    updatedAt: row.updated_at || undefined,
     name: row.name,
     type: row.type,
     city: row.city,
@@ -132,6 +156,8 @@ function mapHospitalModelToRow(hosp: HospitalPartner) {
   return {
     id: hosp.id,
     slug: hosp.slug,
+    slugs: hosp.slugs || {},
+    seo: hosp.seo || {},
     name: hosp.name,
     type: hosp.type,
     city: hosp.city,
@@ -198,6 +224,9 @@ function mapDoctorRowToModel(row: any): Doctor {
   return {
     id: row.id,
     slug: row.slug,
+    slugs: row.slugs || undefined,
+    seo: row.seo || undefined,
+    updatedAt: row.updated_at || undefined,
     name: row.name,
     title: row.title,
     specialtySlug: row.specialty_slug,
@@ -228,6 +257,8 @@ function mapDoctorModelToRow(doc: Doctor) {
   return {
     id: doc.id,
     slug: doc.slug,
+    slugs: doc.slugs || {},
+    seo: doc.seo || {},
     name: doc.name,
     title: doc.title,
     specialty_slug: doc.specialtySlug,
@@ -297,6 +328,9 @@ function mapTreatmentRowToModel(row: any): Treatment {
   return {
     id: row.id,
     slug: row.slug,
+    slugs: row.slugs || undefined,
+    seo: row.seo || undefined,
+    updatedAt: row.updated_at || undefined,
     title: row.title,
     shortDescription: row.short_description,
     fullOverview: row.full_overview,
@@ -315,6 +349,8 @@ function mapTreatmentModelToRow(treat: Treatment) {
   return {
     id: treat.id,
     slug: treat.slug,
+    slugs: treat.slugs || {},
+    seo: treat.seo || {},
     title: treat.title,
     short_description: treat.shortDescription,
     full_overview: treat.fullOverview,
@@ -455,6 +491,10 @@ function mapArticleRowToModel(row: any): Article {
   return {
     id: row.id,
     slug: row.slug,
+    slugs: row.slugs || undefined,
+    seo: row.seo || undefined,
+    faqs: row.faqs || undefined,
+    htmlContent: row.html_content || undefined,
     categorySlug: row.category_slug,
     categoryName: row.category_name,
     title: row.title,
@@ -462,9 +502,13 @@ function mapArticleRowToModel(row: any): Article {
     content: row.content,
     readingTimeMinutes: row.reading_time_minutes,
     publishedDate: row.published_date,
+    updatedDate: row.updated_date || undefined,
+    updatedAt: row.updated_at || undefined,
     sourceHospital: row.source_hospital,
     image: row.image,
+    authorDoctorId: row.author_doctor_id || undefined,
     author: row.author,
+    medicalReviewer: row.medical_reviewer || undefined,
   };
 }
 
@@ -472,6 +516,10 @@ function mapArticleModelToRow(art: Article) {
   return {
     id: art.id,
     slug: art.slug,
+    slugs: art.slugs || {},
+    seo: art.seo || {},
+    faqs: art.faqs || [],
+    html_content: art.htmlContent || {},
     category_slug: art.categorySlug,
     category_name: art.categoryName,
     title: art.title,
@@ -479,9 +527,12 @@ function mapArticleModelToRow(art: Article) {
     content: art.content,
     reading_time_minutes: art.readingTimeMinutes,
     published_date: art.publishedDate,
+    updated_date: art.updatedDate || art.publishedDate,
     source_hospital: art.sourceHospital,
     image: art.image,
+    author_doctor_id: art.authorDoctorId || null,
     author: art.author,
+    medical_reviewer: art.medicalReviewer || null,
     updated_at: new Date().toISOString(),
   };
 }
@@ -534,8 +585,16 @@ function mapInquiryRowToModel(row: any): ConsultationInquiry {
     country: row.country,
     specialty: row.specialty,
     notes: row.notes,
+    language: row.language || 'ar',
+    sourceUrl: row.source_url || undefined,
+    assignedTo: row.assigned_to || undefined,
+    assignedName: row.assigned_name || undefined,
+    internalNotes: row.internal_notes || [],
+    attachments: row.attachments || [],
+    notificationLog: row.notification_log || [],
     status: row.status,
     createdAt: row.created_at,
+    updatedAt: row.updated_at,
   };
 }
 
@@ -549,6 +608,13 @@ function mapInquiryModelToRow(inq: ConsultationInquiry) {
     country: inq.country || null,
     specialty: inq.specialty || null,
     notes: inq.notes || null,
+    language: inq.language || 'ar',
+    source_url: inq.sourceUrl || null,
+    assigned_to: inq.assignedTo || null,
+    assigned_name: inq.assignedName || null,
+    internal_notes: inq.internalNotes || [],
+    attachments: inq.attachments || [],
+    notification_log: inq.notificationLog || [],
     status: inq.status,
     created_at: inq.createdAt,
     updated_at: new Date().toISOString(),

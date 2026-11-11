@@ -118,10 +118,19 @@ export function analyzeArticleSeo(params: {
   const effectiveDesc = (seoDescription || excerpt || '').trim();
   const effectiveSlug = (slug || effectiveTitle).trim();
 
+  // Strip HTML tags when measuring readable text & keyword density while keeping raw HTML for structure checks
+  const plainBody = body
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
   const normKeyword = normalizeText(focusKeyword);
   const normTitle = normalizeText(effectiveTitle);
   const normDesc = normalizeText(effectiveDesc);
-  const normBody = normalizeText(body);
+  const normBody = normalizeText(plainBody);
   const normSlug = normalizeText(effectiveSlug.replace(/[-_]/g, ' '));
 
   // Word count & words array
@@ -160,10 +169,13 @@ export function analyzeArticleSeo(params: {
 
   const hasKeywordInContent = normKeyword ? normBody.includes(normKeyword) : false;
 
-  // Subheadings check
-  const subheadingsMatches = body.match(/(?:^|\n)#{2,6}\s+([^\n]+)|<h[2-6][^>]*>([^<]+)<\/h[2-6]>/gi) || [];
+  // Subheadings check (supports nested tags like <h2><strong>Text</strong></h2>)
+  const subheadingsMatches =
+    body.match(/(?:^|\n)#{2,6}\s+([^\n]+)|<h[2-6][^>]*>[\s\S]*?<\/h[2-6]>/gi) || [];
   const hasSubheadings = subheadingsMatches.length > 0;
-  const subheadingsText = normalizeText(subheadingsMatches.join(' '));
+  const subheadingsText = normalizeText(
+    subheadingsMatches.map((m) => m.replace(/<[^>]+>/g, ' ')).join(' ')
+  );
   const hasKeywordInSubheadings = normKeyword ? subheadingsText.includes(normKeyword) : false;
 
   // Image ALT check
@@ -172,9 +184,9 @@ export function analyzeArticleSeo(params: {
   const altTexts = normalizeText(imageAltMatches.join(' '));
   const hasKeywordInImageAlt = normKeyword ? altTexts.includes(normKeyword) : false;
 
-  // Links check
+  // Links check (recognizes /, /fr/, /en/ internal paths and external URLs)
   const externalLinkRegex = /\[([^\]]+)\]\((https?:\/\/(?!avicinna\.com)[^\)]+)\)|<a[^>]+href=["'](https?:\/\/(?!avicinna\.com)[^"']+)["']/gi;
-  const internalLinkRegex = /\[([^\]]+)\]\((\/(?!https?)[^\)]+)\)|<a[^>]+href=["'](\/(?!https?)[^"']+)["']/gi;
+  const internalLinkRegex = /\[([^\]]+)\]\((\/(?!https?)[^\)]+)\)|<a[^>]+href=["'](\/(?!https?)[^"']+|https?:\/\/(?:www\.)?avicinna\.com[^"']*)["']/gi;
 
   const hasExternalLinks = externalLinkRegex.test(body);
   const hasInternalLinks = internalLinkRegex.test(body);
@@ -184,7 +196,9 @@ export function analyzeArticleSeo(params: {
   const hasTOC = /\[toc\]|table of contents|فهرس المحتويات/i.test(body) || subheadingsMatches.length >= 3;
 
   // Short paragraphs (< 120 words each)
-  const rawParagraphs = body.split(/\n\s*\n/).filter((p) => p.trim().length > 0);
+  const rawParagraphs = plainBody
+    ? body.split(/\n\s*\n|<\/p>|<\/h[2-6]>|<\/li>/i).map((p) => p.replace(/<[^>]+>/g, ' ').trim()).filter(Boolean)
+    : [];
   const hasShortParagraphs =
     rawParagraphs.length > 0
       ? rawParagraphs.every((p) => p.trim().split(/\s+/).length <= 120)

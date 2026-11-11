@@ -23,6 +23,10 @@ import {
   X,
   Sun,
   Moon,
+  FileText,
+  Image as ImageIcon,
+  ArrowRightLeft,
+  ShieldCheck,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTheme } from '@/context/ThemeContext';
@@ -276,11 +280,39 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
                 <span className="text-xs">Consultation Inquiries</span>
               </Command.Item>
               <Command.Item
+                onSelect={() => runCommand(() => router.push('/admin/pages'))}
+                className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-slate-700 hover:bg-sky-50 hover:text-sky-900 cursor-pointer aria-selected:bg-sky-50 aria-selected:text-sky-900"
+              >
+                <FileText className="h-4 w-4 text-sky-600" />
+                <span className="text-xs">Pages & Legal Docs (/privacy, /terms)</span>
+              </Command.Item>
+              <Command.Item
+                onSelect={() => runCommand(() => router.push('/admin/media'))}
+                className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-slate-700 hover:bg-sky-50 hover:text-sky-900 cursor-pointer aria-selected:bg-sky-50 aria-selected:text-sky-900"
+              >
+                <ImageIcon className="h-4 w-4 text-teal-600" />
+                <span className="text-xs">Media Library & Alt Text</span>
+              </Command.Item>
+              <Command.Item
+                onSelect={() => runCommand(() => router.push('/admin/redirects'))}
+                className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-slate-700 hover:bg-sky-50 hover:text-sky-900 cursor-pointer aria-selected:bg-sky-50 aria-selected:text-sky-900"
+              >
+                <ArrowRightLeft className="h-4 w-4 text-indigo-600" />
+                <span className="text-xs">301 Redirects Manager</span>
+              </Command.Item>
+              <Command.Item
+                onSelect={() => runCommand(() => router.push('/admin/security'))}
+                className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-slate-700 hover:bg-sky-50 hover:text-sky-900 cursor-pointer aria-selected:bg-sky-50 aria-selected:text-sky-900"
+              >
+                <ShieldCheck className="h-4 w-4 text-emerald-600" />
+                <span className="text-xs">Security, Users, 2FA & Activity Log</span>
+              </Command.Item>
+              <Command.Item
                 onSelect={() => runCommand(() => router.push('/admin/settings'))}
                 className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-slate-700 hover:bg-sky-50 hover:text-sky-900 cursor-pointer aria-selected:bg-sky-50 aria-selected:text-sky-900"
               >
                 <Settings className="h-4 w-4 text-slate-600" />
-                <span className="text-xs">Platform & System Settings</span>
+                <span className="text-xs">Platform, Tracking & Notification Settings</span>
               </Command.Item>
             </Command.Group>
 

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { requireApiAuth } from '@/lib/serverAuth';
 
 export interface TranslationRequest {
   sourceLang: 'ar' | 'fr' | 'en';
@@ -159,9 +160,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Empty translation payload' }, { status: 400 });
     }
 
-    const apiKey = process.env.OPENAI_API_KEY;
+    const auth = await requireApiAuth(req, ['admin', 'editor']);
+    const apiKey = auth.ok ? process.env.OPENAI_API_KEY : undefined;
 
-    // 1. If OpenAI API key is present, execute via LLM
+    // 1. If OpenAI API key is present and caller is authenticated admin/editor, execute via LLM
     if (apiKey) {
       try {
         const systemPrompt = `You are a certified medical translator for the AVICINNA International Healthcare Platform in Turkey.

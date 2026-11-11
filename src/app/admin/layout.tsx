@@ -1,22 +1,26 @@
 import React from 'react';
-import { cookies } from 'next/headers';
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-import { verifyAdminSessionServer } from '@/lib/auth';
+import { getAuthenticatedSessionFromCookies } from '@/lib/serverAuth';
 import AdminClientLayout from './AdminClientLayout';
 
 export const dynamic = 'force-dynamic';
 
+export const metadata: Metadata = {
+  title: 'AVICINNA Command Console',
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+  },
+};
+
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const cookieStore = await cookies();
-  const sessionCookie =
-    cookieStore.get('avicinna_admin_session')?.value ||
-    cookieStore.get('avicinna_session')?.value;
+  const session = await getAuthenticatedSessionFromCookies();
 
-  const isValid = await verifyAdminSessionServer(sessionCookie);
-
-  if (!isValid) {
+  if (!session) {
     redirect('/auth/login?from=/admin');
   }
 
-  return <AdminClientLayout>{children}</AdminClientLayout>;
+  return <AdminClientLayout session={session}>{children}</AdminClientLayout>;
 }

@@ -1,3 +1,5 @@
+import type { TrackingConfig, NotificationConfig } from '@/types/cms';
+
 export interface SiteConfig {
   brandName: string;
   brandArabic: string;
@@ -46,6 +48,8 @@ export interface SiteConfig {
     footer: boolean;
     whatsappFloating: boolean;
   };
+  tracking?: TrackingConfig;
+  notifications?: NotificationConfig;
   adminGuideEnabled: boolean;
 }
 
@@ -108,6 +112,27 @@ export const initialSiteConfig: SiteConfig = {
     finalCta: true,
     footer: true,
     whatsappFloating: true,
+  },
+  tracking: {
+    enableTracking: true,
+    ga4MeasurementId: '',
+    metaPixelId: '',
+    metaCapiAccessToken: '',
+    metaTestEventCode: '',
+  },
+  notifications: {
+    emailEnabled: false,
+    emailTo: 'contact@avicinna-health.com',
+    emailFrom: 'AVICINNA Alerts <alerts@avicinna.com>',
+    resendApiKey: '',
+    telegramEnabled: false,
+    telegramBotToken: '',
+    telegramChatId: '',
+    whatsappWebhookEnabled: false,
+    whatsappWebhookUrl: '',
+    whatsappCloudToken: '',
+    whatsappPhoneNumberId: '',
+    whatsappNotifyNumber: '905442822769',
   },
   adminGuideEnabled: true,
 };

@@ -28,6 +28,8 @@ import {
   Clock,
   ChevronLeft,
   ChevronRight,
+  UserCheck,
+  Building2,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRef } from 'react';

@@ -4,6 +4,8 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ShieldCheck, Award } from 'lucide-react';
+import { getLocalizedPath } from '@/lib/i18nRoutes';
+import { useData } from '@/context/DataContext';
 
 /**
  * PLACEMENT A: First-Visit Cinematic Curtain Preloader (Disabled - renders null)
@@ -31,7 +33,7 @@ export function AnimatedNavbarLogo({
 
   return (
     <Link
-      href="/"
+      href={getLocalizedPath('/', locale)}
       className="inline-flex items-center gap-2.5 sm:gap-3 focus:outline-none select-none"
       aria-label="AVICINNA Healthcare Turkey"
     >
@@ -69,6 +71,8 @@ export function AboutVideoMedallion({
 }: {
   locale?: 'ar' | 'fr' | 'en';
 }) {
+  const { sections } = useData();
+  const experienceCount = sections?.stats?.experienceCount || '+10';
   return (
     <div
       className="flex items-center gap-2.5 sm:gap-3.5 rounded-2xl sm:rounded-3xl border border-white/20 bg-slate-950/90 p-2.5 sm:p-3.5 text-white shadow-xl backdrop-blur-2xl max-w-[calc(100vw-2.5rem)] sm:max-w-none"
@@ -83,8 +87,8 @@ export function AboutVideoMedallion({
         />
       </div>
       <div className="pe-2">
-        <div className="flex items-center gap-1.5 text-xl font-black text-sky-400 tabular-nums">
-          <span>+10</span>
+        <div dir="ltr" className="flex items-center gap-1.5 text-xl font-black text-sky-400 tabular-nums">
+          <span>{experienceCount}</span>
           <ShieldCheck className="h-4 w-4 text-emerald-400" />
         </div>
         <p className="text-xs font-bold leading-snug text-slate-200">

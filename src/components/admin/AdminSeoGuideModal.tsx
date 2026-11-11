@@ -436,22 +436,22 @@ export function AdminSeoGuideModal({
             {activeTab === 'snippets' && (
               <div className="space-y-4 animate-in fade-in duration-150">
                 <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                  تتميز منصة أفيسينا بتوليد تلقائي لكود البيانات المنظمة (JSON-LD Schema Markup) المعتمد رسمياً لدى جوجل، مما يتيح للمقال الظهور بنتائج بارزة تضم النجوم والأسئلة الشائعة:
+                  تتميز منصة أفيسينا بتوليد تلقائي لكود البيانات المنظمة (JSON-LD Schema Markup) المعتمد رسمياً لدى جوجل للمحتوى الطبي الموثوق E-E-A-T والأسئلة الشائعة:
                 </p>
 
                 <div className="space-y-3">
                   <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 space-y-1.5">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 font-bold text-xs text-slate-900 dark:text-white">
-                        <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-                        <span>تقييمات النجوم المدمجة (AggregateRating Schema)</span>
+                        <Award className="w-4 h-4 text-emerald-500" />
+                        <span>التأليف والمراجعة الطبية الموثوقة (MedicalWebPage E-E-A-T)</span>
                       </div>
                       <span className="text-[10px] font-mono font-bold text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded">
                         مفعل تلقائياً
                       </span>
                     </div>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
-                      تظهر نجوم التقييم الذهبية (4.9 / 5 نجوم) بجانب رابط المقال في جوجل، مما يرفع نسبة النقر CTR بأكثر من 35% مقارنة بالمواقع التقليدية.
+                      يربط كود السكيما المقال باسم الطبيب المؤلف، المراجع الطبي، وتاريخ آخر تحديث لضمان أعلى معايير الثقة الطبية YMYL في جوجل.
                     </p>
                   </div>
 
