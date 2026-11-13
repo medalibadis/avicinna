@@ -1,17 +1,5 @@
-'use client';
-
 import React from 'react';
-import { motion } from 'framer-motion';
 
 export default function RootTemplate({ children }: { children: React.ReactNode }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.15, ease: 'easeOut' }}
-      className="w-full min-h-screen"
-    >
-      {children}
-    </motion.div>
-  );
+  return <div className="w-full min-h-screen">{children}</div>;
 }

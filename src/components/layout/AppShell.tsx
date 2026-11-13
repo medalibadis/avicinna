@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { LanguageProvider } from '@/context/LanguageContext';
 import { LocaleAlternatesProvider } from '@/context/LocaleAlternatesContext';
@@ -33,6 +33,13 @@ export function AppShell({
   const isAdmin = pathname?.startsWith('/admin');
   const isAuth = pathname?.startsWith('/auth');
   const hidePublicShell = isAdmin || isAuth;
+
+  // Instantly reset scroll to top on page redirection without animated smooth scrolling
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !window.location.hash) {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
+    }
+  }, [pathname]);
 
   return (
     <ThemeProvider>
