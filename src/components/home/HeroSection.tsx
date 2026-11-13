@@ -115,9 +115,13 @@ export const HeroSection: React.FC = () => {
   const eyebrow = heroData.eyebrow[language] || t.hero.eyebrow;
 
   // Clean headline fragments and sanitize legacy artifacts
-  const rawPart1 = (heroData.headlinePart1?.[language] || t.hero.headlinePart1 || '').trim();
-  const rawHighlight = (heroData.headlineHighlight?.[language] || t.hero.headlineHighlight || '').trim();
-  const rawPart2 = (heroData.headlinePart2?.[language] || (t.hero as any)?.headlinePart2 || '').trim();
+  const rawPart1 = (heroData.headlinePart1?.[language] ?? t.hero.headlinePart1 ?? '').trim();
+  const rawHighlight = (heroData.headlineHighlight?.[language] ?? t.hero.headlineHighlight ?? '').trim();
+  const rawPart2 = (
+    heroData.headlinePart2?.[language] !== undefined
+      ? heroData.headlinePart2[language]
+      : (t.hero as any)?.headlinePart2 || ''
+  ).trim();
 
   const cleanPart1 = rawPart1.replace(/\s+pour\s+votre$/i, '').replace(/\s+for\s+your$/i, '').trim();
   const isLegacyPart2 = ['voyage', 'journey', 'لرعايتكم'].includes(rawPart2.toLowerCase());

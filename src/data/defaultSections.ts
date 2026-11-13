@@ -92,9 +92,9 @@ export const defaultSections: SiteSectionsData = {
       fr: 'Pour Votre Santé',
     },
     headlinePart2: {
-      ar: '',
-      en: '',
-      fr: '',
+      ar: 'مع نخبة الاستشاريين وأحدث المستشفيات المعتمدة عالمياً',
+      en: 'Connecting you with top accredited professors & JCI hospitals',
+      fr: 'Avec des professeurs d’élite et des hôpitaux certifiés JCI',
     },
     subtitle: {
       ar: 'نربطكم بأعلى المستشفيات المعتمدة دولياً (JCI) ونخبة الجراحين الاستشاريين في تركيا، مع مرافقة علاجية ولوجستية شاملة واستشارة مجانية فورية.',

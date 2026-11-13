@@ -49,6 +49,7 @@ const SECTIONS_UI: Record<Locale, any> = {
       eyebrow: 'Hero Eyebrow Badge',
       headlinePart1: 'Main Headline Part 1',
       headlineHighlight: 'Headline Highlighted Segment',
+      headlinePart2: 'Main Headline Part 2 (Trailing Segment)',
       subtitle: 'Hero Subtitle / Description',
       patientsCount: 'Patients Treated Count',
       patientsLabel: 'Patients Label',
@@ -108,6 +109,7 @@ const SECTIONS_UI: Record<Locale, any> = {
       eyebrow: 'Badge d’Accroche Hero',
       headlinePart1: 'Titre Principal Partie 1',
       headlineHighlight: 'Segment Mis en Valeur',
+      headlinePart2: 'Titre Principal Partie 2 (Suite)',
       subtitle: 'Sous-titre / Description Hero',
       patientsCount: 'Nombre de Patients Traités',
       patientsLabel: 'Libellé des Patients',
@@ -167,6 +169,7 @@ const SECTIONS_UI: Record<Locale, any> = {
       eyebrow: 'شارة الهيرو الترحيبية',
       headlinePart1: 'العنوان الرئيسي - الجزء الأول',
       headlineHighlight: 'النص المميز باللون الأزرق',
+      headlinePart2: 'العنوان الرئيسي - الجزء الثاني (تكملة العنوان)',
       subtitle: 'وصف وتفاصيل الهيرو',
       mobileSectionHeading: 'نصوص واجهة الجوال (نسخة موجزة للشاشات الصغيرة)',
       mobileSectionHelper: 'نصوص مختصرة ومكثفة تظهر فقط على الهواتف الذكية (< 768px) لتقليل طول النصوص وجعل شريط البحث وأزرار الحجز تظهر فوراً دون تمرير.',
@@ -249,6 +252,7 @@ export default function AdminSectionsPage() {
           'eyebrow',
           'headlinePart1',
           'headlineHighlight',
+          'headlinePart2',
           'subtitle',
           'mobileEyebrow',
           'mobileHeadlinePart1',
@@ -747,7 +751,7 @@ export default function AdminSectionsPage() {
               }
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <SmartTranslatableField
                 label={t.fields.headlinePart1}
                 value={formData.hero.headlinePart1}
@@ -768,6 +772,18 @@ export default function AdminSectionsPage() {
                   setFormData({
                     ...formData,
                     hero: { ...formData.hero, headlineHighlight: updated },
+                  })
+                }
+              />
+
+              <SmartTranslatableField
+                label={t.fields.headlinePart2}
+                value={formData.hero.headlinePart2 || { ar: '', en: '', fr: '' }}
+                activeLocale={locale}
+                onChange={(updated) =>
+                  setFormData({
+                    ...formData,
+                    hero: { ...formData.hero, headlinePart2: updated },
                   })
                 }
               />
