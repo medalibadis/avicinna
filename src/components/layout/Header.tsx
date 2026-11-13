@@ -24,6 +24,7 @@ export const Header: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [servicesDropdownOpen, setServicesDropdownOpen] = useState(false);
   const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const handleDropdownEnter = () => {
     if (dropdownTimeoutRef.current) {
@@ -39,11 +40,18 @@ export const Header: React.FC = () => {
     }
     dropdownTimeoutRef.current = setTimeout(() => {
       setServicesDropdownOpen(false);
-    }, 250);
+    }, 500);
   };
 
   useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setServicesDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
     return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
       if (dropdownTimeoutRef.current) {
         clearTimeout(dropdownTimeoutRef.current);
       }
@@ -114,14 +122,22 @@ export const Header: React.FC = () => {
                   return (
                     <div
                       key={link.bare}
-                      className="relative"
+                      ref={dropdownRef}
+                      className={`relative ${servicesDropdownOpen ? 'z-50' : 'z-20'}`}
                       onMouseEnter={handleDropdownEnter}
                       onMouseLeave={handleDropdownLeave}
                     >
-                      <Link
-                        href={link.href}
-                        onClick={() => setServicesDropdownOpen(false)}
-                        className={`inline-flex items-center gap-1 px-3 2xl:px-4 py-1.5 2xl:py-2 rounded-full text-xs xl:text-[13px] 2xl:text-sm font-semibold whitespace-nowrap transition-all duration-200 select-none ${
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (dropdownTimeoutRef.current) {
+                            clearTimeout(dropdownTimeoutRef.current);
+                            dropdownTimeoutRef.current = null;
+                          }
+                          setServicesDropdownOpen((prev) => !prev);
+                        }}
+                        className={`inline-flex items-center gap-1 px-3 2xl:px-4 py-1.5 2xl:py-2 rounded-full text-xs xl:text-[13px] 2xl:text-sm font-semibold whitespace-nowrap transition-all duration-200 select-none cursor-pointer ${
                           isActive
                             ? 'bg-[#0097FB] text-white shadow-sm shadow-[#0097FB]/30 font-bold'
                             : !isScrolled && isDarkHeroPage
@@ -131,16 +147,16 @@ export const Header: React.FC = () => {
                       >
                         <span>{link.label}</span>
                         <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${servicesDropdownOpen ? 'rotate-180 opacity-100 text-[#0097FB]' : 'opacity-70'}`} />
-                      </Link>
+                      </button>
 
                       {servicesDropdownOpen && (
                         <div
-                          className="absolute top-full left-1/2 -translate-x-1/2 pt-2 w-80 max-w-[90vw] z-50 animate-in fade-in slide-in-from-top-1 duration-150"
+                          className="absolute top-full left-1/2 -translate-x-1/2 pt-1.5 w-80 max-w-[90vw] z-50 animate-in fade-in duration-150"
                           onMouseEnter={handleDropdownEnter}
                           onMouseLeave={handleDropdownLeave}
                         >
-                          {/* Invisible hover bridge: covers the gap completely so mouse cursor never leaves hover zone */}
-                          <div className="absolute -top-3 left-0 right-0 h-4 bg-transparent pointer-events-auto" />
+                          {/* Invisible super-shield hover bridge: covers any vertical or diagonal gap completely */}
+                          <div className="absolute -top-4 -left-10 -right-10 h-7 bg-transparent pointer-events-auto" />
                           <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800 p-2.5">
                             <div className="text-[11px] font-semibold uppercase tracking-wider text-[#64748B] dark:text-slate-400 px-3 py-1.5 border-b border-slate-100 dark:border-slate-800">
                               {t.specialties.badge}
