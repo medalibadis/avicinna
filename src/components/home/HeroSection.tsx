@@ -78,22 +78,22 @@ const heroSearchDict = {
 
 const mobileHeroText = {
   ar: {
-    eyebrow: 'وجهتكم الأولى للرعاية الصحية في إسطنبول',
-    headlinePart1: 'أفضل المستشفيات وأشهر الأطباء في تركيا ',
+    eyebrow: 'رعاية طبية موثوقة في إسطنبول',
+    headlinePart1: 'أفضل مستشفيات تركيا',
     headlineHighlight: 'لرعايتكم الصحية',
-    subtitle: 'نربطكم بأعلى المستشفيات المعتمدة دولياً (JCI) مع استشارة مجانية فورية.',
+    subtitle: 'مستشفيات معتمدة دولياً (JCI) واستشارة مجانية فورية.',
   },
   en: {
-    eyebrow: 'Premier Healthcare in Istanbul',
-    headlinePart1: "Turkey's Top Hospitals & Elite Surgeons for ",
-    headlineHighlight: 'Your Healthcare',
-    subtitle: 'Connecting you with JCI-accredited hospitals and free instant consultation.',
+    eyebrow: 'Trusted Care in Istanbul',
+    headlinePart1: 'Top Hospitals in Turkey for',
+    headlineHighlight: 'Your Care',
+    subtitle: 'JCI-accredited hospitals & instant free consultation.',
   },
   fr: {
-    eyebrow: "Soins Médicaux d'Excellence à Istanbul",
-    headlinePart1: 'Les Meilleurs Hôpitaux et Chirurgiens de Turquie pour ',
+    eyebrow: "Soins d'Élite à Istanbul",
+    headlinePart1: 'Hôpitaux d’Élite en Turquie pour',
     headlineHighlight: 'Votre Santé',
-    subtitle: 'Accédez aux hôpitaux accrédités JCI avec une consultation gratuite immédiate.',
+    subtitle: 'Hôpitaux agréés JCI & consultation gratuite immédiate.',
   },
 };
 
@@ -131,6 +131,30 @@ export const HeroSection: React.FC = () => {
       : rawHighlight;
 
   const subtitle = heroData.subtitle[language] || t.hero.subtitle;
+
+  const mobileEyebrow = (
+    heroData.mobileEyebrow?.[language] ||
+    mobileHeroText[langKey]?.eyebrow ||
+    eyebrow
+  ).trim();
+
+  const mobilePart1 = (
+    heroData.mobileHeadlinePart1?.[language] ||
+    mobileHeroText[langKey]?.headlinePart1 ||
+    cleanPart1
+  ).trim();
+
+  const mobileHighlight = (
+    heroData.mobileHeadlineHighlight?.[language] ||
+    mobileHeroText[langKey]?.headlineHighlight ||
+    cleanHighlight
+  ).trim();
+
+  const mobileSub = (
+    heroData.mobileSubtitle?.[language] ||
+    mobileHeroText[langKey]?.subtitle ||
+    subtitle
+  ).trim();
   const heroBgConfigured =
     heroData.backgroundImage?.trim() || '/images/hospitals/memorial-bahcelievler.jpg';
   const [heroBgSrc, setHeroBgSrc] = useState(heroBgConfigured);
@@ -273,20 +297,30 @@ export const HeroSection: React.FC = () => {
         <div className="inline-flex items-center gap-1.5 sm:gap-2 bg-[#0097FB]/15 border border-[#00BFFF]/30 backdrop-blur-md px-3 sm:px-4 py-1 sm:py-1.5 rounded-full mb-3 md:mb-5 shadow-xs">
           <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#00BFFF]" />
           <span className="text-[11px] sm:text-sm font-semibold text-[#00BFFF] tracking-wide">
-            {eyebrow}
+            <span className="hidden md:inline">{eyebrow}</span>
+            <span className="md:hidden">{mobileEyebrow}</span>
           </span>
         </div>
 
         <h1 className="text-2xl sm:text-3xl lg:text-5xl font-black tracking-tight leading-snug lg:leading-[1.2] mb-2.5 md:mb-5 max-w-md md:max-w-3xl mx-auto drop-shadow-[0_2px_12px_rgba(2,24,56,0.75)]">
-          <span>{cleanPart1}</span>{' '}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#38bdf8] via-[#7dd3fc] to-[#00BFFF] inline">
-            {cleanHighlight}
+          <span className="hidden md:inline">
+            <span>{cleanPart1}</span>{' '}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#38bdf8] via-[#7dd3fc] to-[#00BFFF] inline">
+              {cleanHighlight}
+            </span>
+            {cleanPart2 && <span> {cleanPart2}</span>}
           </span>
-          {cleanPart2 && <span> {cleanPart2}</span>}
+          <span className="md:hidden">
+            <span>{mobilePart1}</span>{' '}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#38bdf8] via-[#7dd3fc] to-[#00BFFF] inline">
+              {mobileHighlight}
+            </span>
+          </span>
         </h1>
 
         <p className="text-sm sm:text-base lg:text-lg text-slate-100/95 max-w-sm sm:max-w-md md:max-w-2xl mx-auto leading-relaxed mb-4 md:mb-8 font-normal line-clamp-2 md:line-clamp-none drop-shadow-[0_1px_8px_rgba(2,24,56,0.7)]">
-          {subtitle}
+          <span className="hidden md:inline">{subtitle}</span>
+          <span className="md:hidden">{mobileSub}</span>
         </p>
 
         {/* ─── Search / Consultation Entry Component with Live Autocomplete ─── */}

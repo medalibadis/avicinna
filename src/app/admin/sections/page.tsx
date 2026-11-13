@@ -75,6 +75,12 @@ const SECTIONS_UI: Record<Locale, any> = {
       ctaTitle: 'Consultation Banner Title',
       ctaSubtitle: 'Consultation Banner Subtitle',
       ctaPhone: 'Hotline / WhatsApp Number',
+      mobileSectionHeading: 'Mobile Screen Hero Copy (Condensed)',
+      mobileSectionHelper: 'Optimized, shorter text shown on mobile phones (< 768px) to reduce clutter and keep search and booking buttons immediately accessible above the fold.',
+      mobileEyebrow: 'Mobile Eyebrow Badge',
+      mobileHeadlinePart1: 'Mobile Headline Part 1',
+      mobileHeadlineHighlight: 'Mobile Headline Highlighted Segment',
+      mobileSubtitle: 'Mobile Subtitle / Description',
     },
   },
   fr: {
@@ -128,6 +134,12 @@ const SECTIONS_UI: Record<Locale, any> = {
       ctaTitle: 'Titre de la Bannière',
       ctaSubtitle: 'Sous-titre de la Bannière',
       ctaPhone: 'Ligne Directe / WhatsApp',
+      mobileSectionHeading: 'Textes Hero pour Écrans Mobiles (Version Épurée)',
+      mobileSectionHelper: 'Textes courts et percutants affichés sur téléphones mobiles (< 768px) pour alléger l’affichage et garder la recherche et les boutons visibles.',
+      mobileEyebrow: 'Badge Mobile',
+      mobileHeadlinePart1: 'Titre Mobile Partie 1',
+      mobileHeadlineHighlight: 'Segment Mis en Valeur Mobile',
+      mobileSubtitle: 'Sous-titre / Description Mobile',
     },
   },
   ar: {
@@ -156,6 +168,12 @@ const SECTIONS_UI: Record<Locale, any> = {
       headlinePart1: 'العنوان الرئيسي - الجزء الأول',
       headlineHighlight: 'النص المميز باللون الأزرق',
       subtitle: 'وصف وتفاصيل الهيرو',
+      mobileSectionHeading: 'نصوص واجهة الجوال (نسخة موجزة للشاشات الصغيرة)',
+      mobileSectionHelper: 'نصوص مختصرة ومكثفة تظهر فقط على الهواتف الذكية (< 768px) لتقليل طول النصوص وجعل شريط البحث وأزرار الحجز تظهر فوراً دون تمرير.',
+      mobileEyebrow: 'شارة الجوال الترحيبية',
+      mobileHeadlinePart1: 'عنوان الجوال - الجزء الأول',
+      mobileHeadlineHighlight: 'عنوان الجوال - الجزء الملون',
+      mobileSubtitle: 'وصف الجوال المختصر',
       patientsCount: 'عدد المرضى المعالجين',
       patientsLabel: 'وصف إحصائية المرضى',
       hospitalsCount: 'عدد المستشفيات الشريكة',
@@ -227,11 +245,21 @@ export default function AdminSectionsPage() {
 
     try {
       if (activeTab === 'hero') {
-        const fieldsToTranslate = ['eyebrow', 'headlinePart1', 'headlineHighlight', 'subtitle'] as const;
-        const updatedHero = { ...formData.hero };
+        const fieldsToTranslate = [
+          'eyebrow',
+          'headlinePart1',
+          'headlineHighlight',
+          'subtitle',
+          'mobileEyebrow',
+          'mobileHeadlinePart1',
+          'mobileHeadlineHighlight',
+          'mobileSubtitle',
+        ] as const;
+        const updatedHero: any = { ...formData.hero };
 
         for (const field of fieldsToTranslate) {
-          const sourceText = updatedHero[field][locale];
+          const fieldObj = updatedHero[field];
+          const sourceText = fieldObj?.[locale];
           if (!sourceText) continue;
 
           const res = await fetch('/api/translate', {
@@ -250,9 +278,9 @@ export default function AdminSectionsPage() {
           const data = await res.json();
           if (data.success && data.translations) {
             updatedHero[field] = {
-              en: data.translations.en?.text ?? updatedHero[field].en,
-              fr: data.translations.fr?.text ?? updatedHero[field].fr,
-              ar: data.translations.ar?.text ?? updatedHero[field].ar,
+              en: data.translations.en?.text ?? fieldObj?.en ?? '',
+              fr: data.translations.fr?.text ?? fieldObj?.fr ?? '',
+              ar: data.translations.ar?.text ?? fieldObj?.ar ?? '',
               [locale]: sourceText,
             };
           }
@@ -757,6 +785,68 @@ export default function AdminSectionsPage() {
                 })
               }
             />
+
+            {/* Mobile Screen Hero Copy Sub-Panel */}
+            <div className="rounded-2xl border border-sky-100 dark:border-sky-900/60 bg-sky-50/40 dark:bg-sky-950/20 p-4 sm:p-5 space-y-4">
+              <div className="flex items-center gap-2 text-xs font-bold text-sky-900 dark:text-sky-200">
+                <Sparkles className="w-4 h-4 text-sky-600 dark:text-sky-400" />
+                <span>{t.fields.mobileSectionHeading}</span>
+              </div>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                {t.fields.mobileSectionHelper}
+              </p>
+
+              <SmartTranslatableField
+                label={t.fields.mobileEyebrow}
+                value={formData.hero.mobileEyebrow || { ar: '', en: '', fr: '' }}
+                activeLocale={locale}
+                onChange={(updated) =>
+                  setFormData({
+                    ...formData,
+                    hero: { ...formData.hero, mobileEyebrow: updated },
+                  })
+                }
+              />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <SmartTranslatableField
+                  label={t.fields.mobileHeadlinePart1}
+                  value={formData.hero.mobileHeadlinePart1 || { ar: '', en: '', fr: '' }}
+                  activeLocale={locale}
+                  onChange={(updated) =>
+                    setFormData({
+                      ...formData,
+                      hero: { ...formData.hero, mobileHeadlinePart1: updated },
+                    })
+                  }
+                />
+
+                <SmartTranslatableField
+                  label={t.fields.mobileHeadlineHighlight}
+                  value={formData.hero.mobileHeadlineHighlight || { ar: '', en: '', fr: '' }}
+                  activeLocale={locale}
+                  onChange={(updated) =>
+                    setFormData({
+                      ...formData,
+                      hero: { ...formData.hero, mobileHeadlineHighlight: updated },
+                    })
+                  }
+                />
+              </div>
+
+              <SmartTranslatableField
+                label={t.fields.mobileSubtitle}
+                value={formData.hero.mobileSubtitle || { ar: '', en: '', fr: '' }}
+                activeLocale={locale}
+                multiline
+                onChange={(updated) =>
+                  setFormData({
+                    ...formData,
+                    hero: { ...formData.hero, mobileSubtitle: updated },
+                  })
+                }
+              />
+            </div>
           </div>
         )}
 

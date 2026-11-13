@@ -83,11 +83,22 @@ export function LuxuryCinemaHero({ locale = 'ar' }: { locale?: 'ar' | 'fr' | 'en
         >
           <Sparkles className="h-3.5 w-3.5 text-teal-400 animate-spin" style={{ animationDuration: '6s' }} />
           <span>
-            {locale === 'ar'
-              ? 'وجهتكم الأولى للرعاية الصحية المتقدمة في إسطنبول'
-              : locale === 'fr'
-              ? 'Votre Destination d’Excellence Médicale à Istanbul'
-              : 'Your Premier Destination for JCI Healthcare in Istanbul'}
+            {locale === 'ar' ? (
+              <>
+                <span className="hidden md:inline">وجهتكم الأولى للرعاية الصحية المتقدمة في إسطنبول</span>
+                <span className="md:hidden">رعاية طبية موثوقة في إسطنبول</span>
+              </>
+            ) : locale === 'fr' ? (
+              <>
+                <span className="hidden md:inline">Votre Destination d’Excellence Médicale à Istanbul</span>
+                <span className="md:hidden">Soins d’Élite à Istanbul</span>
+              </>
+            ) : (
+              <>
+                <span className="hidden md:inline">Your Premier Destination for JCI Healthcare in Istanbul</span>
+                <span className="md:hidden">Trusted Care in Istanbul</span>
+              </>
+            )}
           </span>
         </motion.div>
 
@@ -96,28 +107,52 @@ export function LuxuryCinemaHero({ locale = 'ar' }: { locale?: 'ar' | 'fr' | 'en
           initial={{ opacity: 0, y: 22 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ type: 'spring', stiffness: 320, damping: 28, delay: 0.06 }}
-          className="mx-auto max-w-4xl text-4xl font-black leading-[1.18] tracking-tight text-balance sm:text-5xl lg:text-6xl"
+          className="mx-auto max-w-4xl text-3xl font-black leading-[1.18] tracking-tight text-balance sm:text-5xl lg:text-6xl"
         >
           {locale === 'ar' ? (
             <>
-              أفضل المستشفيات وأشهر الأطباء في تركيا{' '}
-              <span className="bg-gradient-to-r from-sky-400 via-cyan-300 to-teal-300 bg-clip-text text-transparent">
-                لرعايتكم الصحية
-              </span>{' '}
-              بأحدث الاعتمادات العالمية
+              <span className="hidden md:inline">
+                أفضل المستشفيات وأشهر الأطباء في تركيا{' '}
+                <span className="bg-gradient-to-r from-sky-400 via-cyan-300 to-teal-300 bg-clip-text text-transparent">
+                  لرعايتكم الصحية
+                </span>{' '}
+                بأحدث الاعتمادات العالمية
+              </span>
+              <span className="md:hidden">
+                أفضل مستشفيات تركيا{' '}
+                <span className="bg-gradient-to-r from-sky-400 via-cyan-300 to-teal-300 bg-clip-text text-transparent">
+                  لرعايتكم الصحية
+                </span>
+              </span>
             </>
           ) : locale === 'fr' ? (
             <>
-              Les Meilleurs Hôpitaux & Chirurgiens de Turquie{' '}
-              <span className="bg-gradient-to-r from-sky-400 via-cyan-300 to-teal-300 bg-clip-text text-transparent">
-                Pour Votre Santé
+              <span className="hidden md:inline">
+                Les Meilleurs Hôpitaux & Chirurgiens de Turquie{' '}
+                <span className="bg-gradient-to-r from-sky-400 via-cyan-300 to-teal-300 bg-clip-text text-transparent">
+                  Pour Votre Santé
+                </span>
+              </span>
+              <span className="md:hidden">
+                Hôpitaux d’Élite en Turquie pour{' '}
+                <span className="bg-gradient-to-r from-sky-400 via-cyan-300 to-teal-300 bg-clip-text text-transparent">
+                  Votre Santé
+                </span>
               </span>
             </>
           ) : (
             <>
-              Turkey’s Premier JCI Hospitals & World-Renowned Surgeons{' '}
-              <span className="bg-gradient-to-r from-sky-400 via-cyan-300 to-teal-300 bg-clip-text text-transparent">
-                For Your Recovery
+              <span className="hidden md:inline">
+                Turkey’s Premier JCI Hospitals & World-Renowned Surgeons{' '}
+                <span className="bg-gradient-to-r from-sky-400 via-cyan-300 to-teal-300 bg-clip-text text-transparent">
+                  For Your Recovery
+                </span>
+              </span>
+              <span className="md:hidden">
+                Top Hospitals in Turkey for{' '}
+                <span className="bg-gradient-to-r from-sky-400 via-cyan-300 to-teal-300 bg-clip-text text-transparent">
+                  Your Care
+                </span>
               </span>
             </>
           )}
@@ -128,13 +163,36 @@ export function LuxuryCinemaHero({ locale = 'ar' }: { locale?: 'ar' | 'fr' | 'en
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ type: 'spring', stiffness: 320, damping: 28, delay: 0.12 }}
-          className="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-slate-300 sm:text-base text-pretty"
+          className="mx-auto mt-4 max-w-2xl text-xs sm:text-base leading-relaxed text-slate-300 text-pretty"
         >
-          {locale === 'ar'
-            ? 'نربطكم بأعلى المستشفيات المعتمدة دولياً (JCI) ونخبة الجراحين الاستشاريين في تركيا، مع مرافقة علاجية ولوجستية شاملة واستشارة مجانية فورية.'
-            : locale === 'fr'
-            ? 'Accédez aux centres hospitaliers accrédités JCI et aux professeurs les plus réputés d’Istanbul avec un accompagnement VIP 24/7.'
-            : 'Direct access to JCI-accredited hospitals and board-certified professors in Istanbul with full VIP logistics and free 24h medical evaluation.'}
+          {locale === 'ar' ? (
+            <>
+              <span className="hidden md:inline">
+                نربطكم بأعلى المستشفيات المعتمدة دولياً (JCI) ونخبة الجراحين الاستشاريين في تركيا، مع مرافقة علاجية ولوجستية شاملة واستشارة مجانية فورية.
+              </span>
+              <span className="md:hidden">
+                مستشفيات معتمدة دولياً (JCI) واستشارة مجانية فورية.
+              </span>
+            </>
+          ) : locale === 'fr' ? (
+            <>
+              <span className="hidden md:inline">
+                Accédez aux centres hospitaliers accrédités JCI et aux professeurs les plus réputés d’Istanbul avec un accompagnement VIP 24/7.
+              </span>
+              <span className="md:hidden">
+                Hôpitaux agréés JCI & consultation gratuite immédiate.
+              </span>
+            </>
+          ) : (
+            <>
+              <span className="hidden md:inline">
+                Direct access to JCI-accredited hospitals and board-certified professors in Istanbul with full VIP logistics and free 24h medical evaluation.
+              </span>
+              <span className="md:hidden">
+                JCI-accredited hospitals & instant free consultation.
+              </span>
+            </>
+          )}
         </motion.p>
 
         {/* INTERACTIVE GLASSMORPHIC SEARCH DOCK WITH SPECIALTY PILLS */}

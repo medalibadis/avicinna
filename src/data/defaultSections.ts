@@ -34,6 +34,10 @@ export interface SiteSectionsData {
     headlinePart2: { ar: string; en: string; fr: string };
     subtitle: { ar: string; en: string; fr: string };
     backgroundImage?: string;
+    mobileEyebrow?: { ar: string; en: string; fr: string };
+    mobileHeadlinePart1?: { ar: string; en: string; fr: string };
+    mobileHeadlineHighlight?: { ar: string; en: string; fr: string };
+    mobileSubtitle?: { ar: string; en: string; fr: string };
   };
   stats: {
     patientsCount: string;
@@ -98,6 +102,26 @@ export const defaultSections: SiteSectionsData = {
       fr: 'Nous vous relions aux centres hospitaliers accrédités JCI et aux chirurgiens les plus réputés de Turquie avec un accompagnement complet et une assistance 24/7.',
     },
     backgroundImage: '/images/hospitals/memorial-bahcelievler.jpg',
+    mobileEyebrow: {
+      ar: 'رعاية طبية موثوقة في إسطنبول',
+      en: 'Trusted Care in Istanbul',
+      fr: 'Soins d’Élite à Istanbul',
+    },
+    mobileHeadlinePart1: {
+      ar: 'أفضل مستشفيات تركيا',
+      en: 'Top Hospitals in Turkey for',
+      fr: 'Hôpitaux d’Élite en Turquie pour',
+    },
+    mobileHeadlineHighlight: {
+      ar: 'لرعايتكم الصحية',
+      en: 'Your Care',
+      fr: 'Votre Santé',
+    },
+    mobileSubtitle: {
+      ar: 'مستشفيات معتمدة دولياً (JCI) واستشارة مجانية فورية.',
+      en: 'JCI-accredited hospitals & instant free consultation.',
+      fr: 'Hôpitaux agréés JCI & consultation gratuite immédiate.',
+    },
   },
   stats: {
     patientsCount: '+2,500',
@@ -245,6 +269,22 @@ export function mergeSectionsWithDefaults(
       ...defaultSections.hero,
       ...(raw.hero || {}),
       backgroundImage: raw.hero?.backgroundImage?.trim() || defaultSections.hero.backgroundImage,
+      mobileEyebrow: {
+        ...defaultSections.hero.mobileEyebrow!,
+        ...(raw.hero?.mobileEyebrow || {}),
+      },
+      mobileHeadlinePart1: {
+        ...defaultSections.hero.mobileHeadlinePart1!,
+        ...(raw.hero?.mobileHeadlinePart1 || {}),
+      },
+      mobileHeadlineHighlight: {
+        ...defaultSections.hero.mobileHeadlineHighlight!,
+        ...(raw.hero?.mobileHeadlineHighlight || {}),
+      },
+      mobileSubtitle: {
+        ...defaultSections.hero.mobileSubtitle!,
+        ...(raw.hero?.mobileSubtitle || {}),
+      },
     },
     stats: {
       ...defaultSections.stats,
