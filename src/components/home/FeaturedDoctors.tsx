@@ -28,12 +28,12 @@ export const FeaturedDoctors: React.FC = () => {
       label: language === 'ar' ? 'جراحة العظام' : language === 'fr' ? 'Orthopédie' : 'Orthopedics',
     },
     {
-      slug: 'hair-transplant',
-      label: language === 'ar' ? 'زراعة الشعر' : language === 'fr' ? 'Greffe de Cheveux' : 'Hair Transplant',
+      slug: 'oncology',
+      label: language === 'ar' ? 'طب الأورام' : language === 'fr' ? 'Oncologie' : 'Oncology',
     },
     {
-      slug: 'dentistry',
-      label: language === 'ar' ? 'طب الأسنان' : language === 'fr' ? 'Dentisterie' : 'Dentistry',
+      slug: 'organ-transplant',
+      label: language === 'ar' ? 'زراعة الأعضاء' : language === 'fr' ? 'Greffe d’Organes' : 'Organ Transplant',
     },
   ];
 

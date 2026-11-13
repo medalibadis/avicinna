@@ -14,12 +14,12 @@ const metaByLang: Record<Locale, { title: string; description: string }> = {
   fr: {
     title: 'Traitements Médicaux & Spécialités Chirurgicales en Turquie | AVICINNA',
     description:
-      'Découvrez nos pôles d’excellence à Istanbul : chirurgie cardiaque, neurochirurgie, oncologie, orthopédie, greffes et soins dentaires certifiés JCI.',
+      'Découvrez nos pôles d’excellence à Istanbul : chirurgie cardiaque, neurochirurgie, oncologie, orthopédie, greffes d’organes et bilans de santé complets certifiés JCI.',
   },
   en: {
     title: 'Medical Treatments & Accredited Surgical Specialties in Turkey | AVICINNA',
     description:
-      'Explore specialized medical departments at Turkey’s JCI hospitals: cardiac surgery, neurosurgery, oncology, orthopedics, transplants, and dentistry.',
+      'Explore specialized medical departments at Turkey’s JCI hospitals: cardiac surgery, neurosurgery, oncology, orthopedics, organ transplants, and advanced check-ups.',
   },
 };
 

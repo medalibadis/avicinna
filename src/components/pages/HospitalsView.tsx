@@ -582,28 +582,28 @@ function HospitalsPageContent() {
                     {language === 'ar' ? 'جراحة الأعصاب' : language === 'fr' ? 'Neurochirurgie' : 'Neurosurgery'}
                   </button>
 
-                  {/* Hair Transplant */}
+                  {/* Cardiac Surgery */}
                   <button
-                    onClick={() => setSelectedSpecialty(selectedSpecialty === 'hair-transplant' ? 'all' : 'hair-transplant')}
+                    onClick={() => setSelectedSpecialty(selectedSpecialty === 'cardiac-surgery' ? 'all' : 'cardiac-surgery')}
                     className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer ${
-                      selectedSpecialty === 'hair-transplant'
+                      selectedSpecialty === 'cardiac-surgery'
                         ? 'bg-[#0097FB] text-white shadow-sm'
                         : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'
                     }`}
                   >
-                    {language === 'ar' ? 'زراعة الشعر' : language === 'fr' ? 'Greffe de Cheveux' : 'Hair Transplant'}
+                    {language === 'ar' ? 'جراحة القلب' : language === 'fr' ? 'Chirurgie Cardiaque' : 'Cardiology'}
                   </button>
 
-                  {/* Dentistry */}
+                  {/* Organ Transplant */}
                   <button
-                    onClick={() => setSelectedSpecialty(selectedSpecialty === 'dentistry' ? 'all' : 'dentistry')}
+                    onClick={() => setSelectedSpecialty(selectedSpecialty === 'organ-transplant' ? 'all' : 'organ-transplant')}
                     className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer ${
-                      selectedSpecialty === 'dentistry'
+                      selectedSpecialty === 'organ-transplant'
                         ? 'bg-[#0097FB] text-white shadow-sm'
                         : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'
                     }`}
                   >
-                    {language === 'ar' ? 'طب الأسنان' : language === 'fr' ? 'Dentisterie' : 'Dentistry'}
+                    {language === 'ar' ? 'زراعة الأعضاء' : language === 'fr' ? 'Greffe d’Organes' : 'Organ Transplant'}
                   </button>
                 </div>
               </div>

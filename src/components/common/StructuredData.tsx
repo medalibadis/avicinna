@@ -62,7 +62,7 @@ export const MedicalOrganizationSchema: React.FC<{ locale?: Locale }> = ({ local
           'Orthopedics',
           'Oncology',
           'PlasticSurgery',
-          'Dentistry',
+          'OrganTransplantation',
         ],
       },
       {

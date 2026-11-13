@@ -12,7 +12,7 @@ export const SpecialtiesGrid: React.FC = () => {
   const { treatments } = useData();
   const isRtl = direction === 'rtl';
 
-  const visibleTreatments = treatments.slice(0, 8);
+  const visibleTreatments = treatments.slice(0, 6);
 
   return (
     <section id="specialties" className="py-14 sm:py-20 bg-[#F4F7FA] dark:bg-[#0B1120] transition-colors duration-300">
@@ -30,8 +30,8 @@ export const SpecialtiesGrid: React.FC = () => {
           </p>
         </div>
 
-        {/* Multi-row Balanced Grid: 2x4 on Mobile & Tablet (no slider!), 4x2 (4|4) on Desktop */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 md:gap-6 mb-8 sm:mb-10">
+        {/* Multi-row Balanced Grid: 2x3 on Mobile & Tablet (2|2|2), 3x2 (3|3) on Desktop */}
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5 md:gap-6 mb-8 sm:mb-10">
           {visibleTreatments.map((treatment, idx) => (
             <div
               key={treatment.slug}
@@ -39,34 +39,28 @@ export const SpecialtiesGrid: React.FC = () => {
             >
               <Link
                 href={getLocalizedEntityPath('treatments', treatment, language)}
-                className={`group relative h-[215px] sm:h-[270px] ${
-                  idx < 4 ? 'lg:h-96' : 'lg:h-64'
-                } rounded-2xl sm:rounded-3xl overflow-hidden shadow-md hover:shadow-2xl hover:shadow-sky-500/20 transition-all duration-500 block border border-slate-100 dark:border-slate-800 hover:border-sky-400/60`}
+                className="group relative h-[215px] sm:h-[270px] lg:h-[340px] rounded-2xl sm:rounded-3xl overflow-hidden shadow-md hover:shadow-2xl hover:shadow-sky-500/20 transition-all duration-500 block border border-slate-100 dark:border-slate-800 hover:border-sky-400/60"
               >
                 <img
                   src={treatment.image}
                   alt={treatment.title[language]}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                  loading={idx < 4 ? 'eager' : 'lazy'}
+                  loading={idx < 3 ? 'eager' : 'lazy'}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#021838]/95 via-[#032654]/60 to-[#021838]/15" />
                 <div className="absolute inset-0 p-3 sm:p-5 md:p-6 flex flex-col justify-end text-white">
-                  {idx < 4 && (
-                    <span className="hidden sm:flex text-[11px] font-bold text-[#00BFFF] uppercase tracking-wider mb-1 items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                      AVICINNA CLINICAL
-                    </span>
-                  )}
+                  <span className="hidden sm:flex text-[11px] font-bold text-[#00BFFF] uppercase tracking-wider mb-1 items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                    AVICINNA CLINICAL
+                  </span>
                   <h3 className="text-sm sm:text-lg lg:text-xl font-bold mb-1.5 text-white leading-snug group-hover:text-[#00BFFF] transition-colors line-clamp-2">
                     {treatment.title[language]}
                   </h3>
-                  {idx < 4 && (
-                    <div className="hidden sm:block mb-3">
-                      <p className="line-clamp-2 text-xs text-slate-200/85 leading-relaxed">
-                        {treatment.shortDescription[language]}
-                      </p>
-                    </div>
-                  )}
+                  <div className="hidden sm:block mb-3">
+                    <p className="line-clamp-2 text-xs text-slate-200/85 leading-relaxed">
+                      {treatment.shortDescription[language]}
+                    </p>
+                  </div>
                   <div className="rounded-xl sm:rounded-2xl bg-white/12 backdrop-blur-md border border-white/15 px-2.5 py-1.5 sm:p-2.5">
                     <div className="flex items-center justify-between text-[10.5px] sm:text-[11px] font-semibold text-slate-200 gap-1">
                       <span className="hidden sm:inline text-emerald-300 font-bold">
