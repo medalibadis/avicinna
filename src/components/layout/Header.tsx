@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
@@ -23,6 +23,32 @@ export const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [servicesDropdownOpen, setServicesDropdownOpen] = useState(false);
+  const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleDropdownEnter = () => {
+    if (dropdownTimeoutRef.current) {
+      clearTimeout(dropdownTimeoutRef.current);
+      dropdownTimeoutRef.current = null;
+    }
+    setServicesDropdownOpen(true);
+  };
+
+  const handleDropdownLeave = () => {
+    if (dropdownTimeoutRef.current) {
+      clearTimeout(dropdownTimeoutRef.current);
+    }
+    dropdownTimeoutRef.current = setTimeout(() => {
+      setServicesDropdownOpen(false);
+    }, 250);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (dropdownTimeoutRef.current) {
+        clearTimeout(dropdownTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const { barePath } = stripLocalePrefix(pathname);
 
@@ -89,11 +115,12 @@ export const Header: React.FC = () => {
                     <div
                       key={link.bare}
                       className="relative"
-                      onMouseEnter={() => setServicesDropdownOpen(true)}
-                      onMouseLeave={() => setServicesDropdownOpen(false)}
+                      onMouseEnter={handleDropdownEnter}
+                      onMouseLeave={handleDropdownLeave}
                     >
                       <Link
                         href={link.href}
+                        onClick={() => setServicesDropdownOpen(false)}
                         className={`inline-flex items-center gap-1 px-3 2xl:px-4 py-1.5 2xl:py-2 rounded-full text-xs xl:text-[13px] 2xl:text-sm font-semibold whitespace-nowrap transition-all duration-200 select-none ${
                           isActive
                             ? 'bg-[#0097FB] text-white shadow-sm shadow-[#0097FB]/30 font-bold'
@@ -103,32 +130,42 @@ export const Header: React.FC = () => {
                         }`}
                       >
                         <span>{link.label}</span>
-                        <ChevronDown className="w-3.5 h-3.5 opacity-70" />
+                        <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${servicesDropdownOpen ? 'rotate-180 opacity-100 text-[#0097FB]' : 'opacity-70'}`} />
                       </Link>
 
                       {servicesDropdownOpen && (
-                        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-72 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800 p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-                          <div className="text-[11px] font-semibold uppercase tracking-wider text-[#64748B] dark:text-slate-400 px-3 py-1.5 border-b border-slate-100 dark:border-slate-800">
-                            {t.specialties.badge}
-                          </div>
-                          <div className="py-1 max-h-72 overflow-y-auto">
-                            {treatmentsData.map((item) => (
+                        <div
+                          className="absolute top-full left-1/2 -translate-x-1/2 pt-2 w-80 max-w-[90vw] z-50 animate-in fade-in slide-in-from-top-1 duration-150"
+                          onMouseEnter={handleDropdownEnter}
+                          onMouseLeave={handleDropdownLeave}
+                        >
+                          {/* Invisible hover bridge: covers the gap completely so mouse cursor never leaves hover zone */}
+                          <div className="absolute -top-3 left-0 right-0 h-4 bg-transparent pointer-events-auto" />
+                          <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800 p-2.5">
+                            <div className="text-[11px] font-semibold uppercase tracking-wider text-[#64748B] dark:text-slate-400 px-3 py-1.5 border-b border-slate-100 dark:border-slate-800">
+                              {t.specialties.badge}
+                            </div>
+                            <div className="py-1 max-h-80 overflow-y-auto">
+                              {treatmentsData.map((item) => (
+                                <Link
+                                  key={item.slug}
+                                  href={getLocalizedEntityPath('treatments', item, language)}
+                                  onClick={() => setServicesDropdownOpen(false)}
+                                  className="block px-3 py-2 rounded-xl text-xs xl:text-sm font-medium text-[#163B63] dark:text-slate-200 hover:bg-[#EAF6FF] dark:hover:bg-slate-800 hover:text-[#0097FB] dark:hover:text-sky-400 transition-colors whitespace-nowrap"
+                                >
+                                  {item.title[language]}
+                                </Link>
+                              ))}
+                            </div>
+                            <div className="border-t border-slate-100 dark:border-slate-800 p-1.5 mt-1">
                               <Link
-                                key={item.slug}
-                                href={getLocalizedEntityPath('treatments', item, language)}
-                                className="block px-3 py-2 rounded-xl text-xs xl:text-sm font-medium text-[#163B63] dark:text-slate-200 hover:bg-[#EAF6FF] dark:hover:bg-slate-800 hover:text-[#0097FB] dark:hover:text-sky-400 transition-colors"
+                                href={getLocalizedPath('/treatments', language)}
+                                onClick={() => setServicesDropdownOpen(false)}
+                                className="block text-center text-xs font-semibold text-[#0097FB] dark:text-sky-400 hover:text-[#032654] dark:hover:text-sky-300 py-1"
                               >
-                                {item.title[language]}
+                                {t.specialties.cta} →
                               </Link>
-                            ))}
-                          </div>
-                          <div className="border-t border-slate-100 dark:border-slate-800 p-1.5 mt-1">
-                            <Link
-                              href={getLocalizedPath('/treatments', language)}
-                              className="block text-center text-xs font-semibold text-[#0097FB] dark:text-sky-400 hover:text-[#032654] dark:hover:text-sky-300 py-1"
-                            >
-                              {t.specialties.cta} →
-                            </Link>
+                            </div>
                           </div>
                         </div>
                       )}
