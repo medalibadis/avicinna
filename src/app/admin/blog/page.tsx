@@ -91,7 +91,7 @@ const blogDict = {
     fieldAuthorRole: 'الصفة السريرية للكاتب *',
     fieldHospital: 'المستشفى الشريك المعتمد *',
     fieldImage: 'صورة غلاف المقال *',
-    seoSectionTitle: 'تهيئة محركات البحث ومعدل التحويل (Rank Math / Yoast SEO)',
+    seoSectionTitle: 'تهيئة محركات البحث ومعدل التحويل (Rank Math SEO)',
     focusKeyword: 'الكلمة المفتاحية المستهدفة (Focus Keyword)',
     seoTitle: 'عنوان السيو في جوجل (SEO Title)',
     seoDescription: 'الوصف الميتا لمحركات البحث (Meta Description)',
@@ -132,7 +132,7 @@ const blogDict = {
     fieldAuthorRole: 'Author Clinical Specialty *',
     fieldHospital: 'Accredited Partner Hospital *',
     fieldImage: 'Official Feature Cover Image *',
-    seoSectionTitle: 'SEO & Search Engine Optimization (Rank Math / Yoast)',
+    seoSectionTitle: 'SEO & Search Engine Optimization (Rank Math SEO)',
     focusKeyword: 'Focus Keyword',
     seoTitle: 'Custom Google SEO Title',
     seoDescription: 'Meta Description for Search Engines',
@@ -173,7 +173,7 @@ const blogDict = {
     fieldAuthorRole: 'Titre clinique de l’auteur *',
     fieldHospital: 'Hôpital partenaire accrédité *',
     fieldImage: 'Image de couverture officielle *',
-    seoSectionTitle: 'Optimisation Référencement & SEO (Rank Math / Yoast)',
+    seoSectionTitle: 'Optimisation Référencement & SEO (Rank Math SEO)',
     focusKeyword: 'Mot-clé cible (Focus Keyword)',
     seoTitle: 'Titre SEO pour Google',
     seoDescription: 'Meta Description pour les résultats de recherche',
@@ -724,10 +724,10 @@ export default function AdminBlogPage() {
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-xs font-bold uppercase tracking-wider text-teal-300">
                 {langKey === 'ar'
-                  ? 'محرك السيو الطبي المؤتمت (Rank Math & Yoast Studio)'
+                  ? 'محرك السيو الطبي المؤتمت (Rank Math SEO Studio)'
                   : langKey === 'fr'
-                  ? 'Moteur SEO Médical Automatisé (Rank Math & Yoast)'
-                  : 'Automated Medical SEO Studio (Rank Math & Yoast)'}
+                  ? 'Moteur SEO Médical Automatisé (Rank Math SEO)'
+                  : 'Automated Medical SEO Studio (Rank Math SEO)'}
               </span>
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
               <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/10 text-slate-200 border border-white/15">
@@ -1398,7 +1398,7 @@ export default function AdminBlogPage() {
                 onChangeSeo={setSeo}
               />
 
-              {/* Enterprise Rank Math / Yoast Medical SEO Studio */}
+              {/* Enterprise Rank Math Medical SEO Studio */}
               <ArticleSeoStudio
                 focusKeyword={focusKeyword}
                 setFocusKeyword={setFocusKeyword}
