@@ -1,54 +1,97 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { usePathname } from 'next/navigation';
 
 export type Theme = 'light' | 'dark';
 
 interface ThemeContextType {
   theme: Theme;
-  toggleTheme: () => void;
+  toggleTheme: (forced?: Theme) => void;
   setTheme: (t: Theme) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  // Website is strictly locked to Luxury Light mode across all viewports (mobile & desktop)
-  const [theme] = useState<Theme>('light');
+const THEME_STORAGE_KEY = 'avicinna_admin_theme';
 
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const [theme, setThemeState] = useState<Theme>('light');
+  const [mounted, setMounted] = useState(false);
+  const pathname = usePathname();
+  const isAdmin = pathname?.startsWith('/admin');
+
+  // Synchronize theme on mount and route change
   useEffect(() => {
-    // Strip any dark class from documentElement and body
+    setMounted(true);
+    if (typeof window === 'undefined') return;
+
+    try {
+      const saved = (localStorage.getItem(THEME_STORAGE_KEY) || localStorage.getItem('avicinna_theme')) as Theme | null;
+      if (isAdmin) {
+        if (saved === 'dark') {
+          setThemeState('dark');
+          document.documentElement.classList.add('dark');
+          document.body.classList.add('dark');
+        } else {
+          setThemeState('light');
+          document.documentElement.classList.remove('dark');
+          document.body.classList.remove('dark');
+        }
+      } else {
+        // Public website remains clean and luxury daylight mode
+        document.documentElement.classList.remove('dark');
+        document.body.classList.remove('dark');
+        setThemeState('light');
+      }
+    } catch {
+      // Ignore storage errors in restricted iframes/browsers
+    }
+  }, [isAdmin, pathname]);
+
+  const setTheme = useCallback((newTheme: Theme) => {
+    setThemeState(newTheme);
     if (typeof document !== 'undefined') {
-      document.documentElement.classList.remove('dark');
-      document.body.classList.remove('dark');
+      if (newTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+        document.body.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.body.classList.remove('dark');
+      }
       try {
-        localStorage.setItem('avicinna_theme', 'light');
+        localStorage.setItem(THEME_STORAGE_KEY, newTheme);
+        localStorage.setItem('avicinna_theme', newTheme);
       } catch {
-        // Ignore
+        // Ignore storage errors
       }
     }
   }, []);
 
-  const setTheme = (_t: Theme) => {
-    // Strictly enforced light mode
-    if (typeof document !== 'undefined') {
-      document.documentElement.classList.remove('dark');
-      document.body.classList.remove('dark');
-      try {
-        localStorage.setItem('avicinna_theme', 'light');
-      } catch {
-        // Ignore
+  const toggleTheme = useCallback((forced?: Theme) => {
+    setThemeState((currentTheme) => {
+      const nextTheme = forced ? forced : currentTheme === 'dark' ? 'light' : 'dark';
+      if (typeof document !== 'undefined') {
+        if (nextTheme === 'dark') {
+          document.documentElement.classList.add('dark');
+          document.body.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+          document.body.classList.remove('dark');
+        }
+        try {
+          localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+          localStorage.setItem('avicinna_theme', nextTheme);
+        } catch {
+          // Ignore storage errors
+        }
       }
-    }
-  };
-
-  const toggleTheme = () => {
-    // Night mode removed across mobile and desktop per client request
-    setTheme('light');
-  };
+      return nextTheme;
+    });
+  }, []);
 
   return (
-    <ThemeContext.Provider value={{ theme: 'light', toggleTheme, setTheme }}>
+    <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>
       {children}
     </ThemeContext.Provider>
   );

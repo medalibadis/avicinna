@@ -91,9 +91,25 @@
   --accent-border: rgba(245, 158, 11, 0.25);
 }
 
-/* Force Luxury Light globally across all viewports (mobile & desktop) */
-html, body, html.dark, body.dark, .dark {
-  color-scheme: light !important;
+html, body {
+  color-scheme: light;
+}
+
+html.dark, body.dark, .dark {
+  color-scheme: dark !important;
+}
+
+/* Circular View Transition for Liquid Theme Reveal */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-old(root) {
+  z-index: 1;
+}
+::view-transition-new(root) {
+  z-index: 9999;
 }
 
 .dark[data-accent="ocean"] {
